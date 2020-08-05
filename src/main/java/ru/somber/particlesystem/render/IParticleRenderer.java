@@ -1,5 +1,7 @@
 package ru.somber.particlesystem.render;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import ru.somber.particlesystem.particle.IParticle;
 
 import java.util.List;
@@ -9,6 +11,7 @@ import java.util.List;
  * <p>
  * Определяя методы данного интерфейса, можно задавать различные способы отрисовки частиц.
  */
+@SideOnly(Side.CLIENT)
 public interface IParticleRenderer {
 
     /**

@@ -1,5 +1,7 @@
 package ru.somber.particlesystem.render;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
@@ -14,12 +16,12 @@ import ru.somber.particlesystem.particle.IParticle;
 
 import java.util.List;
 
-public class TessellatorParticleRenderer implements IParticleRenderer {
-    private List<IParticle> particleList;
+@SideOnly(Side.CLIENT)
+public class TessellatorParticleRenderer extends AbstractParticleRenderer {
 
     @Override
-    public void preRender(final List<IParticle> particleList) {
-        this.particleList = particleList;
+    public void preRender(List<IParticle> particleList) {
+        super.preRender(particleList);
 
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glEnable(GL11.GL_BLEND);
@@ -30,13 +32,15 @@ public class TessellatorParticleRenderer implements IParticleRenderer {
     }
 
     @Override
-    public void render(final float interpolationFactor) {
+    public void render(float interpolationFactor) {
+        super.render(interpolationFactor);
+
         this.particleList.forEach(particle -> this.renderParticle(particle, interpolationFactor));
     }
 
     @Override
     public void postRender() {
-        this.particleList = null;
+        super.postRender();
 
         GL11.glPopAttrib();
 
@@ -44,7 +48,7 @@ public class TessellatorParticleRenderer implements IParticleRenderer {
         GL11.glEnable(GL11.GL_CULL_FACE);
     }
 
-    private void renderParticle(final IParticle particle, final float interpolationFactor) {
+    private void renderParticle(IParticle particle, float interpolationFactor) {
         final Tessellator tessellator = Tessellator.instance;
         final Minecraft minecraft = Minecraft.getMinecraft();
         final EntityPlayer player = minecraft.thePlayer;
@@ -76,7 +80,7 @@ public class TessellatorParticleRenderer implements IParticleRenderer {
         GL11.glPopMatrix();
     }
 
-    private void applyParticleTransform(final IParticle particle, final Vector3f particleToCamera) {
+    private void applyParticleTransform(IParticle particle, Vector3f particleToCamera) {
         particleToCamera.negate();
 
         if (particle.rotateAxis() != Axis.NONE_AXIS) {
