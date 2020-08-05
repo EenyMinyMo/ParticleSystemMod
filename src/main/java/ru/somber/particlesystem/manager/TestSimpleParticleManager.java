@@ -54,6 +54,7 @@ public class TestSimpleParticleManager implements IParticleManager {
             throw new RuntimeException("ParticleContainer or ParticleRenderer is null.");
         }
 
+        particleComparator.setEntity(Minecraft.getMinecraft().thePlayer);
         particleComparator.setInterpolationFactor(interpolationFactor);
 
         particleContainer.sort(particleComparator);
