@@ -8,14 +8,14 @@ import ru.somber.particlesystem.render.IParticleRenderer;
 
 import java.util.List;
 
-public class TestSimpleParticleManager implements IParticleManager {
+public class TestParticleManager implements IParticleManager {
 
     private ParticleComparator particleComparator;
 
     private IParticleContainer particleContainer;
     private IParticleRenderer particleRenderer;
 
-    public TestSimpleParticleManager() {
+    public TestParticleManager() {
         particleComparator = new ParticleComparator(Minecraft.getMinecraft().thePlayer, 0);
     }
 

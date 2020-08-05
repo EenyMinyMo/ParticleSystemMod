@@ -4,7 +4,7 @@ import ru.somber.particlesystem.particle.IParticle;
 
 import java.util.List;
 
-public class TestSimpleParticleRenderer implements IParticleRenderer {
+public abstract class AbstractParticleRenderer implements IParticleRenderer {
     private List<IParticle> particleList;
 
     @Override

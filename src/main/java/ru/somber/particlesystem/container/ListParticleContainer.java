@@ -6,12 +6,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class TestSimpleParticleContainer implements IParticleContainer {
-
+public class ListParticleContainer implements IParticleContainer {
     private List<IParticle> particleList;
 
 
-    public TestSimpleParticleContainer() {
+    public ListParticleContainer() {
         this.particleList = new ArrayList<>(500);
     }
 
