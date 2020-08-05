@@ -3,6 +3,7 @@
 /build/*
 /eclipse/*
 /gradle/*
+/src/main/java/test/*
 
 #files
 /gradlew.bat

@@ -10,11 +10,13 @@ import java.util.List;
 
 public class TestSimpleParticleManager implements IParticleManager {
 
+    private ParticleComparator particleComparator;
+
     private IParticleContainer particleContainer;
     private IParticleRenderer particleRenderer;
 
     public TestSimpleParticleManager() {
-
+        particleComparator = new ParticleComparator(Minecraft.getMinecraft().thePlayer, 0);
     }
 
     @Override
@@ -52,7 +54,8 @@ public class TestSimpleParticleManager implements IParticleManager {
             throw new RuntimeException("ParticleContainer or ParticleRenderer is null.");
         }
 
-        ParticleComparator particleComparator = new ParticleComparator(Minecraft.getMinecraft().thePlayer, interpolationFactor);
+        particleComparator.setInterpolationFactor(interpolationFactor);
+
         particleContainer.sort(particleComparator);
         List<IParticle> particleForRenderList = particleContainer.getParticleList();
 

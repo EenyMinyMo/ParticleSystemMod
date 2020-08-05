@@ -17,6 +17,21 @@ public class ParticleComparator implements Comparator<IParticle> {
         this.interpolationFactor = interpolationFactor;
     }
 
+    public Entity getEntity() {
+        return entity;
+    }
+
+    public float getInterpolationFactor() {
+        return interpolationFactor;
+    }
+
+    public void setEntity(Entity entity) {
+        this.entity = entity;
+    }
+
+    public void setInterpolationFactor(float interpolationFactor) {
+        this.interpolationFactor = interpolationFactor;
+    }
 
     @Override
     public int compare(IParticle o1, IParticle o2) {

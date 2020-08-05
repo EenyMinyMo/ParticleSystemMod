@@ -2,12 +2,13 @@ package ru.somber.particlesystem;
 
 import ru.somber.particlesystem.manager.IParticleManager;
 
-import java.util.*;
+import java.util.TreeMap;
 
 public final class ParticleAPI {
     private static ParticleAPI instance;
 
     private TreeMap<Integer, IParticleManager> particleManagerMap;
+
 
     private ParticleAPI() {
         particleManagerMap = new TreeMap<>();
