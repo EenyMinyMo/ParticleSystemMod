@@ -44,6 +44,31 @@ public abstract class AbstractUniversalParticle extends AbstractParticle {
         return rotateAxis;
     }
 
+    @Override
+    public void computeNormalVector(Vector3f destination, float xCamera, float yCamera, float zCamera, Vector3f particlePosition) {
+        if (rotateAxis() == Axis.NONE_AXIS) {
+            destination.x = 0;
+            destination.y = 0;
+            destination.z = 1;
+        } else if (rotateAxis() == Axis.ALL_AXIS) {
+            destination.x = particlePosition.x - xCamera;
+            destination.y = particlePosition.y - yCamera;
+            destination.z = particlePosition.z - zCamera;
+        } else if (rotateAxis() == Axis.ABSCISSA_AXIS) {
+            destination.x = 0;
+            destination.y = particlePosition.y - yCamera;
+            destination.z = particlePosition.z - zCamera;
+        } else if (rotateAxis() == Axis.ORDINATE_AXIS) {
+            destination.x = particlePosition.x - xCamera;
+            destination.y = 0;
+            destination.z = particlePosition.z - zCamera;
+        } else if (rotateAxis() == Axis.APPLICATE_AXIS) {
+            destination.x = particlePosition.x - xCamera;
+            destination.y = particlePosition.y - yCamera;
+            destination.z = 0;
+        }
+    }
+
 
     public abstract void update();
 

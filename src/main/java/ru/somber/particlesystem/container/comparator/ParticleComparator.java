@@ -10,11 +10,20 @@ import java.util.Comparator;
 public class ParticleComparator implements Comparator<IParticle> {
     private Entity entity;
     private float interpolationFactor;
+    /**
+     * Векторы вынесены в переменные объекта, чтобы постоянное не создавать их в методе compare.
+     * Крч так лучше для скорости выполнения.
+     */
+    private Vector3f entityPos, pos1, pos2;
 
 
     public ParticleComparator(Entity entity, float interpolationFactor) {
         this.entity = entity;
         this.interpolationFactor = interpolationFactor;
+
+        entityPos = new Vector3f();
+        pos1 = new Vector3f();
+        pos2 = new Vector3f();
     }
 
     public Entity getEntity() {
@@ -34,13 +43,13 @@ public class ParticleComparator implements Comparator<IParticle> {
     }
 
     @Override
-    public int compare(IParticle o1, IParticle o2) {
-        Vector3f pos1 = o1.getInterpolatedPosition(interpolationFactor);
-        Vector3f pos2 = o2.getInterpolatedPosition(interpolationFactor);
-        Vector3f entityPos = SomberUtils.interpolateMove(entity, interpolationFactor);
+    public int compare(IParticle p1, IParticle p2) {
+        p1.computeInterpolatedPosition(pos1, interpolationFactor);
+        p2.computeInterpolatedPosition(pos2, interpolationFactor);
+        SomberUtils.interpolateMove(entityPos, entity, interpolationFactor);
 
-        pos1 = Vector3f.sub(entityPos, pos1, pos1);
-        pos2 = Vector3f.sub(entityPos, pos2, pos2);
+        Vector3f.sub(entityPos, pos1, pos1);
+        Vector3f.sub(entityPos, pos2, pos2);
 
         float len1 = pos1.lengthSquared();
         float len2 = pos2.lengthSquared();
@@ -53,4 +62,5 @@ public class ParticleComparator implements Comparator<IParticle> {
             return -1;
         }
     }
+
 }

@@ -27,6 +27,13 @@ public abstract class AbstractCylindricalParticle extends AbstractParticle {
         return Axis.ORDINATE_AXIS;
     }
 
+    @Override
+    public void computeNormalVector(Vector3f destination, float xCamera, float yCamera, float zCamera, Vector3f particlePosition) {
+        destination.x = particlePosition.x - xCamera;
+        destination.y = 0;
+        destination.z = particlePosition.z - zCamera;
+    }
+
 
     public abstract void update();
 

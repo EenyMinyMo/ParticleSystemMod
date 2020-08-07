@@ -27,6 +27,13 @@ public abstract class AbstractStaticParticle extends AbstractParticle {
         return Axis.NONE_AXIS;
     }
 
+    @Override
+    public void computeNormalVector(Vector3f destination, float xCamera, float yCamera, float zCamera, Vector3f particlePosition) {
+        destination.x = 0;
+        destination.y = 0;
+        destination.z = 1;
+    }
+
 
     public abstract void update();
 

@@ -2,7 +2,7 @@
 
 layout (location = 0) in vec3 particlePosition;
 layout (location = 1) in vec3 particleLocalAngles;
-layout (location = 2) in vec2 particleTextureCoord;
+layout (location = 2) in vec3 particleLookAt;
 layout (location = 3) in vec4 particleAttribute;
 layout (location = 4) in vec3 particleCenterPosition;
 
@@ -25,9 +25,9 @@ mat4 modelTranformMat;
 и переносом в позицию частицы.
 */
 void computeModelTranformMat() {
-    vec3 lookAtParticle = cameraPosition - particleCenterPosition;
+    vec3 translatePosition = particleCenterPosition - cameraPosition;
 
-    vec3 forward = normalize(lookAtParticle);
+    vec3 forward = normalize(particleLookAt);
     vec3 up = vec3(0, 1, 0);
     vec3 left = cross(up, forward);
     up = cross(forward, left);
@@ -35,21 +35,23 @@ void computeModelTranformMat() {
     //Устанавливаем новый базис для матрицы трансформации.
     //строка здесь - столбец для матрицы на самом деле.
     modelTranformMat = mat4(
-    left.x,              left.y,             left.z,            0,
-    up.x,                up.y,               up.z,              0,
-    forward.x,           forward.y,          forward.z,         0,
-    -lookAtParticle.x,  -lookAtParticle.y,  -lookAtParticle.z,  1
+    left.x,                 left.y,                 left.z,                 0,
+    up.x,                   up.y,                   up.z,                   0,
+    forward.x,              forward.y,              forward.z,              0,
+    -translatePosition.x,   -translatePosition.y,   -translatePosition.z,   1
     );
 }
 
 void main() {
-    texCoord = particleTextureCoord;
-    alpha = particleAttribute.x;
-    light = particleAttribute.y;
-
-    vec2 halfSizes = particleAttribute.zw;
-    particlePosition.x *= halfSizes.x;
-    particlePosition.y *= halfSizes.y;
+    /*
+    particleAttribute совмещает в себе текстурные координаты частицы (0 и 1 компонента),
+    коэффициент альфы частицы (3я компонента),
+    коэффициент освещенности (4ая компонента).
+    Так сделано для уменьшения количества входных типов данных вершины.
+    */
+    texCoord = particleAttribute.xy;
+    alpha = particleAttribute.z;
+    light = particleAttribute.w;
 
     gl_Position = projectionAndCameraMatrix * modelTranformMat * vec4(particlePosition, 1);
 }

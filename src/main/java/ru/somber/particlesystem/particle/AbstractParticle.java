@@ -122,12 +122,12 @@ public abstract class AbstractParticle implements IParticle {
     }
 
     @Override
-    public Vector3f getInterpolatedPosition(float interpolationFactor) {
+    public void computeInterpolatedPosition(Vector3f destination, float interpolationFactor) {
         float x = oldPosition.getX() + (newPosition.getX() - oldPosition.getX()) * interpolationFactor;
         float y = oldPosition.getY() + (newPosition.getY() - oldPosition.getY()) * interpolationFactor;
         float z = oldPosition.getZ() + (newPosition.getZ() - oldPosition.getZ()) * interpolationFactor;
 
-        return new Vector3f(x, y, z);
+        destination.set(x, y, z);
     }
 
     @Override
@@ -175,8 +175,18 @@ public abstract class AbstractParticle implements IParticle {
         return getLifeTime() >= getMaxLifeTime();
     }
 
+    @Override
+    public void computeNormalVector(Vector3f destination, float xCamera, float yCamera, float zCamera, float interpolateFactor) {
+        Vector3f interpolatePosition = new Vector3f();
+        computeInterpolatedPosition(interpolatePosition, interpolateFactor);
+
+        computeNormalVector(destination, xCamera, yCamera, zCamera, interpolatePosition);
+    }
+
 
     public abstract Axis rotateAxis();
+
+    public abstract void computeNormalVector(Vector3f destination, float xCamera, float yCamera, float zCamera, Vector3f particlePosition);
 
     public abstract void update();
 

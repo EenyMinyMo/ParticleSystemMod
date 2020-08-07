@@ -27,6 +27,13 @@ public abstract class AbstractSphericalParticle extends AbstractParticle {
         return Axis.ALL_AXIS;
     }
 
+    @Override
+    public void computeNormalVector(Vector3f destination, float xCamera, float yCamera, float zCamera, Vector3f particlePosition) {
+        destination.x = particlePosition.x - xCamera;
+        destination.y = particlePosition.y - yCamera;
+        destination.z = particlePosition.z - zCamera;
+    }
+
 
     public abstract void update();
 

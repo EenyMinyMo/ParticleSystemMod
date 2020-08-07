@@ -19,10 +19,15 @@ import java.util.List;
 @SideOnly(Side.CLIENT)
 public class TessellatorParticleRenderer extends AbstractParticleRenderer {
 
-    @Override
-    public void preRender(List<IParticle> particleList) {
-        super.preRender(particleList);
+    /** Вынесено в переменные объекта, чтобы постоянное не создавать в методе. */
+    private Vector3f particleToCamera;
 
+    public TessellatorParticleRenderer() {
+        particleToCamera = new Vector3f();
+    }
+
+    @Override
+    public void preRender(List<IParticle> particleList, float interpolationFactor) {
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glDisable(GL11.GL_CULL_FACE);
@@ -32,14 +37,12 @@ public class TessellatorParticleRenderer extends AbstractParticleRenderer {
     }
 
     @Override
-    public void render(float interpolationFactor) {
-        this.getParticleList().forEach(particle -> this.renderParticle(particle, interpolationFactor));
+    public void render(List<IParticle> particleList, float interpolationFactor) {
+        particleList.forEach(particle -> this.renderParticle(particle, interpolationFactor));
     }
 
     @Override
-    public void postRender() {
-        super.postRender();
-
+    public void postRender(List<IParticle> particleList, float interpolationFactor) {
         GL11.glPopAttrib();
 
         GL11.glDisable(GL11.GL_BLEND);
@@ -52,11 +55,11 @@ public class TessellatorParticleRenderer extends AbstractParticleRenderer {
     }
 
     private void renderParticle(IParticle particle, float interpolationFactor) {
-        final Tessellator tessellator = Tessellator.instance;
-        final Minecraft minecraft = Minecraft.getMinecraft();
-        final EntityPlayer player = minecraft.thePlayer;
+        Tessellator tessellator = Tessellator.instance;
+        Minecraft minecraft = Minecraft.getMinecraft();
+        EntityPlayer player = minecraft.thePlayer;
 
-        final Vector3f particleToCamera = particle.getInterpolatedPosition(interpolationFactor);
+        particle.computeInterpolatedPosition(particleToCamera, interpolationFactor);
         particleToCamera.translate(-SomberUtils.interpolateMoveX((Entity)player, interpolationFactor), -SomberUtils.interpolateMoveY((Entity)player, interpolationFactor), -SomberUtils.interpolateMoveZ((Entity)player, interpolationFactor));
 
         final Vector2f halfSizes = particle.getHalfSizes();

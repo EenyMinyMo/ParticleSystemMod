@@ -59,10 +59,9 @@ public class TestParticleManager implements IParticleManager {
         particleComparator.setInterpolationFactor(interpolationFactor);
 
         particleContainer.sort(particleComparator);
-        List<IParticle> particleForRenderList = particleContainer.getParticleList();
 
-        particleRenderer.preRender(particleForRenderList);
-        particleRenderer.render(interpolationFactor);
-        particleRenderer.postRender();
+        particleRenderer.preRender(particleContainer.getParticleList(), interpolationFactor);
+        particleRenderer.render(particleContainer.getParticleList(), interpolationFactor);
+        particleRenderer.postRender(particleContainer.getParticleList(), interpolationFactor);
     }
 }

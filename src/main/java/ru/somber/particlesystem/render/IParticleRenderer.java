@@ -22,14 +22,14 @@ public interface IParticleRenderer {
      * Отрисовка частиц происходит в том порядке, в каком частицы идут в списке.
      * Для прозрачных частиц этот список должен быть уже отсортированным от дальнего к ближнему к началу отрисовки.
      */
-    void preRender(List<IParticle> particleList);
+    void preRender(List<IParticle> particleList, float interpolationFactor);
 
     /**
      * Непосредственно отрисовка частиц.
      * <p>
      * Частицы отрисовываются из списка, переданного в параметрах метода {@code preRender(List<IParticle>)}.
      */
-    void render( float interpolationFactor);
+    void render(List<IParticle> particleList, float interpolationFactor);
 
     /**
      * Вызывается после отрисовки частиц.
@@ -37,7 +37,7 @@ public interface IParticleRenderer {
      * Данный метод должен подчистить данные после отрисовки частиц
      * (допустим забиндить стандартный майнкрафтовский фреймбуфер, если тот менялся и т.д.).
      */
-    void postRender();
+    void postRender(List<IParticle> particleList, float interpolationFactor);
 
     /**
      * Вызывается после обновления частиц.
