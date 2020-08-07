@@ -33,9 +33,7 @@ public class TessellatorParticleRenderer extends AbstractParticleRenderer {
 
     @Override
     public void render(float interpolationFactor) {
-        super.render(interpolationFactor);
-
-        this.particleList.forEach(particle -> this.renderParticle(particle, interpolationFactor));
+        this.getParticleList().forEach(particle -> this.renderParticle(particle, interpolationFactor));
     }
 
     @Override
@@ -46,6 +44,11 @@ public class TessellatorParticleRenderer extends AbstractParticleRenderer {
 
         GL11.glDisable(GL11.GL_BLEND);
         GL11.glEnable(GL11.GL_CULL_FACE);
+    }
+
+    @Override
+    public void update(List<IParticle> particleList) {
+
     }
 
     private void renderParticle(IParticle particle, float interpolationFactor) {
@@ -82,12 +85,12 @@ public class TessellatorParticleRenderer extends AbstractParticleRenderer {
 
     private void applyParticleTransform(IParticle particle, Vector3f particleToCamera) {
         particleToCamera.negate();
+        Vector3f upAux = new Vector3f(0.0f, 0.0f, 1.0f);
 
         if (particle.rotateAxis() != Axis.NONE_AXIS) {
 
             if (particle.rotateAxis() == Axis.ALL_AXIS) {
-                final Vector3f upAux = new Vector3f(0.0f, 0.0f, 1.0f);
-                final Vector3f particleToCameraProj = new Vector3f(particleToCamera);
+                Vector3f particleToCameraProj = new Vector3f(particleToCamera);
                 particleToCameraProj.setY(0.0f);
 
                 particleToCamera.normalise();
@@ -109,7 +112,6 @@ public class TessellatorParticleRenderer extends AbstractParticleRenderer {
                     }
                 }
             } else {
-                final Vector3f upAux = new Vector3f(0.0f, 0.0f, 1.0f);
                 float angleCosine2 = 0.0f;
 
                 if (particle.rotateAxis() == Axis.ABSCISSA_AXIS) {
@@ -138,9 +140,10 @@ public class TessellatorParticleRenderer extends AbstractParticleRenderer {
             }
         }
 
-        final Vector3f rotateAngles = particle.getLocalRotateAngles();
+        Vector3f rotateAngles = particle.getLocalRotateAngles();
         GL11.glRotatef(rotateAngles.getX(), 1.0f, 0.0f, 0.0f);
         GL11.glRotatef(rotateAngles.getY(), 0.0f, 1.0f, 0.0f);
         GL11.glRotatef(rotateAngles.getZ(), 0.0f, 0.0f, 1.0f);
     }
+
 }

@@ -8,23 +8,26 @@ import java.util.List;
 
 @SideOnly(Side.CLIENT)
 public abstract class AbstractParticleRenderer implements IParticleRenderer {
-    protected List<IParticle> particleList;
+    private List<IParticle> particleList;
 
     @Override
-    public void preRender(final List<IParticle> particleList) {
+    public void preRender(List<IParticle> particleList) {
         this.particleList = particleList;
 
     }
 
-    @Override
-    public void render(final float interpolationFactor) {
-
-    }
+    public abstract void render(float interpolationFactor);
 
     @Override
     public void postRender() {
         this.particleList = null;
 
+    }
+
+    public abstract void update(List<IParticle> particleList);
+
+    public List<IParticle> getParticleList() {
+        return particleList;
     }
 
 }

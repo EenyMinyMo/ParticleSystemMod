@@ -41,11 +41,12 @@ public class TestParticleManager implements IParticleManager {
 
     @Override
     public void update() {
-        if (particleContainer == null) {
-            throw new RuntimeException("ParticleContainer is null.");
+        if (particleContainer == null || particleRenderer == null) {
+            throw new RuntimeException("ParticleContainer or ParticleRenderer is null.");
         }
 
         particleContainer.update();
+        particleRenderer.update(particleContainer.getParticleList());
     }
 
     @Override

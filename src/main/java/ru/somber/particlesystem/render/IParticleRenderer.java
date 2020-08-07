@@ -39,4 +39,12 @@ public interface IParticleRenderer {
      */
     void postRender();
 
+    /**
+     * Вызывается после обновления частиц.
+     * <p>
+     * Может использоваться для работы с данными частиц,
+     * т.к. между обновлениями данные частиц менятся не должны.
+     */
+    void update(List<IParticle> particleList);
+
 }
