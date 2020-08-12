@@ -58,7 +58,7 @@ public class TestParticleManager implements IParticleManager {
         particleComparator.setEntity(Minecraft.getMinecraft().thePlayer);
         particleComparator.setInterpolationFactor(interpolationFactor);
 
-        particleContainer.sort(particleComparator);
+        particleContainer.sort(particleComparator.reversed());
 
         particleRenderer.preRender(particleContainer.getParticleList(), interpolationFactor);
         particleRenderer.render(particleContainer.getParticleList(), interpolationFactor);
