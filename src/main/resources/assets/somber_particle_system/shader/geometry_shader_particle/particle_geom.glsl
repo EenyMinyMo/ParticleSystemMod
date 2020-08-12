@@ -1,30 +1,26 @@
 #version 330
 
-layout (location = 0) in vec2 particleVertPosition;
-layout (location = 1) in vec4 particleAttribute;
-layout (location = 2) in vec2 particleSideScales;
-layout (location = 3) in vec3 particleCenterPosition;
-layout (location = 4) in vec3 particleNormalVector;
-layout (location = 5) in vec3 particleLocalAngles;
+layout (points) in;
+layout (triangle_strip, max_vertices = 4) out;
 
 
 uniform vec3 cameraPosition;
 uniform mat4 projectionCameraMatrix;
 
 
-out vec2 texCoord;
-out float alpha;
-out float light;
+in vec2 particleAttrib[];
+in vec2 particleSScales[];
+in vec3 particleNormalVec[];
+in vec3 particleLocalAng[];
+in vec4 texCoordAABB[];
 
 
-/*
-Вычисляет матрицу трансформации модели.
-Матрица трансформации модели - по сути совмещенная матрица
-для поворота за вектором lookAtParticle (вектор направления частицы)
-и переносом в позицию частицы.
-*/
-mat4 computeModelTranformMat(vec3 particleCenterPos, vec3 particleNormalVec) {
-    vec3 translatePosition = particleCenterPos.xyz - cameraPosition.xyz;
+out vec2 particleAttribute;
+out vec2 textureCoord;
+
+
+mat4 computeModelTranformMat(vec3 particleCenterPos, vec3 particleNormalVec, vec3 cameraPos) {
+    vec3 translatePosition = particleCenterPos - cameraPos;
 
     vec3 forward = normalize(particleNormalVec);
     vec3 up = vec3(0, 1, 0);
@@ -68,18 +64,30 @@ mat4 computeLocalRotateMat(vec3 localAngles) {
 
 
 void main() {
-    mat4 modelTransformMat = computeModelTranformMat(particleCenterPosition, particleNormalVector);
-    mat4 localAnglesTransformMat = computeLocalRotateMat(particleLocalAngles);
+    vec3 pos = gl_in[0].gl_Position.xyz;
+    vec2 halfSideScales = particleSScales[0] * 0.5;
 
-    /*
-    particleAttribute совмещает в себе текстурные координаты частицы (0 и 1 компонента),
-    коэффициент альфы частицы (3я компонента),
-    коэффициент освещенности (4ая компонента).
-    Так сделано для уменьшения количества входных типов данных вершины.
-    */
-    texCoord = particleAttribute.xy;
-    alpha = particleAttribute.z;
-    light = particleAttribute.w;
+    mat4 modelTransformMat = computeModelTranformMat(pos, particleNormalVec[0], cameraPosition);
+    mat4 rotateMat = computeLocalRotateMat(particleLocalAng[0]);
+    mat4 commonTransformMat = projectionCameraMatrix * modelTransformMat * rotateMat;
 
-    gl_Position = projectionCameraMatrix * modelTransformMat * localAnglesTransformMat * vec4(particleVertPosition.x * particleSideScales.x, particleVertPosition.y * particleSideScales.y, 0, 1);
+    particleAttribute = vec2(particleAttrib[0]);
+
+    textureCoord = vec2(texCoordAABB[0].x, texCoordAABB[0].y);
+    gl_Position = commonTransformMat * vec4(- halfSideScales.x, - halfSideScales.y, 0, 1);
+    EmitVertex();
+
+    textureCoord = vec2(texCoordAABB[0].z, texCoordAABB[0].y);
+    gl_Position = commonTransformMat * vec4(halfSideScales.x, - halfSideScales.y, 0, 1);
+    EmitVertex();
+
+    textureCoord = vec2(texCoordAABB[0].x, texCoordAABB[0].w);
+    gl_Position = commonTransformMat * vec4(- halfSideScales.x, halfSideScales.y, 0, 1);
+    EmitVertex();
+
+    textureCoord = vec2(texCoordAABB[0].z, texCoordAABB[0].w);
+    gl_Position = commonTransformMat * vec4(halfSideScales.x, halfSideScales.y, 0, 1);
+    EmitVertex();
+
+    EndPrimitive();
 }

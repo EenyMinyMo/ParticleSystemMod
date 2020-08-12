@@ -12,4 +12,6 @@ void main() {
     vec4 texel = vec4(texture(particleTexture, texCoord).rgb * light, alpha);
 
     fragColor = texel;
+
+//    fragColor = vec4(1, 1, 1, 1);
 }

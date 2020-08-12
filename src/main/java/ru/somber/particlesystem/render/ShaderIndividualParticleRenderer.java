@@ -24,7 +24,7 @@ import java.nio.FloatBuffer;
 import java.util.List;
 
 @SideOnly(Side.CLIENT)
-public class ShaderParticleRenderer extends AbstractParticleRenderer {
+public class ShaderIndividualParticleRenderer extends AbstractParticleRenderer {
 
     private boolean isShaderInit;
 
@@ -32,6 +32,7 @@ public class ShaderParticleRenderer extends AbstractParticleRenderer {
             new ResourceLocation(ParticleSystemMod.MOD_ID, "shader/simple_shader_particle/particle_vert.glsl");
     private ResourceLocation fragmentShaderCodeLocation =
             new ResourceLocation(ParticleSystemMod.MOD_ID, "shader/simple_shader_particle/particle_frag.glsl");
+
 
     private ShaderProgram shaderProgram;
 
@@ -66,7 +67,7 @@ public class ShaderParticleRenderer extends AbstractParticleRenderer {
     private Vector3f particleCenterPosition, particleNormalVector;
 
 
-    public ShaderParticleRenderer() {
+    public ShaderIndividualParticleRenderer() {
         isShaderInit = false;
 
         buffer8 = BufferUtils.createFloatBuffer(8);
@@ -100,23 +101,22 @@ public class ShaderParticleRenderer extends AbstractParticleRenderer {
 
         GL20.glUseProgram(shaderProgram.getShaderProgramID());
 
-
         prepareUniforms();
-        prepareDataVBOs(particleList, interpolationFactor);
-
 
         VAO.bindVAO(vao);
 
-        BufferObject.bindNone(particlePositionVBO);
+        BufferObject.bindNone(particleCenterPositionVBO);
 
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
         Minecraft.getMinecraft().renderEngine.bindTexture(new ResourceLocation("minecraft:dynamic/lightMap_1"));
     }
 
     @Override
     public void render(List<IParticle> particleList, float interpolationFactor) {
-        GL11.glDrawArrays(GL11.GL_QUADS, 0, 4 * particleList.size());
+        for (IParticle particle : particleList) {
+            prepareDataVBOs(particle, interpolationFactor);
+
+            GL11.glDrawArrays(GL11.GL_QUADS, 0, 4);
+        }
     }
 
     @Override
@@ -277,42 +277,42 @@ public class ShaderParticleRenderer extends AbstractParticleRenderer {
         int countPrimitivePerBuffer;
 
         BufferObject.bindBuffer(particlePositionVBO);
-        countPrimitivePerBuffer = countParticles * 4 * 2;
+        countPrimitivePerBuffer = 4 * 2;
         BufferObject.bufferData(particlePositionVBO, countPrimitivePerBuffer * 4, GL15.GL_STREAM_DRAW);
         if (particlePositionBuffer == null || particlePositionBuffer.capacity() != countPrimitivePerBuffer) {
             particlePositionBuffer = BufferUtils.createFloatBuffer(countPrimitivePerBuffer);
         }
 
         BufferObject.bindBuffer(particleAttributeVBO);
-        countPrimitivePerBuffer = countParticles * 4 * 4;
+        countPrimitivePerBuffer = 4 * 4;
         BufferObject.bufferData(particleAttributeVBO, countPrimitivePerBuffer * 4, GL15.GL_STREAM_DRAW);
         if (particleAttributeBuffer == null || particleAttributeBuffer.capacity() != countPrimitivePerBuffer) {
             particleAttributeBuffer = BufferUtils.createFloatBuffer(countPrimitivePerBuffer);
         }
 
         BufferObject.bindBuffer(particleSideScalesVBO);
-        countPrimitivePerBuffer = countParticles * 2 * 4;
+        countPrimitivePerBuffer = 2 * 4;
         BufferObject.bufferData(particleSideScalesVBO, countPrimitivePerBuffer * 4, GL15.GL_STREAM_DRAW);
         if (particleSideScalesBuffer == null || particleSideScalesBuffer.capacity() != countPrimitivePerBuffer) {
             particleSideScalesBuffer = BufferUtils.createFloatBuffer(countPrimitivePerBuffer);
         }
 
         BufferObject.bindBuffer(particleCenterPositionVBO);
-        countPrimitivePerBuffer = countParticles * 3 * 4;
+        countPrimitivePerBuffer = 3 * 4;
         BufferObject.bufferData(particleCenterPositionVBO, countPrimitivePerBuffer * 4, GL15.GL_STREAM_DRAW);
         if (particleCenterPositionBuffer == null || particleCenterPositionBuffer.capacity() != countPrimitivePerBuffer) {
             particleCenterPositionBuffer = BufferUtils.createFloatBuffer(countPrimitivePerBuffer);
         }
 
         BufferObject.bindBuffer(particleNormalVectorVBO);
-        countPrimitivePerBuffer = countParticles * 3 * 4;
+        countPrimitivePerBuffer = 3 * 4;
         BufferObject.bufferData(particleNormalVectorVBO, countPrimitivePerBuffer * 4, GL15.GL_STREAM_DRAW);
         if (particleNormalVectorBuffer == null || particleNormalVectorBuffer.capacity() != countPrimitivePerBuffer) {
             particleNormalVectorBuffer = BufferUtils.createFloatBuffer(countPrimitivePerBuffer);
         }
 
         BufferObject.bindBuffer(particleLocalAnglesVBO);
-        countPrimitivePerBuffer = countParticles * 3 * 4;
+        countPrimitivePerBuffer = 3 * 4;
         BufferObject.bufferData(particleLocalAnglesVBO, countPrimitivePerBuffer * 4, GL15.GL_STREAM_DRAW);
         if (particleLocalAnglesBuffer == null || particleLocalAnglesBuffer.capacity() != countPrimitivePerBuffer) {
             particleLocalAnglesBuffer = BufferUtils.createFloatBuffer(countPrimitivePerBuffer);
@@ -322,73 +322,67 @@ public class ShaderParticleRenderer extends AbstractParticleRenderer {
         BufferObject.bindNone(particlePositionVBO);
     }
 
-    private void prepareDataVBOs(List<IParticle> particleList, float interpolationFactor) {
+    private void prepareDataVBOs(IParticle particle, float interpolationFactor) {
+        particle.computeInterpolatedPosition(particleCenterPosition, interpolationFactor);
+        particle.computeNormalVector(particleNormalVector, xCamera, yCamera, zCamera, particleCenterPosition);
+        Vector2f halfSizes = particle.getHalfSizes();
+        Vector3f localAngles = particle.getLocalRotateAngles();
+        TextureCoord texCoord = particle.getTextureCoord();
+        float alpha = particle.getAlpha();
+        float light = particle.getLight();
+
+
         particlePositionBuffer.clear();
-        particleAttributeBuffer.clear();
-        particleSideScalesBuffer.clear();
-        particleCenterPositionBuffer.clear();
-        particleNormalVectorBuffer.clear();
-        particleLocalAnglesBuffer.clear();
-
-
-        for (IParticle particle : particleList) {
-            particle.computeInterpolatedPosition(particleCenterPosition, interpolationFactor);
-            particle.computeNormalVector(particleNormalVector, xCamera, yCamera, zCamera, particleCenterPosition);
-            Vector2f halfSizes = particle.getHalfSizes();
-            Vector3f localAngles = particle.getLocalRotateAngles();
-            TextureCoord texCoord = particle.getTextureCoord();
-            float alpha = particle.getAlpha();
-            float light = particle.getLight();
-
-
-            particlePositionBuffer.put(-0.5F).put(-0.5F);
-            particlePositionBuffer.put(+0.5F).put(-0.5F);
-            particlePositionBuffer.put(+0.5F).put(+0.5F);
-            particlePositionBuffer.put(-0.5F).put(+0.5F);
-
-            particleAttributeBuffer.put(texCoord.getCoordX_0()).put(texCoord.getCoordY_0()).put(alpha).put(light);
-            particleAttributeBuffer.put(texCoord.getCoordX_1()).put(texCoord.getCoordY_1()).put(alpha).put(light);
-            particleAttributeBuffer.put(texCoord.getCoordX_2()).put(texCoord.getCoordY_2()).put(alpha).put(light);
-            particleAttributeBuffer.put(texCoord.getCoordX_3()).put(texCoord.getCoordY_3()).put(alpha).put(light);
-
-            particleSideScalesBuffer.put(halfSizes.getX()).put(halfSizes.getY());
-            particleSideScalesBuffer.put(halfSizes.getX()).put(halfSizes.getY());
-            particleSideScalesBuffer.put(halfSizes.getX()).put(halfSizes.getY());
-            particleSideScalesBuffer.put(halfSizes.getX()).put(halfSizes.getY());
-
-            particleCenterPositionBuffer.put(particleCenterPosition.getX()).put(particleCenterPosition.getY()).put(particleCenterPosition.getZ());
-            particleCenterPositionBuffer.put(particleCenterPosition.getX()).put(particleCenterPosition.getY()).put(particleCenterPosition.getZ());
-            particleCenterPositionBuffer.put(particleCenterPosition.getX()).put(particleCenterPosition.getY()).put(particleCenterPosition.getZ());
-            particleCenterPositionBuffer.put(particleCenterPosition.getX()).put(particleCenterPosition.getY()).put(particleCenterPosition.getZ());
-
-            particleNormalVectorBuffer.put(particleNormalVector.getX()).put(particleNormalVector.getY()).put(particleNormalVector.getZ());
-            particleNormalVectorBuffer.put(particleNormalVector.getX()).put(particleNormalVector.getY()).put(particleNormalVector.getZ());
-            particleNormalVectorBuffer.put(particleNormalVector.getX()).put(particleNormalVector.getY()).put(particleNormalVector.getZ());
-            particleNormalVectorBuffer.put(particleNormalVector.getX()).put(particleNormalVector.getY()).put(particleNormalVector.getZ());
-
-            particleLocalAnglesBuffer.put(localAngles.getX()).put(localAngles.getY()).put(localAngles.getZ());
-            particleLocalAnglesBuffer.put(localAngles.getX()).put(localAngles.getY()).put(localAngles.getZ());
-            particleLocalAnglesBuffer.put(localAngles.getX()).put(localAngles.getY()).put(localAngles.getZ());
-            particleLocalAnglesBuffer.put(localAngles.getX()).put(localAngles.getY()).put(localAngles.getZ());
-        }
-
-
+        particlePositionBuffer.put(-0.5F).put(-0.5F);
+        particlePositionBuffer.put(+0.5F).put(-0.5F);
+        particlePositionBuffer.put(+0.5F).put(+0.5F);
+        particlePositionBuffer.put(-0.5F).put(+0.5F);
         particlePositionBuffer.flip();
-        particleAttributeBuffer.flip();
+
+        particleSideScalesBuffer.clear();
+        particleSideScalesBuffer.put(halfSizes.getX()).put(halfSizes.getY());
+        particleSideScalesBuffer.put(halfSizes.getX()).put(halfSizes.getY());
+        particleSideScalesBuffer.put(halfSizes.getX()).put(halfSizes.getY());
+        particleSideScalesBuffer.put(halfSizes.getX()).put(halfSizes.getY());
         particleSideScalesBuffer.flip();
+
+        particleAttributeBuffer.clear();
+        particleAttributeBuffer.put(texCoord.getCoordX_0()).put(texCoord.getCoordY_0()).put(alpha).put(light);
+        particleAttributeBuffer.put(texCoord.getCoordX_1()).put(texCoord.getCoordY_1()).put(alpha).put(light);
+        particleAttributeBuffer.put(texCoord.getCoordX_2()).put(texCoord.getCoordY_2()).put(alpha).put(light);
+        particleAttributeBuffer.put(texCoord.getCoordX_3()).put(texCoord.getCoordY_3()).put(alpha).put(light);
+        particleAttributeBuffer.flip();
+
+        particleCenterPositionBuffer.clear();
+        particleCenterPositionBuffer.put(particleCenterPosition.getX()).put(particleCenterPosition.getY()).put(particleCenterPosition.getZ());
+        particleCenterPositionBuffer.put(particleCenterPosition.getX()).put(particleCenterPosition.getY()).put(particleCenterPosition.getZ());
+        particleCenterPositionBuffer.put(particleCenterPosition.getX()).put(particleCenterPosition.getY()).put(particleCenterPosition.getZ());
+        particleCenterPositionBuffer.put(particleCenterPosition.getX()).put(particleCenterPosition.getY()).put(particleCenterPosition.getZ());
         particleCenterPositionBuffer.flip();
+
+        particleNormalVectorBuffer.clear();
+        particleNormalVectorBuffer.put(particleNormalVector.getX()).put(particleNormalVector.getY()).put(particleNormalVector.getZ());
+        particleNormalVectorBuffer.put(particleNormalVector.getX()).put(particleNormalVector.getY()).put(particleNormalVector.getZ());
+        particleNormalVectorBuffer.put(particleNormalVector.getX()).put(particleNormalVector.getY()).put(particleNormalVector.getZ());
+        particleNormalVectorBuffer.put(particleNormalVector.getX()).put(particleNormalVector.getY()).put(particleNormalVector.getZ());
         particleNormalVectorBuffer.flip();
+
+        particleLocalAnglesBuffer.clear();
+        particleLocalAnglesBuffer.put(localAngles.getX()).put(localAngles.getY()).put(localAngles.getZ());
+        particleLocalAnglesBuffer.put(localAngles.getX()).put(localAngles.getY()).put(localAngles.getZ());
+        particleLocalAnglesBuffer.put(localAngles.getX()).put(localAngles.getY()).put(localAngles.getZ());
+        particleLocalAnglesBuffer.put(localAngles.getX()).put(localAngles.getY()).put(localAngles.getZ());
         particleLocalAnglesBuffer.flip();
 
 
         BufferObject.bindBuffer(particlePositionVBO);
         BufferObject.bufferSubData(particlePositionVBO, 0, particlePositionBuffer);
 
-        BufferObject.bindBuffer(particleAttributeVBO);
-        BufferObject.bufferSubData(particleAttributeVBO, 0, particleAttributeBuffer);
-
         BufferObject.bindBuffer(particleSideScalesVBO);
         BufferObject.bufferSubData(particleSideScalesVBO, 0, particleSideScalesBuffer);
+
+        BufferObject.bindBuffer(particleAttributeVBO);
+        BufferObject.bufferSubData(particleAttributeVBO, 0, particleAttributeBuffer);
 
         BufferObject.bindBuffer(particleCenterPositionVBO);
         BufferObject.bufferSubData(particleCenterPositionVBO, 0, particleCenterPositionBuffer);
@@ -419,3 +413,4 @@ public class ShaderParticleRenderer extends AbstractParticleRenderer {
     }
 
 }
+

@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import ru.somber.clientutil.opengl.texture.TextureCoord;
@@ -74,12 +75,12 @@ public class TessellatorParticleRenderer extends AbstractParticleRenderer {
 
         tessellator.startDrawingQuads();
         tessellator.setColorRGBA_F(1.0f, 1.0f, 1.0f, particle.getAlpha());
-        tessellator.setBrightness((int)(particle.getLight() * 240.0f));
+        tessellator.setBrightness((int) (particle.getLight() * 240.0f));
 
-        tessellator.addVertexWithUV(-halfSizes.getX(), -halfSizes.getY(), 0.0, textureCoord.getCoordX_0(), textureCoord.getCoordY_0());
-        tessellator.addVertexWithUV(halfSizes.getX(), -halfSizes.getY(), 0.0, textureCoord.getCoordX_1(), textureCoord.getCoordY_1());
-        tessellator.addVertexWithUV(halfSizes.getX(), halfSizes.getY(), 0.0, textureCoord.getCoordX_2(), textureCoord.getCoordY_2());
-        tessellator.addVertexWithUV(-halfSizes.getX(), halfSizes.getY(), 0.0, textureCoord.getCoordX_3(), textureCoord.getCoordY_3());
+        tessellator.addVertexWithUV(- (0.5F) * halfSizes.getX(), - (0.5F) * halfSizes.getY(), 0.0, textureCoord.getCoordX_0(), textureCoord.getCoordY_0());
+        tessellator.addVertexWithUV((0.5F) * halfSizes.getX(), - (0.5F) * halfSizes.getY(), 0.0, textureCoord.getCoordX_1(), textureCoord.getCoordY_1());
+        tessellator.addVertexWithUV((0.5F) * halfSizes.getX(), (0.5F) * halfSizes.getY(), 0.0, textureCoord.getCoordX_2(), textureCoord.getCoordY_2());
+        tessellator.addVertexWithUV(- (0.5F) * halfSizes.getX(), (0.5F) * halfSizes.getY(), 0.0, textureCoord.getCoordX_3(), textureCoord.getCoordY_3());
 
         tessellator.draw();
 
