@@ -6,7 +6,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import ru.somber.clientutil.opengl.texture.TextureCoord;
@@ -70,7 +72,8 @@ public class TessellatorParticleRenderer extends AbstractParticleRenderer {
 
         this.applyParticleTransform(particle, particleToCamera);
 
-        minecraft.renderEngine.bindTexture(particle.getTextureLocation());
+        GL13.glActiveTexture(GL13.GL_TEXTURE0);
+        Minecraft.getMinecraft().renderEngine.bindTexture(new ResourceLocation("minecraft:dynamic/lightMap_1"));
 
         tessellator.startDrawingQuads();
         tessellator.setColorRGBA_F(1.0f, 1.0f, 1.0f, particle.getAlpha());
@@ -144,9 +147,9 @@ public class TessellatorParticleRenderer extends AbstractParticleRenderer {
         }
 
         Vector3f rotateAngles = particle.getLocalRotateAngles();
-        GL11.glRotatef(rotateAngles.getX(), 1.0f, 0.0f, 0.0f);
-        GL11.glRotatef(rotateAngles.getY(), 0.0f, 1.0f, 0.0f);
-        GL11.glRotatef(rotateAngles.getZ(), 0.0f, 0.0f, 1.0f);
+        GL11.glRotatef((float) Math.toDegrees(rotateAngles.getX()), 1.0f, 0.0f, 0.0f);
+        GL11.glRotatef((float) Math.toDegrees(rotateAngles.getY()), 0.0f, 1.0f, 0.0f);
+        GL11.glRotatef((float) Math.toDegrees(rotateAngles.getZ()), 0.0f, 0.0f, 1.0f);
     }
 
 }
