@@ -15,7 +15,7 @@ void main() {
     float alpha = particleAttribute.x;
     float light = particleAttribute.y;
 
-    vec4 texel = vec4(texture(particleTexture, textureCoord).rgb * light, alpha);
+    vec4 texel = texture(particleTexture, textureCoord);
 
-    fragColor = texel;
+    fragColor = vec4(texel.rgb * light, texel.a * alpha);
 }

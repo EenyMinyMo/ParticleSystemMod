@@ -9,9 +9,8 @@ in float light;
 out vec4 fragColor;
 
 void main() {
-    vec4 texel = vec4(texture(particleTexture, texCoord).rgb * light, alpha);
-
-    fragColor = texel;
+    vec4 texel = texture(particleTexture, texCoord);
 
 //    fragColor = vec4(1, 1, 1, 1);
+    fragColor = vec4(texel.rgb * light, texel.a * alpha);
 }
