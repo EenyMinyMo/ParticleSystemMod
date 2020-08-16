@@ -8,14 +8,14 @@ uniform vec3 cameraPosition;
 uniform mat4 projectionCameraMatrix;
 
 
-in vec2 particleAttrib[];
+in vec4 particleColorFact[];
 in vec2 particleSScales[];
 in vec3 particleNormalVec[];
 in vec3 particleLocalAng[];
 in vec4 texCoordAABB[];
 
 
-out vec2 particleAttribute;
+out vec4 colorFactor;
 out vec2 textureCoord;
 
 
@@ -71,21 +71,21 @@ void main() {
     mat4 rotateMat = computeLocalRotateMat(particleLocalAng[0]);
     mat4 commonTransformMat = projectionCameraMatrix * modelTransformMat * rotateMat;
 
-    particleAttribute = vec2(particleAttrib[0]);
+    colorFactor = vec4(particleColorFact[0]);
 
-    textureCoord = vec2(texCoordAABB[0].x, texCoordAABB[0].y);
+    textureCoord = vec2(texCoordAABB[0].x - texCoordAABB[0].z, texCoordAABB[0].y - texCoordAABB[0].w);
     gl_Position = commonTransformMat * vec4(- halfSideScales.x, - halfSideScales.y, 0, 1);
     EmitVertex();
 
-    textureCoord = vec2(texCoordAABB[0].z, texCoordAABB[0].y);
+    textureCoord = vec2(texCoordAABB[0].x - texCoordAABB[0].z, texCoordAABB[0].y - texCoordAABB[0].w);
     gl_Position = commonTransformMat * vec4(halfSideScales.x, - halfSideScales.y, 0, 1);
     EmitVertex();
 
-    textureCoord = vec2(texCoordAABB[0].x, texCoordAABB[0].w);
+    textureCoord = vec2(texCoordAABB[0].x - texCoordAABB[0].z, texCoordAABB[0].y - texCoordAABB[0].w);
     gl_Position = commonTransformMat * vec4(- halfSideScales.x, halfSideScales.y, 0, 1);
     EmitVertex();
 
-    textureCoord = vec2(texCoordAABB[0].z, texCoordAABB[0].w);
+    textureCoord = vec2(texCoordAABB[0].x - texCoordAABB[0].z, texCoordAABB[0].y - texCoordAABB[0].w);
     gl_Position = commonTransformMat * vec4(halfSideScales.x, halfSideScales.y, 0, 1);
     EmitVertex();
 

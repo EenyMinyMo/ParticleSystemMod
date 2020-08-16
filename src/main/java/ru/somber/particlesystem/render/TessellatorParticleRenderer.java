@@ -11,7 +11,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
-import ru.somber.clientutil.opengl.texture.TextureCoord;
+import ru.somber.clientutil.opengl.texture.TextureCoordAABB;
 import ru.somber.commonutil.Axis;
 import ru.somber.commonutil.SomberUtils;
 import ru.somber.particlesystem.particle.IParticle;
@@ -62,10 +62,10 @@ public class TessellatorParticleRenderer extends AbstractParticleRenderer {
         EntityPlayer player = minecraft.thePlayer;
 
         particle.computeInterpolatedPosition(particleToCamera, interpolationFactor);
-        particleToCamera.translate(-SomberUtils.interpolateMoveX((Entity)player, interpolationFactor), -SomberUtils.interpolateMoveY((Entity)player, interpolationFactor), -SomberUtils.interpolateMoveZ((Entity)player, interpolationFactor));
+        particleToCamera.translate(-SomberUtils.interpolateMoveX(player, interpolationFactor), -SomberUtils.interpolateMoveY((Entity)player, interpolationFactor), -SomberUtils.interpolateMoveZ((Entity)player, interpolationFactor));
 
         final Vector2f halfSizes = particle.getHalfSizes();
-        final TextureCoord textureCoord = particle.getTextureCoord();
+        final TextureCoordAABB textureCoordAABB = particle.getTextureCoordAABB();
 
         GL11.glPushMatrix();
         GL11.glTranslatef(particleToCamera.getX(), particleToCamera.getY(), particleToCamera.getZ());
@@ -76,13 +76,13 @@ public class TessellatorParticleRenderer extends AbstractParticleRenderer {
         Minecraft.getMinecraft().renderEngine.bindTexture(new ResourceLocation("minecraft:dynamic/lightMap_1"));
 
         tessellator.startDrawingQuads();
-        tessellator.setColorRGBA_F(1.0f, 1.0f, 1.0f, particle.getAlpha());
-        tessellator.setBrightness((int) (particle.getLight() * 240.0f));
+        tessellator.setColorRGBA_F(particle.getColorFactor()[0], particle.getColorFactor()[1], particle.getColorFactor()[2], particle.getColorFactor()[3]);
+        tessellator.setBrightness(240);
 
-        tessellator.addVertexWithUV(- (0.5F) * halfSizes.getX(), - (0.5F) * halfSizes.getY(), 0.0, textureCoord.getCoordX_0(), textureCoord.getCoordY_0());
-        tessellator.addVertexWithUV((0.5F) * halfSizes.getX(), - (0.5F) * halfSizes.getY(), 0.0, textureCoord.getCoordX_1(), textureCoord.getCoordY_1());
-        tessellator.addVertexWithUV((0.5F) * halfSizes.getX(), (0.5F) * halfSizes.getY(), 0.0, textureCoord.getCoordX_2(), textureCoord.getCoordY_2());
-        tessellator.addVertexWithUV(- (0.5F) * halfSizes.getX(), (0.5F) * halfSizes.getY(), 0.0, textureCoord.getCoordX_3(), textureCoord.getCoordY_3());
+        tessellator.addVertexWithUV(-(0.5F) * halfSizes.getX(), -(0.5F) * halfSizes.getY(), 0.0, textureCoordAABB.getCenterX() - textureCoordAABB.getHalfWidth(), textureCoordAABB.getCenterY() - textureCoordAABB.getHalfHeight());
+        tessellator.addVertexWithUV((0.5F) * halfSizes.getX(),  -(0.5F) * halfSizes.getY(), 0.0, textureCoordAABB.getCenterX() + textureCoordAABB.getHalfWidth(), textureCoordAABB.getCenterY() - textureCoordAABB.getHalfHeight());
+        tessellator.addVertexWithUV((0.5F) * halfSizes.getX(),  (0.5F) * halfSizes.getY(),  0.0, textureCoordAABB.getCenterX() + textureCoordAABB.getHalfWidth(), textureCoordAABB.getCenterY() + textureCoordAABB.getHalfHeight());
+        tessellator.addVertexWithUV(-(0.5F) * halfSizes.getX(), (0.5F) * halfSizes.getY(),  0.0, textureCoordAABB.getCenterX() - textureCoordAABB.getHalfWidth(), textureCoordAABB.getCenterY() + textureCoordAABB.getHalfHeight());
 
         tessellator.draw();
 

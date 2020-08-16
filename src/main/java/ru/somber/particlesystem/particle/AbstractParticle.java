@@ -3,7 +3,7 @@ package ru.somber.particlesystem.particle;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
-import ru.somber.clientutil.opengl.texture.TextureCoord;
+import ru.somber.clientutil.opengl.texture.TextureCoordAABB;
 import ru.somber.commonutil.Axis;
 
 /**
@@ -27,13 +27,11 @@ public abstract class AbstractParticle implements IParticle {
      */
     protected Vector3f localRotateAngles;
 
-    /** Коэффициент альфа прозрачности частицы. */
-    protected float alpha;
-    /** Коэффициент освещенности частицы. */
-    protected float light;
+    /** Коэффициенты цветов. */
+    protected float[] colorFactor;
 
     /** Текстурные координаты. */
-    protected TextureCoord textureCoord;
+    protected TextureCoordAABB textureCoordAABB;
     /** ResourceLocation c текстурой частицы. */
     protected ResourceLocation textureLocation;
 
@@ -46,9 +44,8 @@ public abstract class AbstractParticle implements IParticle {
         this.lifeTime = 0;
         this.halfSizes = new Vector2f(0.5f, 0.5f);
         this.localRotateAngles = new Vector3f(0.0f, 0.0f, 0.0f);
-        this.textureCoord = new TextureCoord();
-        this.alpha = 1.0f;
-        this.light = 1.0f;
+        this.textureCoordAABB = new TextureCoordAABB();
+        this.colorFactor = new float[] {1, 1, 1, 1};
     }
 
     public AbstractParticle(Vector3f newPosition, Vector2f halfSizes, int maxLifeTime) {
@@ -59,9 +56,8 @@ public abstract class AbstractParticle implements IParticle {
 
         this.lifeTime = 0;
         this.localRotateAngles = new Vector3f(0.0f, 0.0f, 0.0f);
-        this.textureCoord = new TextureCoord();
-        this.alpha = 1.0f;
-        this.light = 1.0f;
+        this.textureCoordAABB = new TextureCoordAABB();
+        this.colorFactor = new float[] {1, 1, 1, 1};
     }
 
     public AbstractParticle(Vector3f newPosition, Vector2f halfSizes, Vector3f localRotateAngles, int maxLifeTime) {
@@ -72,9 +68,8 @@ public abstract class AbstractParticle implements IParticle {
         this.maxLifeTime = maxLifeTime;
 
         this.lifeTime = 0;
-        this.textureCoord = new TextureCoord();
-        this.alpha = 1.0f;
-        this.light = 1.0f;
+        this.textureCoordAABB = new TextureCoordAABB();
+        this.colorFactor = new float[] {1, 1, 1, 1};
     }
 
 
@@ -94,16 +89,15 @@ public abstract class AbstractParticle implements IParticle {
         this.localRotateAngles = localRotateAngles;
     }
 
-    public void setAlpha(float alpha) {
-        this.alpha = alpha;
+    public void setColorFactor(float r, float g, float b, float a) {
+        colorFactor[0] = r;
+        colorFactor[1] = g;
+        colorFactor[2] = b;
+        colorFactor[3] = a;
     }
 
-    public void setLight(float light) {
-        this.light = light;
-    }
-
-    public void setTextureCoord(TextureCoord textureCoord) {
-        this.textureCoord = textureCoord;
+    public void setTextureCoordAABB(TextureCoordAABB textureCoordAABB) {
+        this.textureCoordAABB = textureCoordAABB;
     }
 
     public void setTextureLocation(ResourceLocation textureLocation) {
@@ -151,18 +145,13 @@ public abstract class AbstractParticle implements IParticle {
     }
 
     @Override
-    public float getAlpha() {
-        return alpha;
+    public float[] getColorFactor() {
+        return colorFactor;
     }
 
     @Override
-    public float getLight() {
-        return light;
-    }
-
-    @Override
-    public TextureCoord getTextureCoord() {
-        return textureCoord;
+    public TextureCoordAABB getTextureCoordAABB() {
+        return textureCoordAABB;
     }
 
     @Override

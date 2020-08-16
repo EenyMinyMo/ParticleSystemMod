@@ -1,20 +1,20 @@
 #version 330
 
 layout (location = 0) in vec2 particleVertPosition;
-layout (location = 1) in vec4 particleAttribute;
+layout (location = 1) in vec4 particleColorFactor;
 layout (location = 2) in vec2 particleSideScales;
 layout (location = 3) in vec3 particleCenterPosition;
 layout (location = 4) in vec3 particleNormalVector;
 layout (location = 5) in vec3 particleLocalAngles;
+layout (location = 6) in vec2 particleTexCoord;
 
 
 uniform vec3 cameraPosition;
 uniform mat4 projectionCameraMatrix;
 
 
+out vec4 colorFactor;
 out vec2 texCoord;
-out float alpha;
-out float light;
 
 
 /*
@@ -77,9 +77,8 @@ void main() {
     коэффициент освещенности (4ая компонента).
     Так сделано для уменьшения количества входных типов данных вершины.
     */
-    texCoord = particleAttribute.xy;
-    alpha = particleAttribute.z;
-    light = particleAttribute.w;
+    texCoord = particleTexCoord;
+    colorFactor = particleColorFactor;
 
-    gl_Position = projectionCameraMatrix * modelTransformMat * localAnglesTransformMat * vec4(particleVertPosition.x * particleSideScales.x, particleVertPosition.y * particleSideScales.y, 0, 1);
+    gl_Position = projectionCameraMatrix * modelTransformMat * localAnglesTransformMat * vec4(particleVertPosition * particleSideScales, 0, 1);
 }

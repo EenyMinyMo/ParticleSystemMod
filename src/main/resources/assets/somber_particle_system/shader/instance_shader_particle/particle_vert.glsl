@@ -5,15 +5,17 @@ layout (location = 0) in vec2 particlePosition;             //per vertex
 layout (location = 1) in vec3 particleCenterPosition;       //per primitive
 layout (location = 2) in vec3 particleNormalVector;         //per primitive
 layout (location = 3) in vec3 particleLocalAngles;          //per primitive
-layout (location = 4) in vec2 particleAttribute;            //per primitive
-layout (location = 5) in vec2 particleTextureCoord;         //per vertex
+layout (location = 4) in vec4 particleColorFactor;          //per primitive
+layout (location = 5) in vec4 particleTextureCoordAABB;     //per primitive
+layout (location = 6) in vec2 particleScale;                //per primitive
+
 
 
 uniform vec3 cameraPosition;
 uniform mat4 projectionCameraMatrix;
 
 
-out vec2 particleAttrib;
+out vec4 colorFactor;
 out vec2 texCoord;
 
 
@@ -71,8 +73,8 @@ void main() {
     коэффициент освещенности (1ая компонента).
     Так сделано для уменьшения количества входных типов данных вершины.
     */
-    particleAttrib = particleAttribute;
-    texCoord = particleTextureCoord;
+    colorFactor = particleColorFactor;
+    texCoord = vec2(particleTextureCoordAABB.xy) + vec2(particlePosition * 2 * particleTextureCoordAABB.zw);
 
-    gl_Position = commonTransformMat * vec4(particlePosition, 0, 1);
+    gl_Position = commonTransformMat * vec4(particlePosition * particleScale, 0, 1);
 }

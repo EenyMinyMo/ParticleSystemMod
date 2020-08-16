@@ -17,7 +17,7 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import ru.somber.clientutil.opengl.*;
-import ru.somber.clientutil.opengl.texture.TextureCoord;
+import ru.somber.clientutil.opengl.texture.TextureCoordAABB;
 import ru.somber.commonutil.SomberUtils;
 import ru.somber.particlesystem.ParticleSystemMod;
 import ru.somber.particlesystem.particle.IParticle;
@@ -44,18 +44,20 @@ public class ShaderParticleRenderer extends AbstractParticleRenderer {
     private int tickUpdate;
 
     private BufferObject particlePositionVBO;
-    private BufferObject particleAttributeVBO;
+    private BufferObject particleColorFactorVBO;
     private BufferObject particleSideScalesVBO;
     private BufferObject particleCenterPositionVBO;
     private BufferObject particleNormalVectorVBO;
     private BufferObject particleLocalAnglesVBO;
+    private BufferObject particleTexCoordVBO;
 
     private FloatBuffer particlePositionBuffer;
-    private FloatBuffer particleAttributeBuffer;
+    private FloatBuffer particleColorFactorBuffer;
     private FloatBuffer particleSideScalesBuffer;
     private FloatBuffer particleCenterPositionBuffer;
     private FloatBuffer particleNormalVectorBuffer;
     private FloatBuffer particleLocalAnglesBuffer;
+    private FloatBuffer particleTexCoordBuffer;
 
     private Matrix4f projectionMatrix;
     private Matrix4f cameraMatrix;
@@ -139,6 +141,7 @@ public class ShaderParticleRenderer extends AbstractParticleRenderer {
         GL20.glDisableVertexAttribArray(3);
         GL20.glDisableVertexAttribArray(4);
         GL20.glDisableVertexAttribArray(5);
+        GL20.glDisableVertexAttribArray(6);
 
 
         GL20.glUseProgram(0);
@@ -195,36 +198,40 @@ public class ShaderParticleRenderer extends AbstractParticleRenderer {
 
     private void createVBOs() {
         particlePositionVBO = BufferObject.createVBO();
-        particleAttributeVBO = BufferObject.createVBO();
+        particleColorFactorVBO = BufferObject.createVBO();
         particleSideScalesVBO = BufferObject.createVBO();
         particleCenterPositionVBO = BufferObject.createVBO();
         particleNormalVectorVBO = BufferObject.createVBO();
         particleLocalAnglesVBO = BufferObject.createVBO();
+        particleTexCoordVBO = BufferObject.createVBO();
 
         BufferObject.bindBuffer(particlePositionVBO);
-        BufferObject.bindBuffer(particleAttributeVBO);
+        BufferObject.bindBuffer(particleColorFactorVBO);
         BufferObject.bindBuffer(particleSideScalesVBO);
         BufferObject.bindBuffer(particleCenterPositionVBO);
         BufferObject.bindBuffer(particleNormalVectorVBO);
         BufferObject.bindBuffer(particleLocalAnglesVBO);
+        BufferObject.bindBuffer(particleTexCoordVBO);
 
         BufferObject.bindNone(particlePositionVBO);
 
 
         particlePositionBuffer = BufferUtils.createFloatBuffer(0);
-        particleAttributeBuffer = BufferUtils.createFloatBuffer(0);
+        particleColorFactorBuffer = BufferUtils.createFloatBuffer(0);
         particleSideScalesBuffer = BufferUtils.createFloatBuffer(0);
         particleCenterPositionBuffer = BufferUtils.createFloatBuffer(0);
         particleNormalVectorBuffer = BufferUtils.createFloatBuffer(0);
         particleLocalAnglesBuffer = BufferUtils.createFloatBuffer(0);
+        particleTexCoordBuffer = BufferUtils.createFloatBuffer(0);
 
         int intervalTimeUpdate = SomberUtils.timeToTick(0, 1, 0);
         vboDataManager.addVBO(particlePositionVBO, particlePositionBuffer, GL15.GL_STREAM_DRAW, intervalTimeUpdate, 1.5F);
-        vboDataManager.addVBO(particleAttributeVBO, particleAttributeBuffer, GL15.GL_STREAM_DRAW, intervalTimeUpdate, 1.5F);
+        vboDataManager.addVBO(particleColorFactorVBO, particleColorFactorBuffer, GL15.GL_STREAM_DRAW, intervalTimeUpdate, 1.5F);
         vboDataManager.addVBO(particleSideScalesVBO, particleSideScalesBuffer, GL15.GL_STREAM_DRAW, intervalTimeUpdate, 1.5F);
         vboDataManager.addVBO(particleCenterPositionVBO, particleCenterPositionBuffer, GL15.GL_STREAM_DRAW, intervalTimeUpdate, 1.5F);
         vboDataManager.addVBO(particleNormalVectorVBO, particleNormalVectorBuffer, GL15.GL_STREAM_DRAW, intervalTimeUpdate, 1.5F);
         vboDataManager.addVBO(particleLocalAnglesVBO, particleLocalAnglesBuffer, GL15.GL_STREAM_DRAW, intervalTimeUpdate, 1.5F);
+        vboDataManager.addVBO(particleTexCoordVBO, particleTexCoordBuffer, GL15.GL_STREAM_DRAW, intervalTimeUpdate, 1.5F);
     }
 
     private void createVAO() {
@@ -237,7 +244,7 @@ public class ShaderParticleRenderer extends AbstractParticleRenderer {
         BufferObject.bindBuffer(particlePositionVBO);
         GL20.glVertexAttribPointer(0, 2, GL11.GL_FLOAT, false, 0, 0);
 
-        BufferObject.bindBuffer(particleAttributeVBO);
+        BufferObject.bindBuffer(particleColorFactorVBO);
         GL20.glVertexAttribPointer(1, 4, GL11.GL_FLOAT, false, 0, 0);
 
         BufferObject.bindBuffer(particleSideScalesVBO);
@@ -252,6 +259,9 @@ public class ShaderParticleRenderer extends AbstractParticleRenderer {
         BufferObject.bindBuffer(particleLocalAnglesVBO);
         GL20.glVertexAttribPointer(5, 3, GL11.GL_FLOAT, false, 0, 0);
 
+        BufferObject.bindBuffer(particleTexCoordVBO);
+        GL20.glVertexAttribPointer(6, 2, GL11.GL_FLOAT, false, 0, 0);
+
 
         GL20.glEnableVertexAttribArray(0);
         GL20.glEnableVertexAttribArray(1);
@@ -259,6 +269,7 @@ public class ShaderParticleRenderer extends AbstractParticleRenderer {
         GL20.glEnableVertexAttribArray(3);
         GL20.glEnableVertexAttribArray(4);
         GL20.glEnableVertexAttribArray(5);
+        GL20.glEnableVertexAttribArray(6);
 
 
         VAO.bindNone();
@@ -272,6 +283,7 @@ public class ShaderParticleRenderer extends AbstractParticleRenderer {
         GL20.glDisableVertexAttribArray(3);
         GL20.glDisableVertexAttribArray(4);
         GL20.glDisableVertexAttribArray(5);
+        GL20.glDisableVertexAttribArray(6);
     }
 
     private void prepareUniforms() {
@@ -310,8 +322,8 @@ public class ShaderParticleRenderer extends AbstractParticleRenderer {
         particlePositionBuffer = vboDataManager.getDataBuffer(particlePositionVBO);
 
         countPrimitivePerBuffer = countParticles * 4 * 4;
-        vboDataManager.getEntry(particleAttributeVBO).updateSize(countPrimitivePerBuffer, tickUpdate);
-        particleAttributeBuffer = vboDataManager.getDataBuffer(particleAttributeVBO);
+        vboDataManager.getEntry(particleColorFactorVBO).updateSize(countPrimitivePerBuffer, tickUpdate);
+        particleColorFactorBuffer = vboDataManager.getDataBuffer(particleColorFactorVBO);
 
         countPrimitivePerBuffer = countParticles * 2 * 4;
         vboDataManager.getEntry(particleSideScalesVBO).updateSize(countPrimitivePerBuffer, tickUpdate);
@@ -328,15 +340,20 @@ public class ShaderParticleRenderer extends AbstractParticleRenderer {
         countPrimitivePerBuffer = countParticles * 3 * 4;
         vboDataManager.getEntry(particleLocalAnglesVBO).updateSize(countPrimitivePerBuffer, tickUpdate);
         particleLocalAnglesBuffer = vboDataManager.getDataBuffer(particleLocalAnglesVBO);
+
+        countPrimitivePerBuffer = countParticles * 2 * 4;
+        vboDataManager.getEntry(particleTexCoordVBO).updateSize(countPrimitivePerBuffer, tickUpdate);
+        particleTexCoordBuffer = vboDataManager.getDataBuffer(particleTexCoordVBO);
     }
 
     private void prepareDataVBOs(List<IParticle> particleList, float interpolationFactor) {
         particlePositionBuffer.clear();
-        particleAttributeBuffer.clear();
+        particleColorFactorBuffer.clear();
         particleSideScalesBuffer.clear();
         particleCenterPositionBuffer.clear();
         particleNormalVectorBuffer.clear();
         particleLocalAnglesBuffer.clear();
+        particleTexCoordBuffer.clear();
 
 
         for (IParticle particle : particleList) {
@@ -344,9 +361,8 @@ public class ShaderParticleRenderer extends AbstractParticleRenderer {
             particle.computeNormalVector(particleNormalVector, xCamera, yCamera, zCamera, particleCenterPosition);
             Vector2f halfSizes = particle.getHalfSizes();
             Vector3f localAngles = particle.getLocalRotateAngles();
-            TextureCoord texCoord = particle.getTextureCoord();
-            float alpha = particle.getAlpha();
-            float light = particle.getLight();
+            TextureCoordAABB textureCoordAABB = particle.getTextureCoordAABB();
+            float[] colorFactor = particle.getColorFactor();
 
 
             particlePositionBuffer.put(-0.5F).put(-0.5F);
@@ -354,10 +370,10 @@ public class ShaderParticleRenderer extends AbstractParticleRenderer {
             particlePositionBuffer.put(+0.5F).put(+0.5F);
             particlePositionBuffer.put(-0.5F).put(+0.5F);
 
-            particleAttributeBuffer.put(texCoord.getCoordX_0()).put(texCoord.getCoordY_0()).put(alpha).put(light);
-            particleAttributeBuffer.put(texCoord.getCoordX_1()).put(texCoord.getCoordY_1()).put(alpha).put(light);
-            particleAttributeBuffer.put(texCoord.getCoordX_2()).put(texCoord.getCoordY_2()).put(alpha).put(light);
-            particleAttributeBuffer.put(texCoord.getCoordX_3()).put(texCoord.getCoordY_3()).put(alpha).put(light);
+            particleColorFactorBuffer.put(colorFactor[0]).put(colorFactor[1]).put(colorFactor[2]).put(colorFactor[3]);
+            particleColorFactorBuffer.put(colorFactor[0]).put(colorFactor[1]).put(colorFactor[2]).put(colorFactor[3]);
+            particleColorFactorBuffer.put(colorFactor[0]).put(colorFactor[1]).put(colorFactor[2]).put(colorFactor[3]);
+            particleColorFactorBuffer.put(colorFactor[0]).put(colorFactor[1]).put(colorFactor[2]).put(colorFactor[3]);
 
             particleSideScalesBuffer.put(halfSizes.getX()).put(halfSizes.getY());
             particleSideScalesBuffer.put(halfSizes.getX()).put(halfSizes.getY());
@@ -378,22 +394,28 @@ public class ShaderParticleRenderer extends AbstractParticleRenderer {
             particleLocalAnglesBuffer.put(localAngles.getX()).put(localAngles.getY()).put(localAngles.getZ());
             particleLocalAnglesBuffer.put(localAngles.getX()).put(localAngles.getY()).put(localAngles.getZ());
             particleLocalAnglesBuffer.put(localAngles.getX()).put(localAngles.getY()).put(localAngles.getZ());
+
+            particleTexCoordBuffer.put(textureCoordAABB.getCenterX() - textureCoordAABB.getHalfWidth()).put(textureCoordAABB.getCenterY() - textureCoordAABB.getHalfHeight());
+            particleTexCoordBuffer.put(textureCoordAABB.getCenterX() + textureCoordAABB.getHalfWidth()).put(textureCoordAABB.getCenterY() - textureCoordAABB.getHalfHeight());
+            particleTexCoordBuffer.put(textureCoordAABB.getCenterX() + textureCoordAABB.getHalfWidth()).put(textureCoordAABB.getCenterY() + textureCoordAABB.getHalfHeight());
+            particleTexCoordBuffer.put(textureCoordAABB.getCenterX() - textureCoordAABB.getHalfWidth()).put(textureCoordAABB.getCenterY() + textureCoordAABB.getHalfHeight());
         }
 
 
         particlePositionBuffer.flip();
-        particleAttributeBuffer.flip();
+        particleColorFactorBuffer.flip();
         particleSideScalesBuffer.flip();
         particleCenterPositionBuffer.flip();
         particleNormalVectorBuffer.flip();
         particleLocalAnglesBuffer.flip();
+        particleTexCoordBuffer.flip();
 
 
         BufferObject.bindBuffer(particlePositionVBO);
         BufferObject.bufferSubData(particlePositionVBO, 0, particlePositionBuffer);
 
-        BufferObject.bindBuffer(particleAttributeVBO);
-        BufferObject.bufferSubData(particleAttributeVBO, 0, particleAttributeBuffer);
+        BufferObject.bindBuffer(particleColorFactorVBO);
+        BufferObject.bufferSubData(particleColorFactorVBO, 0, particleColorFactorBuffer);
 
         BufferObject.bindBuffer(particleSideScalesVBO);
         BufferObject.bufferSubData(particleSideScalesVBO, 0, particleSideScalesBuffer);
@@ -406,6 +428,9 @@ public class ShaderParticleRenderer extends AbstractParticleRenderer {
 
         BufferObject.bindBuffer(particleLocalAnglesVBO);
         BufferObject.bufferSubData(particleLocalAnglesVBO, 0, particleLocalAnglesBuffer);
+
+        BufferObject.bindBuffer(particleTexCoordVBO);
+        BufferObject.bufferSubData(particleTexCoordVBO, 0, particleTexCoordBuffer);
 
         BufferObject.bindNone(particlePositionVBO);
     }

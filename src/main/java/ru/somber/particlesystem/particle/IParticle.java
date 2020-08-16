@@ -3,7 +3,7 @@ package ru.somber.particlesystem.particle;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
-import ru.somber.clientutil.opengl.texture.TextureCoord;
+import ru.somber.clientutil.opengl.texture.TextureCoordAABB;
 import ru.somber.commonutil.Axis;
 
 /**
@@ -77,7 +77,7 @@ public interface IParticle {
     /**
      * Возвращает текстурные координаты, соответствующие частице.
      */
-    TextureCoord getTextureCoord();
+    TextureCoordAABB getTextureCoordAABB();
 
     /**
      * Текущее время жизни частицы.
@@ -92,14 +92,9 @@ public interface IParticle {
     int getMaxLifeTime();
 
     /**
-     * Возвращает коэффициент альфа-прозрачности.
+     * Возвращает коэффициенты цветов.
      */
-    float getAlpha();
-
-    /**
-     * Возвращает коэффициент освещенности.
-     */
-    float getLight();
+    float[] getColorFactor();
 
     /**
      * Обновляет внутренние данные частицы
