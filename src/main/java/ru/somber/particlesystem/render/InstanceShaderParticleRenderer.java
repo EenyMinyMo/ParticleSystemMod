@@ -136,6 +136,7 @@ public class InstanceShaderParticleRenderer extends AbstractParticleRenderer {
         GL33.glVertexAttribDivisor(2, 0);
         GL33.glVertexAttribDivisor(3, 0);
         GL33.glVertexAttribDivisor(4, 0);
+        GL33.glVertexAttribDivisor(5, 0);
         GL33.glVertexAttribDivisor(6, 0);
 
 
@@ -280,6 +281,7 @@ public class InstanceShaderParticleRenderer extends AbstractParticleRenderer {
         GL33.glVertexAttribDivisor(2, 1);
         GL33.glVertexAttribDivisor(3, 1);
         GL33.glVertexAttribDivisor(4, 1);
+        GL33.glVertexAttribDivisor(5, 1);
         GL33.glVertexAttribDivisor(6, 1);
 
 
@@ -292,6 +294,7 @@ public class InstanceShaderParticleRenderer extends AbstractParticleRenderer {
         GL33.glVertexAttribDivisor(2, 0);
         GL33.glVertexAttribDivisor(3, 0);
         GL33.glVertexAttribDivisor(4, 0);
+        GL33.glVertexAttribDivisor(5, 0);
         GL33.glVertexAttribDivisor(6, 0);
 
         GL20.glDisableVertexAttribArray(0);
@@ -354,14 +357,13 @@ public class InstanceShaderParticleRenderer extends AbstractParticleRenderer {
         vboDataManager.getEntry(particleColorFactorVBO).updateSize(countPrimitivePerBuffer, tickUpdate);
         particleColorFactorBuffer = vboDataManager.getDataBuffer(particleColorFactorVBO);
 
-        countPrimitivePerBuffer = countParticles * 2 * 4;
+        countPrimitivePerBuffer = countParticles * 4;
         vboDataManager.getEntry(particleTextureCoordAABBVBO).updateSize(countPrimitivePerBuffer, tickUpdate);
         particleTextureCoordAABBBuffer = vboDataManager.getDataBuffer(particleTextureCoordAABBVBO);
 
-        countPrimitivePerBuffer = countParticles * 4
-        ;
-        vboDataManager.getEntry(particleTextureCoordAABBVBO).updateSize(countPrimitivePerBuffer, tickUpdate);
-        particleTextureCoordAABBBuffer = vboDataManager.getDataBuffer(particleTextureCoordAABBVBO);
+        countPrimitivePerBuffer = countParticles * 2;
+        vboDataManager.getEntry(particleScaleVBO).updateSize(countPrimitivePerBuffer, tickUpdate);
+        particleScaleBuffer = vboDataManager.getDataBuffer(particleScaleVBO);
     }
 
     private void prepareDataVBOs(List<IParticle> particleList, float interpolationFactor) {
@@ -370,6 +372,7 @@ public class InstanceShaderParticleRenderer extends AbstractParticleRenderer {
         particleNormalVectorBuffer.clear();
         particleLocalAnglesBuffer.clear();
         particleColorFactorBuffer.clear();
+        particleTextureCoordAABBBuffer.clear();
         particleScaleBuffer.clear();
 
 
