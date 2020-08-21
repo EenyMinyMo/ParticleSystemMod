@@ -4,6 +4,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,13 +22,14 @@ import ru.somber.clientutil.opengl.texture.TextureCoordAABB;
 import ru.somber.commonutil.SomberUtils;
 import ru.somber.particlesystem.ParticleSystemMod;
 import ru.somber.particlesystem.particle.IParticle;
+import ru.somber.particlesystem.texture.ParticleTextureAtlas;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.util.List;
 
 @SideOnly(Side.CLIENT)
-public class ShaderParticleRenderer extends AbstractParticleRenderer {
+public class ShaderParticleRenderer implements IParticleRenderer {
 
     private boolean isShaderInit;
 
@@ -73,6 +75,8 @@ public class ShaderParticleRenderer extends AbstractParticleRenderer {
     /** Вынесено в переменные объекта, чтобы постоянное не создавать в методе. */
     private Vector3f particleCenterPosition, particleNormalVector;
 
+    private ParticleTextureAtlas textureAtlas;
+
 
     public ShaderParticleRenderer() {
         isShaderInit = false;
@@ -89,6 +93,17 @@ public class ShaderParticleRenderer extends AbstractParticleRenderer {
 
         vboDataManager = new VBODataManager();
         tickUpdate = 0;
+    }
+
+
+    @Override
+    public ParticleTextureAtlas getParticleTextureAtlas() {
+        return textureAtlas;
+    }
+
+    @Override
+    public void setParticleTextureAtlas(ParticleTextureAtlas textureAtlas) {
+        this.textureAtlas = textureAtlas;
     }
 
     @Override
@@ -122,7 +137,7 @@ public class ShaderParticleRenderer extends AbstractParticleRenderer {
 
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        Minecraft.getMinecraft().renderEngine.bindTexture(new ResourceLocation("minecraft:dynamic/lightMap_1"));
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureAtlas.getGlTextureId());
     }
 
     @Override
@@ -361,8 +376,9 @@ public class ShaderParticleRenderer extends AbstractParticleRenderer {
             particle.computeNormalVector(particleNormalVector, xCamera, yCamera, zCamera, particleCenterPosition);
             Vector2f halfSizes = particle.getHalfSizes();
             Vector3f localAngles = particle.getLocalRotateAngles();
-            TextureCoordAABB textureCoordAABB = particle.getTextureCoordAABB();
             float[] colorFactor = particle.getColorFactor();
+            String iconName = particle.getIconName();
+            IIcon icon = textureAtlas.getAtlasSprite(iconName);
 
 
             particlePositionBuffer.put(-0.5F).put(-0.5F);
@@ -395,10 +411,10 @@ public class ShaderParticleRenderer extends AbstractParticleRenderer {
             particleLocalAnglesBuffer.put(localAngles.getX()).put(localAngles.getY()).put(localAngles.getZ());
             particleLocalAnglesBuffer.put(localAngles.getX()).put(localAngles.getY()).put(localAngles.getZ());
 
-            particleTexCoordBuffer.put(textureCoordAABB.getCenterX() - textureCoordAABB.getHalfWidth()).put(textureCoordAABB.getCenterY() - textureCoordAABB.getHalfHeight());
-            particleTexCoordBuffer.put(textureCoordAABB.getCenterX() + textureCoordAABB.getHalfWidth()).put(textureCoordAABB.getCenterY() - textureCoordAABB.getHalfHeight());
-            particleTexCoordBuffer.put(textureCoordAABB.getCenterX() + textureCoordAABB.getHalfWidth()).put(textureCoordAABB.getCenterY() + textureCoordAABB.getHalfHeight());
-            particleTexCoordBuffer.put(textureCoordAABB.getCenterX() - textureCoordAABB.getHalfWidth()).put(textureCoordAABB.getCenterY() + textureCoordAABB.getHalfHeight());
+            particleTexCoordBuffer.put(icon.getMinU()).put(icon.getMinV());
+            particleTexCoordBuffer.put(icon.getMaxU()).put(icon.getMinV());
+            particleTexCoordBuffer.put(icon.getMaxU()).put(icon.getMaxV());
+            particleTexCoordBuffer.put(icon.getMinU()).put(icon.getMaxV());
         }
 
 

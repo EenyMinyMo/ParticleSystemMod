@@ -1,10 +1,9 @@
 package ru.somber.particlesystem.particle;
 
-import net.minecraft.util.ResourceLocation;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
-import ru.somber.clientutil.opengl.texture.TextureCoordAABB;
 import ru.somber.commonutil.Axis;
+import ru.somber.particlesystem.texture.ParticleAtlasSprite;
 
 /**
  * Абстрактный класс частицы, реализцющий наиболее общий функционал частиц.
@@ -30,37 +29,19 @@ public abstract class AbstractParticle implements IParticle {
     /** Коэффициенты цветов. */
     protected float[] colorFactor;
 
-    /** Текстурные координаты. */
-    protected TextureCoordAABB textureCoordAABB;
-    /** ResourceLocation c текстурой частицы. */
-    protected ResourceLocation textureLocation;
+    /** Здесь текстурные координаты. */
+    protected String particleIconName;
 
 
-    public AbstractParticle(Vector3f newPosition, int maxLifeTime) {
-        this.newPosition = newPosition;
-        this.oldPosition = new Vector3f(newPosition);
-        this.maxLifeTime = maxLifeTime;
-
-        this.lifeTime = 0;
-        this.halfSizes = new Vector2f(0.5f, 0.5f);
-        this.localRotateAngles = new Vector3f(0.0f, 0.0f, 0.0f);
-        this.textureCoordAABB = new TextureCoordAABB();
-        this.colorFactor = new float[] {1, 1, 1, 1};
+    public AbstractParticle(Vector3f newPosition, int maxLifeTime, String iconName) {
+        this(newPosition, new Vector2f(0.5f, 0.5f), new Vector3f(0.0f, 0.0f, 0.0f), maxLifeTime, iconName);
     }
 
-    public AbstractParticle(Vector3f newPosition, Vector2f halfSizes, int maxLifeTime) {
-        this.newPosition = newPosition;
-        this.oldPosition = new Vector3f(newPosition);
-        this.halfSizes = halfSizes;
-        this.maxLifeTime = maxLifeTime;
-
-        this.lifeTime = 0;
-        this.localRotateAngles = new Vector3f(0.0f, 0.0f, 0.0f);
-        this.textureCoordAABB = new TextureCoordAABB();
-        this.colorFactor = new float[] {1, 1, 1, 1};
+    public AbstractParticle(Vector3f newPosition, Vector2f halfSizes, int maxLifeTime, String iconName) {
+        this(newPosition, halfSizes, new Vector3f(0.0f, 0.0f, 0.0f), maxLifeTime, iconName);
     }
 
-    public AbstractParticle(Vector3f newPosition, Vector2f halfSizes, Vector3f localRotateAngles, int maxLifeTime) {
+    public AbstractParticle(Vector3f newPosition, Vector2f halfSizes, Vector3f localRotateAngles, int maxLifeTime, String iconName) {
         this.newPosition = newPosition;
         this.oldPosition = new Vector3f(newPosition);
         this.halfSizes = halfSizes;
@@ -68,7 +49,7 @@ public abstract class AbstractParticle implements IParticle {
         this.maxLifeTime = maxLifeTime;
 
         this.lifeTime = 0;
-        this.textureCoordAABB = new TextureCoordAABB();
+        this.particleIconName = iconName;
         this.colorFactor = new float[] {1, 1, 1, 1};
     }
 
@@ -96,14 +77,9 @@ public abstract class AbstractParticle implements IParticle {
         colorFactor[3] = a;
     }
 
-    public void setTextureCoordAABB(TextureCoordAABB textureCoordAABB) {
-        this.textureCoordAABB = textureCoordAABB;
+    public void setParticleIconName(String particleIconName) {
+        this.particleIconName = particleIconName;
     }
-
-    public void setTextureLocation(ResourceLocation textureLocation) {
-        this.textureLocation = textureLocation;
-    }
-
 
     @Override
     public Vector3f getNewPosition() {
@@ -150,13 +126,8 @@ public abstract class AbstractParticle implements IParticle {
     }
 
     @Override
-    public TextureCoordAABB getTextureCoordAABB() {
-        return textureCoordAABB;
-    }
-
-    @Override
-    public ResourceLocation getTextureLocation() {
-        return textureLocation;
+    public String getIconName() {
+        return particleIconName;
     }
 
     @Override

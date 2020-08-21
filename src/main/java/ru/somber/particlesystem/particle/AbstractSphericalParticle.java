@@ -10,16 +10,16 @@ import ru.somber.commonutil.Axis;
  */
 public abstract class AbstractSphericalParticle extends AbstractParticle {
 
-    public AbstractSphericalParticle(Vector3f newPosition, int maxLifeTime) {
-        super(newPosition, maxLifeTime);
+    public AbstractSphericalParticle(Vector3f newPosition, int maxLifeTime, String iconName) {
+        super(newPosition, maxLifeTime, iconName);
     }
 
-    public AbstractSphericalParticle(Vector3f newPosition, Vector2f halfSizes, int maxLifeTime) {
-        super(newPosition, halfSizes, maxLifeTime);
+    public AbstractSphericalParticle(Vector3f newPosition, Vector2f halfSizes, int maxLifeTime, String iconName) {
+        super(newPosition, halfSizes, maxLifeTime, iconName);
     }
 
-    public AbstractSphericalParticle(Vector3f newPosition, Vector2f halfSizes, Vector3f localRotateAngles, int maxLifeTime) {
-        super(newPosition, halfSizes, localRotateAngles, maxLifeTime);
+    public AbstractSphericalParticle(Vector3f newPosition, Vector2f halfSizes, Vector3f localRotateAngles, int maxLifeTime, String iconName) {
+        super(newPosition, halfSizes, localRotateAngles, maxLifeTime, iconName);
     }
 
     @Override

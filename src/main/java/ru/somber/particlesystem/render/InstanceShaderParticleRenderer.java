@@ -4,6 +4,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,13 +19,14 @@ import ru.somber.clientutil.opengl.texture.TextureCoordAABB;
 import ru.somber.commonutil.SomberUtils;
 import ru.somber.particlesystem.ParticleSystemMod;
 import ru.somber.particlesystem.particle.IParticle;
+import ru.somber.particlesystem.texture.ParticleTextureAtlas;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.util.List;
 
 @SideOnly(Side.CLIENT)
-public class InstanceShaderParticleRenderer extends AbstractParticleRenderer {
+public class InstanceShaderParticleRenderer implements IParticleRenderer {
 
     private boolean isShaderInit;
 
@@ -70,6 +72,8 @@ public class InstanceShaderParticleRenderer extends AbstractParticleRenderer {
     /** Вынесено в переменные объекта, чтобы постоянное не создавать в методе. */
     private Vector3f particleCenterPosition, particleNormalVector;
 
+    private ParticleTextureAtlas textureAtlas;
+
 
     public InstanceShaderParticleRenderer() {
         isShaderInit = false;
@@ -88,9 +92,20 @@ public class InstanceShaderParticleRenderer extends AbstractParticleRenderer {
         tickUpdate = 0;
     }
 
+
+    @Override
+    public ParticleTextureAtlas getParticleTextureAtlas() {
+        return textureAtlas;
+    }
+
+    @Override
+    public void setParticleTextureAtlas(ParticleTextureAtlas textureAtlas) {
+        this.textureAtlas = textureAtlas;
+    }
+
     @Override
     public void preRender(List<IParticle> particleList, float interpolationFactor) {
-        if (!isShaderInit) {
+        if (! isShaderInit) {
             initShaderAndBuffers();
         }
 
@@ -119,7 +134,7 @@ public class InstanceShaderParticleRenderer extends AbstractParticleRenderer {
 
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        Minecraft.getMinecraft().renderEngine.bindTexture(new ResourceLocation("minecraft:dynamic/lightMap_1"));
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureAtlas.getGlTextureId());
     }
 
     @Override
@@ -387,8 +402,9 @@ public class InstanceShaderParticleRenderer extends AbstractParticleRenderer {
             particle.computeNormalVector(particleNormalVector, xCamera, yCamera, zCamera, particleCenterPosition);
             Vector2f halfSizes = particle.getHalfSizes();
             Vector3f localAngles = particle.getLocalRotateAngles();
-            TextureCoordAABB texCoord = particle.getTextureCoordAABB();
             float[] colorFactor = particle.getColorFactor();
+            String iconName = particle.getIconName();
+            IIcon icon = textureAtlas.getAtlasSprite(iconName);
 
 
             particleCenterPositionBuffer.put(particleCenterPosition.getX()).put(particleCenterPosition.getY()).put(particleCenterPosition.getZ());
@@ -399,7 +415,7 @@ public class InstanceShaderParticleRenderer extends AbstractParticleRenderer {
 
             particleColorFactorBuffer.put(colorFactor);
 
-            particleTextureCoordAABBBuffer.put(texCoord.getCoords());
+            particleTextureCoordAABBBuffer.put(icon.getMinU()).put(icon.getMinV()).put(icon.getMaxU()).put(icon.getMaxV());
 
             particleScaleBuffer.put(halfSizes.getX()).put(halfSizes.getY());
         }

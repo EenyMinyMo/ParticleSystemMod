@@ -1,5 +1,6 @@
 package ru.somber.particlesystem.particle;
 
+import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
@@ -75,9 +76,9 @@ public interface IParticle {
     void computeNormalVector(Vector3f destination, float xCamera, float yCamera, float zCamera, Vector3f particlePosition);
 
     /**
-     * Возвращает текстурные координаты, соответствующие частице.
+     * Возвращает название иконки частицы.
      */
-    TextureCoordAABB getTextureCoordAABB();
+    String getIconName();
 
     /**
      * Текущее время жизни частицы.
@@ -108,10 +109,5 @@ public interface IParticle {
     default boolean isDie() {
         return getLifeTime() >= getMaxLifeTime();
     }
-
-    /**
-     * Возвращает ResourceLocation c текстурой частицы.
-     */
-    ResourceLocation getTextureLocation();
 
 }

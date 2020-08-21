@@ -24,18 +24,18 @@ public abstract class AbstractUniversalParticle extends AbstractParticle {
      */
     protected Axis rotateAxis;
 
-    public AbstractUniversalParticle(Vector3f newPosition, Axis rotateAxis, int maxLifeTime) {
-        super(newPosition, maxLifeTime);
+    public AbstractUniversalParticle(Vector3f newPosition, Axis rotateAxis, int maxLifeTime, String iconName) {
+        super(newPosition, maxLifeTime, iconName);
         this.rotateAxis = rotateAxis;
     }
 
-    public AbstractUniversalParticle(Vector3f newPosition, Vector2f halfSizes, Axis rotateAxis, int maxLifeTime) {
-        super(newPosition, halfSizes, maxLifeTime);
+    public AbstractUniversalParticle(Vector3f newPosition, Vector2f halfSizes, Axis rotateAxis, int maxLifeTime, String iconName) {
+        super(newPosition, halfSizes, maxLifeTime, iconName);
         this.rotateAxis = rotateAxis;
     }
 
-    public AbstractUniversalParticle(Vector3f newPosition, Vector2f halfSizes, Vector3f localRotateAngles, Axis rotateAxis, int maxLifeTime) {
-        super(newPosition, halfSizes, localRotateAngles, maxLifeTime);
+    public AbstractUniversalParticle(Vector3f newPosition, Vector2f halfSizes, Vector3f localRotateAngles, Axis rotateAxis, int maxLifeTime, String iconName) {
+        super(newPosition, halfSizes, localRotateAngles, maxLifeTime, iconName);
         this.rotateAxis = rotateAxis;
     }
 

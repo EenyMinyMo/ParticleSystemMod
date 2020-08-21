@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -15,17 +16,32 @@ import ru.somber.clientutil.opengl.texture.TextureCoordAABB;
 import ru.somber.commonutil.Axis;
 import ru.somber.commonutil.SomberUtils;
 import ru.somber.particlesystem.particle.IParticle;
+import ru.somber.particlesystem.texture.ParticleTextureAtlas;
 
 import java.util.List;
 
 @SideOnly(Side.CLIENT)
-public class TessellatorParticleRenderer extends AbstractParticleRenderer {
+public class TessellatorParticleRenderer implements IParticleRenderer {
 
     /** Вынесено в переменные объекта, чтобы постоянное не создавать в методе. */
     private Vector3f particleToCamera;
 
+    private ParticleTextureAtlas textureAtlas;
+
+
     public TessellatorParticleRenderer() {
         particleToCamera = new Vector3f();
+    }
+
+
+    @Override
+    public ParticleTextureAtlas getParticleTextureAtlas() {
+        return textureAtlas;
+    }
+
+    @Override
+    public void setParticleTextureAtlas(ParticleTextureAtlas textureAtlas) {
+        this.textureAtlas = textureAtlas;
     }
 
     @Override
@@ -36,11 +52,16 @@ public class TessellatorParticleRenderer extends AbstractParticleRenderer {
 
         GL11.glPushAttrib(GL11.GL_LIGHTING_BIT);
         GL11.glDisable(GL11.GL_LIGHTING);
+
+        GL13.glActiveTexture(GL13.GL_TEXTURE0);
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureAtlas.getGlTextureId());
     }
 
     @Override
     public void render(List<IParticle> particleList, float interpolationFactor) {
-        particleList.forEach(particle -> this.renderParticle(particle, interpolationFactor));
+        particleList.forEach((IParticle particle) -> {
+            this.renderParticle(particle, interpolationFactor);
+        });
     }
 
     @Override
@@ -52,9 +73,7 @@ public class TessellatorParticleRenderer extends AbstractParticleRenderer {
     }
 
     @Override
-    public void update(List<IParticle> particleList) {
-
-    }
+    public void update(List<IParticle> particleList) {}
 
     private void renderParticle(IParticle particle, float interpolationFactor) {
         Tessellator tessellator = Tessellator.instance;
@@ -64,25 +83,23 @@ public class TessellatorParticleRenderer extends AbstractParticleRenderer {
         particle.computeInterpolatedPosition(particleToCamera, interpolationFactor);
         particleToCamera.translate(-SomberUtils.interpolateMoveX(player, interpolationFactor), -SomberUtils.interpolateMoveY((Entity)player, interpolationFactor), -SomberUtils.interpolateMoveZ((Entity)player, interpolationFactor));
 
-        final Vector2f halfSizes = particle.getHalfSizes();
-        final TextureCoordAABB textureCoordAABB = particle.getTextureCoordAABB();
+        Vector2f halfSizes = particle.getHalfSizes();
+        String iconName = particle.getIconName();
+        IIcon icon = textureAtlas.getAtlasSprite(iconName);
 
         GL11.glPushMatrix();
         GL11.glTranslatef(particleToCamera.getX(), particleToCamera.getY(), particleToCamera.getZ());
 
         this.applyParticleTransform(particle, particleToCamera);
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        Minecraft.getMinecraft().renderEngine.bindTexture(new ResourceLocation("minecraft:dynamic/lightMap_1"));
-
         tessellator.startDrawingQuads();
         tessellator.setColorRGBA_F(particle.getColorFactor()[0], particle.getColorFactor()[1], particle.getColorFactor()[2], particle.getColorFactor()[3]);
         tessellator.setBrightness(240);
 
-        tessellator.addVertexWithUV(-(0.5F) * halfSizes.getX(), -(0.5F) * halfSizes.getY(), 0.0, textureCoordAABB.getCenterX() - textureCoordAABB.getHalfWidth(), textureCoordAABB.getCenterY() - textureCoordAABB.getHalfHeight());
-        tessellator.addVertexWithUV((0.5F) * halfSizes.getX(),  -(0.5F) * halfSizes.getY(), 0.0, textureCoordAABB.getCenterX() + textureCoordAABB.getHalfWidth(), textureCoordAABB.getCenterY() - textureCoordAABB.getHalfHeight());
-        tessellator.addVertexWithUV((0.5F) * halfSizes.getX(),  (0.5F) * halfSizes.getY(),  0.0, textureCoordAABB.getCenterX() + textureCoordAABB.getHalfWidth(), textureCoordAABB.getCenterY() + textureCoordAABB.getHalfHeight());
-        tessellator.addVertexWithUV(-(0.5F) * halfSizes.getX(), (0.5F) * halfSizes.getY(),  0.0, textureCoordAABB.getCenterX() - textureCoordAABB.getHalfWidth(), textureCoordAABB.getCenterY() + textureCoordAABB.getHalfHeight());
+        tessellator.addVertexWithUV(-(0.5F) * halfSizes.getX(), -(0.5F) * halfSizes.getY(), 0.0, icon.getMinU(), icon.getMinV());
+        tessellator.addVertexWithUV((0.5F) * halfSizes.getX(),  -(0.5F) * halfSizes.getY(), 0.0, icon.getMaxU(), icon.getMinV());
+        tessellator.addVertexWithUV((0.5F) * halfSizes.getX(),  (0.5F) * halfSizes.getY(),  0.0, icon.getMaxU(), icon.getMaxV());
+        tessellator.addVertexWithUV(-(0.5F) * halfSizes.getX(), (0.5F) * halfSizes.getY(),  0.0, icon.getMinU(), icon.getMaxV());
 
         tessellator.draw();
 
@@ -106,15 +123,15 @@ public class TessellatorParticleRenderer extends AbstractParticleRenderer {
                 Vector3f.cross(upAux, particleToCameraProj, upAux);
 
                 if (angleCosine < 0.9999 && angleCosine > -0.9999) {
-                    GL11.glRotatef((float)(Math.acos(angleCosine) * 180.0 / 3.141592653589793), upAux.getX(), upAux.getY(), upAux.getZ());
+                    GL11.glRotatef((float) (Math.acos(angleCosine) * 180.0 / Math.PI), upAux.getX(), upAux.getY(), upAux.getZ());
                 }
 
                 angleCosine = Vector3f.dot(particleToCameraProj, particleToCamera);
                 if (angleCosine < 0.9999 && angleCosine > -0.9999) {
                     if (particleToCamera.getY() < 0.0f) {
-                        GL11.glRotatef((float) (Math.acos(angleCosine) * 180.0 / 3.141592653589793), 1.0f, 0.0f, 0.0f);
+                        GL11.glRotatef((float) (Math.acos(angleCosine) * 180.0 / Math.PI), 1.0f, 0.0f, 0.0f);
                     } else {
-                        GL11.glRotatef((float) (Math.acos(angleCosine) * 180.0 / 3.141592653589793), -1.0f, 0.0f, 0.0f);
+                        GL11.glRotatef((float) (Math.acos(angleCosine) * 180.0 / Math.PI), -1.0f, 0.0f, 0.0f);
                     }
                 }
             } else {
@@ -141,7 +158,7 @@ public class TessellatorParticleRenderer extends AbstractParticleRenderer {
                 }
 
                 if (angleCosine2 < 0.9999 && angleCosine2 > -0.9999) {
-                    GL11.glRotatef((float) (Math.acos(angleCosine2) * 180.0 / 3.141592653589793), upAux.getX(), upAux.getY(), upAux.getZ());
+                    GL11.glRotatef((float) (Math.acos(angleCosine2) * 180.0 / Math.PI), upAux.getX(), upAux.getY(), upAux.getZ());
                 }
             }
         }
