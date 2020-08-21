@@ -32,10 +32,10 @@ void main() {
     particleLocalAng = particleLocalAngles;
     /*
     texCoordAABB - текстурные координаты представлены в виде AABB:
-    x - xCenter
-    y - yCenter
-    z - halfWidth
-    w - halfHeight
+    x - minU
+    y - minV
+    z - maxU
+    w - maxV
     */
     texCoordAABB = particleTextureCoordAABB;
 

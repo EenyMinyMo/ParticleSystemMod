@@ -73,19 +73,19 @@ void main() {
 
     colorFactor = vec4(particleColorFact[0]);
 
-    textureCoord = vec2(texCoordAABB[0].x - texCoordAABB[0].z, texCoordAABB[0].y - texCoordAABB[0].w);
+    textureCoord = vec2(texCoordAABB[0].x, texCoordAABB[0].y);
     gl_Position = commonTransformMat * vec4(- halfSideScales.x, - halfSideScales.y, 0, 1);
     EmitVertex();
 
-    textureCoord = vec2(texCoordAABB[0].x + texCoordAABB[0].z, texCoordAABB[0].y - texCoordAABB[0].w);
+    textureCoord = vec2(texCoordAABB[0].z, texCoordAABB[0].y);
     gl_Position = commonTransformMat * vec4(halfSideScales.x, - halfSideScales.y, 0, 1);
     EmitVertex();
 
-    textureCoord = vec2(texCoordAABB[0].x - texCoordAABB[0].z, texCoordAABB[0].y + texCoordAABB[0].w);
+    textureCoord = vec2(texCoordAABB[0].x, texCoordAABB[0].w);
     gl_Position = commonTransformMat * vec4(- halfSideScales.x, halfSideScales.y, 0, 1);
     EmitVertex();
 
-    textureCoord = vec2(texCoordAABB[0].x + texCoordAABB[0].z, texCoordAABB[0].y + texCoordAABB[0].w);
+    textureCoord = vec2(texCoordAABB[0].z, texCoordAABB[0].w);
     gl_Position = commonTransformMat * vec4(halfSideScales.x, halfSideScales.y, 0, 1);
     EmitVertex();
 

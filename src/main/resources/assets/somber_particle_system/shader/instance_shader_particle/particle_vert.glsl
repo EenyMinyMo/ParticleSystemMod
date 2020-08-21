@@ -74,7 +74,26 @@ void main() {
     Так сделано для уменьшения количества входных типов данных вершины.
     */
     colorFactor = particleColorFactor;
-    texCoord = vec2(particleTextureCoordAABB.xy) + vec2(particlePosition * 2 * particleTextureCoordAABB.zw);
+
+    /*
+    x - minU
+    y - minV
+    z - maxU
+    w - maxV
+    Для нахождения тектурных координат вершины применяются следующий алгортим:
+    1. Находим центр текстуры по координатам. (min + max) / 2
+    2. Находим размер стороны прямоугольника текстуры. (max - min)
+    3. Вершина частицы всегда имеет координаты:
+    .(-0.5, 0.5)-----.(0.5, 0.5)
+    |                |
+    |                |
+    .(-0.5, -0.5)----.(0.5, -0.5)
+    Тогда умножением размеров стороны текстуры на координаты вершины и прибавлением координат центра текстуры
+    мы получим нужные координаты вершины текстуры, соответствующие вершине частицы.
+    */
+    vec2 texCoordCenter = vec2(particleTextureCoordAABB.xy + particleTextureCoordAABB.zw) / 2;
+    vec2 texCoordSideSizes = vec2(particleTextureCoordAABB.zw - particleTextureCoordAABB.xy);
+    texCoord = vec2(texCoordCenter.xy) + vec2(particlePosition.xy * texCoordSideSizes.xy);
 
     gl_Position = commonTransformMat * vec4(particlePosition * particleScale, 0, 1);
 }
