@@ -32,16 +32,16 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
 
     /**
      * Здесь хранятся спрайты, которые будут загружаться.
-     * Хранение в формате <Название текстуры, соответствующий TextureAtlasSprite>.
+     * Хранение в формате <Название текстуры, соответствующий ParticleTextureAtlas>.
      */
-    private final Map<String, TextureAtlasSprite> mapRegisteredSprites = Maps.newHashMap();
+    private final Map<String, ParticleAtlasSprite> mapRegisteredSprites = Maps.newHashMap();
     /**
      * Здесь хранятся спрайты, вошедшие в текущий текстурный атлас. Т.е. мапа заполнена спрайтами, имеющися в уже готовом атласе.
-     * <Название текстуры, соответствующий TextureAtlasSprite>.
+     * <Название текстуры, соответствующий ParticleTextureAtlas>.
      */
-    private final Map<String, TextureAtlasSprite> mapUploadedSprites = Maps.newHashMap();
+    private final Map<String, ParticleAtlasSprite> mapUploadedSprites = Maps.newHashMap();
     /** Список спрайтов, которые могут в анимацию. (майнкрафтовская штукенция) */
-    private final List<TextureAtlasSprite> listAnimatedSprites = Lists.newArrayList();
+    private final List<ParticleAtlasAnimatedSprite> listAnimatedSprites = Lists.newArrayList();
 
     /** Путь до атласа. Нужен для идетификации в менеджере ресурсов и формирования путей до ресурсов частиц. */
     private final String atlasPath;
@@ -53,7 +53,7 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
     private boolean skipFirst;
 
     /** Спрайт для отсутствующих текстур. */
-    private final TextureAtlasSprite missingImage = new ParticleAtlasSprite("missingno");
+    private final ParticleAtlasSprite missingImage = new ParticleAtlasSprite("missingno");
 
 
     public ParticleTextureAtlas(String atlasPath) {
@@ -71,12 +71,15 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
         this.mipmapLevels = mipmapLevels;
 
         initMissingImage();
+        Minecraft.getMinecraft().renderEngine.loadTickableTexture(new ResourceLocation(atlasPath), this);
     }
 
     /**
      * Загружает частицы и формирует текстурный атлас частиц.
      */
     public void loadTextureAtlas(IResourceManager resourceManager) {
+        this.deleteGlTexture();
+
         //они будут заполнены далее.
         this.mapUploadedSprites.clear();
         this.listAnimatedSprites.clear();
@@ -101,7 +104,7 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
         stitcher.doStitch();
 
         //Выделяем место под текстуру-атлас в OGL. Данные в эту текстуру загружаем ниже.
-        logger.info("Created: {}x{} {}-particle atlas", stitcher.getCurrentWidth(), stitcher.getCurrentHeight(), this.atlasPath);
+        logger.info("Created: {}x{} {}-atlas", stitcher.getCurrentWidth(), stitcher.getCurrentHeight(), this.atlasPath);
         TextureUtil.allocateTextureImpl(
                 this.getGlTextureId(),
                 this.mipmapLevels,
@@ -110,9 +113,9 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
                 this.anisotropicFiltering);
 
         //Все спрайты в mapRegisteredSprites, которые вошли в stitcher, загрузить в текстуру openGL вместе с их мипмапами.
-        HashMap<String, TextureAtlasSprite> tempMapRegisteredSprites = Maps.newHashMap(this.mapRegisteredSprites);
-        List<TextureAtlasSprite> stichSlots = stitcher.getStichSlots();
-        for (TextureAtlasSprite atlasSprite : stichSlots) {
+        HashMap<String, ParticleAtlasSprite> tempMapRegisteredSprites = Maps.newHashMap(this.mapRegisteredSprites);
+        List<ParticleAtlasSprite> stichSlots = stitcher.getStichSlots();
+        for (ParticleAtlasSprite atlasSprite : stichSlots) {
             String iconName = atlasSprite.getIconName();
             tempMapRegisteredSprites.remove(iconName);
             this.mapUploadedSprites.put(iconName, atlasSprite);
@@ -139,16 +142,18 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
                 throw new ReportedException(crashreport1);
             }
 
-            if (atlasSprite.hasAnimationMetadata()) {
-                this.listAnimatedSprites.add(atlasSprite);
-            } else {
-                atlasSprite.clearFramesTextureData();
-            }
+            atlasSprite.clearFramesTextureData();
         }
 
         //Для всех, не вошедших в mapRegisteredSprites спрайтов, установить атрибуты от missingImage.
         for (TextureAtlasSprite atlasSprite : tempMapRegisteredSprites.values()) {
             atlasSprite.copyFrom(this.missingImage);
+        }
+
+        for (ParticleAtlasSprite sprite : mapRegisteredSprites.values()) {
+            if (sprite.isAnimatedSprite()) {
+                listAnimatedSprites.add((ParticleAtlasAnimatedSprite) sprite);
+            }
         }
     }
 
@@ -179,14 +184,14 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
      * Регистрация спрайта для загруки в атлас.
      * При следующем формировании атласа переданный спрайт будет загружен в атлас.
      */
-    public void registerSpriteTexture(String spriteName, TextureAtlasSprite textureAtlasSprite) {
-        mapRegisteredSprites.put(spriteName, textureAtlasSprite);
+    public void registerSpriteTexture(String spriteName, ParticleAtlasSprite particleAtlasSprite) {
+        mapRegisteredSprites.put(spriteName, particleAtlasSprite);
     }
 
     /**
      * Возвращает зарегистрированный спрайт по его имени.
      */
-    public TextureAtlasSprite getRegisteredTextureAtlasSprite(String spriteName) {
+    public ParticleAtlasSprite getRegisteredTextureAtlasSprite(String spriteName) {
         return mapRegisteredSprites.get(spriteName);
     }
 
@@ -206,13 +211,13 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
      * Возвращает спрайт по имени, если он входит в текущий текстурный атлас.
      * Иначе возвращается текстура-заглушка.
      */
-    public TextureAtlasSprite getAtlasSprite(String spriteName) {
-        TextureAtlasSprite textureAtlasSprite = this.mapUploadedSprites.get(spriteName);
-        if (textureAtlasSprite == null) {
-            textureAtlasSprite = this.missingImage;
+    public ParticleAtlasSprite getAtlasSprite(String spriteName) {
+        ParticleAtlasSprite particleAtlasSprite = this.mapUploadedSprites.get(spriteName);
+        if (particleAtlasSprite == null) {
+            particleAtlasSprite = this.missingImage;
         }
 
-        return textureAtlasSprite;
+        return particleAtlasSprite;
     }
 
     /**
@@ -236,26 +241,20 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
      * Короче майнкрафтовская штукенция для анимированных текстур. Лучше не юзать.
      */
     public void updateAnimations() {
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.getGlTextureId());
-
         for (TextureAtlasSprite textureAtlasSprite : this.listAnimatedSprites) {
             textureAtlasSprite.updateAnimation();
         }
     }
 
     @Override
-    public void loadTexture(IResourceManager resourceManager) throws IOException {
-        this.initMissingImage();
-        this.deleteGlTexture();
-        this.loadTextureAtlas(resourceManager);
-    }
+    public void loadTexture(IResourceManager resourceManager) throws IOException {}
 
     @Override
     public IIcon registerIcon(String iconName) {
         if (iconName == null) {
             throw new IllegalArgumentException("Name cannot be null!");
         } else if (iconName.indexOf(92) == -1) {  // Disable backslashes (\) in texture asset paths.
-            TextureAtlasSprite textureAtlasSprite = this.mapRegisteredSprites.get(iconName);
+            ParticleAtlasSprite textureAtlasSprite = this.mapRegisteredSprites.get(iconName);
 
             if (textureAtlasSprite == null) {
                 textureAtlasSprite = new ParticleAtlasSprite(iconName);
@@ -269,9 +268,23 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
         }
     }
 
+    public IIcon registerIcon(ParticleAtlasSprite sprite) {
+        String iconName = sprite.getIconName();
+
+        if (iconName == null) {
+            throw new IllegalArgumentException("Name cannot be null!");
+        } else if (iconName.indexOf(92) == -1) {  // Disable backslashes (\) in texture asset paths.
+            this.mapRegisteredSprites.put(iconName, sprite);
+
+            return sprite;
+        } else {
+            throw new IllegalArgumentException("Name cannot contain slashes!");
+        }
+    }
+
     @Override
     public void tick() {
-//        this.updateAnimations();
+        this.updateAnimations();
     }
 
 
@@ -306,7 +319,7 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
         int minCountTexelForSprite = Integer.MAX_VALUE;
 
         //здесь происходит загрузка спрайтов.
-        for (Map.Entry<String, TextureAtlasSprite> entry : this.mapRegisteredSprites.entrySet()) {
+        for (Map.Entry<String, ParticleAtlasSprite> entry : this.mapRegisteredSprites.entrySet()) {
             ResourceLocation resourcelocation = new ResourceLocation(entry.getKey());
             TextureAtlasSprite textureAtlasSprite = entry.getValue();
             ResourceLocation completeResourceLocation = this.completeResourceLocation(resourcelocation, 0);
@@ -348,8 +361,7 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
                         }
                     }
 
-                    AnimationMetadataSection animationMetadataSection = (AnimationMetadataSection) textureImageResource.getMetadata("animation");
-                    textureAtlasSprite.loadSprite(buffImageMipmapData, animationMetadataSection, this.anisotropicFiltering > 1);
+                    textureAtlasSprite.loadSprite(buffImageMipmapData, null, this.anisotropicFiltering > 1);
                 } catch (RuntimeException runtimeexception) {
                     //logger.error("Unable to parse metadata from " + completeResourceLocation, runtimeexception);
                     cpw.mods.fml.client.FMLClientHandler.instance().trackBrokenTexture(completeResourceLocation, runtimeexception.getMessage());
