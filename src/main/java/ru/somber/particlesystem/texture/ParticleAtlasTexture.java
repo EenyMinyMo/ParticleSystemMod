@@ -6,7 +6,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.*;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.client.resources.data.AnimationMetadataSection;
 import net.minecraft.client.resources.data.TextureMetadataSection;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
@@ -16,7 +15,6 @@ import net.minecraft.util.ReportedException;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.opengl.GL11;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -26,22 +24,46 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-public class ParticleTextureAtlas extends AbstractTexture implements ITickableTextureObject, IIconRegister {
+/**
+ * Класс для представления текстурного атласа частиц.
+ * Во многом скопирован с манйкрафтовского TextureMap, однако здесь добавлена документация и вырезана часть ненужного кода.
+ *
+ * <p> Создание атласа:
+ * <p> 1. Создаем объект класса с корректными atlasPath и уровнями анизатропной фильтрации и мипмапы.
+ * <p> Для atlasPath: путь до папки с тексутрами для атласа. Все текстуры атласа должны храниться в этой папке.
+ * atlasPath должен быть следующего формата: "MOD_ID:путь_до_папки_с_текстурами".
+ *
+ * <p> 2. Все используемые для частиц спрайты зарегистрировать. Лучше делать это, используя метод с параматром-объектом готовой иконки.
+ * Т.е. объект иконки создать заранее и прописать ему нужные характеристики.
+ * Для использования иконок подойдут только иконки-наследники от ParticleAtlasIcon.
+ * Для объекта иконок прописывать имя следующим образом: "MOD_ID + ":название_файла_частицы"".
+ * В качестве названия файла указывать только само название файла! Папки до файла не нужно!
+ *
+ * <p> 3. Вызвать loadTextureAtlas с переданными файловым менеджером (можно юзать майнкрафтовский).
+ * Этот метод загрузит текстурки частиц и сформирует текстурный атласа.
+ *
+ * <p> Использование атласа:
+ * <p> 1. Забиндить атлас как текстуру.
+ * <p> 2. Получить объекты иконок, в которых уже хранятся нужные текстурные координаты. Рисовать объекты с этими текстурными координатами.
+ *
+ * <p> При внесении изменений в атлас (добавление новой иконки и тд.) требуется пересоздавать атлас, иначе изменения не будут учтены.
+ */
+public class ParticleAtlasTexture extends AbstractTexture implements ITickableTextureObject, IIconRegister {
 
     private static final Logger logger = LogManager.getLogger();
 
     /**
-     * Здесь хранятся спрайты, которые будут загружаться.
-     * Хранение в формате <Название текстуры, соответствующий ParticleTextureAtlas>.
+     * Здесь хранятся иконки, которые будут загружаться.
+     * Хранение в формате <Название иконки, соответствующий ParticleAtlasIcon>.
      */
-    private final Map<String, ParticleAtlasSprite> mapRegisteredSprites = Maps.newHashMap();
+    private final Map<String, ParticleAtlasIcon> mapRegisteredIcons = Maps.newHashMap();
     /**
-     * Здесь хранятся спрайты, вошедшие в текущий текстурный атлас. Т.е. мапа заполнена спрайтами, имеющися в уже готовом атласе.
-     * <Название текстуры, соответствующий ParticleTextureAtlas>.
+     * Здесь хранятся иконки, вошедшие в текущий текстурный атлас. Т.е. мапа заполнена иконки, имеющися в уже готовом атласе.
+     * <Название иконки, соответствующий ParticleAtlasIcon>.
      */
-    private final Map<String, ParticleAtlasSprite> mapUploadedSprites = Maps.newHashMap();
-    /** Список спрайтов, которые могут в анимацию. (майнкрафтовская штукенция) */
-    private final List<ParticleAtlasAnimatedSprite> listAnimatedSprites = Lists.newArrayList();
+    private final Map<String, ParticleAtlasIcon> mapUploadedIcons = Maps.newHashMap();
+    /** Список иконок, которые могут в анимацию. */
+    private final List<ParticleAtlasIcon> listAnimatedIcons = Lists.newArrayList();
 
     /** Путь до атласа. Нужен для идетификации в менеджере ресурсов и формирования путей до ресурсов частиц. */
     private final String atlasPath;
@@ -49,24 +71,27 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
     private int mipmapLevels;
     /** Уровень анизатропной фильтрации для этого алтаса. */
     private int anisotropicFiltering = 1;
-    /** Нужно ли пропускать загрузку частиц при первом вызове loadTextureAtlas. */
-    private boolean skipFirst;
 
     /** Спрайт для отсутствующих текстур. */
-    private final ParticleAtlasSprite missingImage = new ParticleAtlasSprite("missingno");
+    private final ParticleAtlasIcon missingImage = new ParticleAtlasIcon("missingno");
 
 
-    public ParticleTextureAtlas(String atlasPath) {
-        this(atlasPath, 1, 0, false);
+    /**
+     * @param atlasPath путь до папки с тексутрами для атласа. Все текстуры атласа должны храниться в этой папке.
+     *                  atlasPath должен быть следующего формата: "MOD_ID:путь_до_папки_с_текстурами"
+     */
+    public ParticleAtlasTexture(String atlasPath) {
+        this(atlasPath, 1, 0);
     }
 
-    public ParticleTextureAtlas(String atlasPath, boolean skipFirst) {
-        this(atlasPath, 1, 0, skipFirst);
-    }
-
-    public ParticleTextureAtlas(String atlasPath, int anisotropicFiltering, int mipmapLevels, boolean skipFirst) {
+    /**
+     * @param atlasPath путь до папки с тексутрами для атласа. Все текстуры атласа должны храниться в этой папке.
+     *                  atlasPath должен быть следующего формата: "MOD_ID:путь_до_папки_с_текстурами"
+     * @param anisotropicFiltering уровень анизатропной фильтрации.
+     * @param mipmapLevels уровень формирования мипмапов.
+     */
+    public ParticleAtlasTexture(String atlasPath, int anisotropicFiltering, int mipmapLevels) {
         this.atlasPath = atlasPath;
-        this.skipFirst = skipFirst;
         this.anisotropicFiltering = anisotropicFiltering;
         this.mipmapLevels = mipmapLevels;
 
@@ -81,24 +106,20 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
         this.deleteGlTexture();
 
         //они будут заполнены далее.
-        this.mapUploadedSprites.clear();
-        this.listAnimatedSprites.clear();
+        this.mapUploadedIcons.clear();
+        this.listAnimatedIcons.clear();
 
         //инициализация ститчера.
         int maximumTextureSize = Minecraft.getGLMaximumTextureSize();
         Stitcher stitcher = new Stitcher(maximumTextureSize, maximumTextureSize, true, 0, this.mipmapLevels);
 
-        //Выполнить только если не пропускаем первую инициализацию.
-        //Здесь происходит подготовка всех спрайтов из mapRegisteredSprites
-        if (! skipFirst) {
-            loadSprites(resourceManager, stitcher, maximumTextureSize);
-            generateMipmap();
-        }
+        //Здесь происходит загрузка и дальнешая подготовка всех спрайтов из mapRegisteredIcons
+        loadAllIcons(resourceManager, stitcher, maximumTextureSize);
+        generateMipmap();
 
         //подготовка текстуры-заглушки.
         this.missingImage.generateMipmaps(this.mipmapLevels);
         stitcher.addSprite(this.missingImage);
-        skipFirst = false;
 
         //Сшиваем текстуру.
         stitcher.doStitch();
@@ -113,22 +134,22 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
                 this.anisotropicFiltering);
 
         //Все спрайты в mapRegisteredSprites, которые вошли в stitcher, загрузить в текстуру openGL вместе с их мипмапами.
-        HashMap<String, ParticleAtlasSprite> tempMapRegisteredSprites = Maps.newHashMap(this.mapRegisteredSprites);
-        List<ParticleAtlasSprite> stichSlots = stitcher.getStichSlots();
-        for (ParticleAtlasSprite atlasSprite : stichSlots) {
-            String iconName = atlasSprite.getIconName();
-            tempMapRegisteredSprites.remove(iconName);
-            this.mapUploadedSprites.put(iconName, atlasSprite);
+        HashMap<String, ParticleAtlasIcon> tempMapRegisteredIcons = Maps.newHashMap(this.mapRegisteredIcons);
+        List<ParticleAtlasIcon> stichSlots = stitcher.getStichSlots();
+        for (ParticleAtlasIcon atlasIcons : stichSlots) {
+            String iconName = atlasIcons.getIconName();
+            tempMapRegisteredIcons.remove(iconName);
+            this.mapUploadedIcons.put(iconName, atlasIcons);
 
             try {
                 //загрузить данные текстуры вместе с их мипмапами в текстуру-атлас
                 //по сути это glTexSubImage2D
                 TextureUtil.uploadTextureMipmap(
-                        atlasSprite.getFrameTextureData(0),
-                        atlasSprite.getIconWidth(),
-                        atlasSprite.getIconHeight(),
-                        atlasSprite.getOriginX(),
-                        atlasSprite.getOriginY(),
+                        atlasIcons.getFrameTextureData(0),
+                        atlasIcons.getIconWidth(),
+                        atlasIcons.getIconHeight(),
+                        atlasIcons.getOriginX(),
+                        atlasIcons.getOriginY(),
                         false,
                         false);
             } catch (Throwable throwable) {
@@ -137,72 +158,51 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
                 CrashReportCategory crashreportcategory1 = crashreport1.makeCategory("Texture being stitched together");
 
                 crashreportcategory1.addCrashSection("Atlas path", this.atlasPath);
-                crashreportcategory1.addCrashSection("Sprite", atlasSprite);
+                crashreportcategory1.addCrashSection("Sprite", atlasIcons);
 
                 throw new ReportedException(crashreport1);
             }
 
-            atlasSprite.clearFramesTextureData();
+            atlasIcons.clearFramesTextureData();
         }
 
         //Для всех, не вошедших в mapRegisteredSprites спрайтов, установить атрибуты от missingImage.
-        for (TextureAtlasSprite atlasSprite : tempMapRegisteredSprites.values()) {
+        for (ParticleAtlasIcon atlasSprite : tempMapRegisteredIcons.values()) {
             atlasSprite.copyFrom(this.missingImage);
         }
 
-        for (ParticleAtlasSprite sprite : mapRegisteredSprites.values()) {
-            if (sprite.isAnimatedSprite()) {
-                listAnimatedSprites.add((ParticleAtlasAnimatedSprite) sprite);
+        for (ParticleAtlasIcon icon : mapRegisteredIcons.values()) {
+            if (icon.isAnimatedIcon()) {
+                listAnimatedIcons.add((ParticleAtlasAnimatedIcon) icon);
             }
         }
-    }
-
-    /**
-     * В зависимости от номера мипмапа формирует путь до ресурса.
-     * Путь до ресурса выглядит следующим образом:
-     * <p>
-     * Мипмап 0: atlasPath + "/" + spriteLocation + ".png"
-     * <p>
-     * Мипмап не 0: atlasPath + "/" + mipmaps + "/" + spriteLocation + "." + mipmapLevel + ".png"
-     * <p>
-     * Примеры:
-     * "atlasPath/spriteTexture.png", "atlasPath/mipmaps/spriteTexture.2.png"
-     */
-    private ResourceLocation completeResourceLocation(ResourceLocation spriteLocation, int mipmapLevel) {
-        ResourceLocation location;
-
-        if (mipmapLevel == 0) {
-            location = new ResourceLocation(spriteLocation.getResourceDomain(), String.format("%s/%s%s", this.atlasPath, spriteLocation.getResourcePath(), ".png"));
-        } else {
-            location = new ResourceLocation(spriteLocation.getResourceDomain(), String.format("%s/mipmaps/%s.%d%s", this.atlasPath, spriteLocation.getResourcePath(), mipmapLevel, ".png"));
-        }
-
-        return location;
-    }
-
-    /**
-     * Регистрация спрайта для загруки в атлас.
-     * При следующем формировании атласа переданный спрайт будет загружен в атлас.
-     */
-    public void registerSpriteTexture(String spriteName, ParticleAtlasSprite particleAtlasSprite) {
-        mapRegisteredSprites.put(spriteName, particleAtlasSprite);
     }
 
     /**
      * Возвращает зарегистрированный спрайт по его имени.
      */
-    public ParticleAtlasSprite getRegisteredTextureAtlasSprite(String spriteName) {
-        return mapRegisteredSprites.get(spriteName);
+    public ParticleAtlasIcon getRegisteredParticleAtlasIcon(String iconName) {
+        return mapRegisteredIcons.get(iconName);
     }
 
+    /**
+     * Возвращает путь до папки с атласом.
+     * Все текстуры атласа должны храниться в этой папке.
+     */
     public String getAtlasPath() {
         return atlasPath;
     }
 
+    /**
+     * Возвращает уровень создания мипмапов.
+     */
     public int getMipmapLevels() {
         return mipmapLevels;
     }
 
+    /**
+     * Возвращает уровень анизатропной фильтрации.
+     */
     public int getAnisotropicFiltering() {
         return anisotropicFiltering;
     }
@@ -211,13 +211,13 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
      * Возвращает спрайт по имени, если он входит в текущий текстурный атлас.
      * Иначе возвращается текстура-заглушка.
      */
-    public ParticleAtlasSprite getAtlasSprite(String spriteName) {
-        ParticleAtlasSprite particleAtlasSprite = this.mapUploadedSprites.get(spriteName);
-        if (particleAtlasSprite == null) {
-            particleAtlasSprite = this.missingImage;
+    public ParticleAtlasIcon getAtlasIcon(String iconName) {
+        ParticleAtlasIcon particleAtlasIcon = this.mapUploadedIcons.get(iconName);
+        if (particleAtlasIcon == null) {
+            particleAtlasIcon = this.missingImage;
         }
 
-        return particleAtlasSprite;
+        return particleAtlasIcon;
     }
 
     /**
@@ -241,8 +241,8 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
      * Короче майнкрафтовская штукенция для анимированных текстур. Лучше не юзать.
      */
     public void updateAnimations() {
-        for (TextureAtlasSprite textureAtlasSprite : this.listAnimatedSprites) {
-            textureAtlasSprite.updateAnimation();
+        for (ParticleAtlasIcon particleAtlasIcon : this.listAnimatedIcons) {
+            particleAtlasIcon.updateAnimation();
         }
     }
 
@@ -250,16 +250,21 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
     public void loadTexture(IResourceManager resourceManager) throws IOException {}
 
     @Override
+    public void tick() {
+        this.updateAnimations();
+    }
+
+    @Override
     public IIcon registerIcon(String iconName) {
         if (iconName == null) {
             throw new IllegalArgumentException("Name cannot be null!");
         } else if (iconName.indexOf(92) == -1) {  // Disable backslashes (\) in texture asset paths.
-            ParticleAtlasSprite textureAtlasSprite = this.mapRegisteredSprites.get(iconName);
+            ParticleAtlasIcon textureAtlasSprite = this.mapRegisteredIcons.get(iconName);
 
             if (textureAtlasSprite == null) {
-                textureAtlasSprite = new ParticleAtlasSprite(iconName);
+                textureAtlasSprite = new ParticleAtlasIcon(iconName);
 
-                this.mapRegisteredSprites.put(iconName, textureAtlasSprite);
+                this.mapRegisteredIcons.put(iconName, textureAtlasSprite);
             }
 
             return textureAtlasSprite;
@@ -268,23 +273,21 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
         }
     }
 
-    public IIcon registerIcon(ParticleAtlasSprite sprite) {
-        String iconName = sprite.getIconName();
+    /**
+     * Вносит переданную иконку в список иконок для загрузки и формирования атласа с ней.
+     */
+    public IIcon registerIcon(ParticleAtlasIcon icon) {
+        String iconName = icon.getIconName();
 
         if (iconName == null) {
             throw new IllegalArgumentException("Name cannot be null!");
         } else if (iconName.indexOf(92) == -1) {  // Disable backslashes (\) in texture asset paths.
-            this.mapRegisteredSprites.put(iconName, sprite);
+            this.mapRegisteredIcons.put(iconName, icon);
 
-            return sprite;
+            return icon;
         } else {
             throw new IllegalArgumentException("Name cannot contain slashes!");
         }
-    }
-
-    @Override
-    public void tick() {
-        this.updateAnimations();
     }
 
 
@@ -295,13 +298,16 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
         int[] textureData;
 
         if (this.anisotropicFiltering > 1) {
+            textureData = new int[1024];
+
             this.missingImage.setIconWidth(32);
             this.missingImage.setIconHeight(32);
-            textureData = new int[1024];
+
             System.arraycopy(TextureUtil.missingTextureData, 0, textureData, 0, TextureUtil.missingTextureData.length);
             TextureUtil.prepareAnisotropicData(textureData, 16, 16, 8);
         } else {
             textureData = TextureUtil.missingTextureData;
+
             this.missingImage.setIconWidth(16);
             this.missingImage.setIconHeight(16);
         }
@@ -312,16 +318,16 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
     }
 
     /**
-     * Загружает спрайты из mapRegisteredSprites стандартным майновским способом.
+     * Загружает иконки из mapRegisteredIcons стандартным майновским способом.
      */
-    private void loadSprites(IResourceManager resourceManager, Stitcher stitcher, int maximumTextureSize) {
+    private void loadAllIcons(IResourceManager resourceManager, Stitcher stitcher, int maximumTextureSize) {
         //сохранит количество текселей самой маленькой стороны спрайта среди всех спрайтов.
         int minCountTexelForSprite = Integer.MAX_VALUE;
 
         //здесь происходит загрузка спрайтов.
-        for (Map.Entry<String, ParticleAtlasSprite> entry : this.mapRegisteredSprites.entrySet()) {
+        for (Map.Entry<String, ParticleAtlasIcon> entry : this.mapRegisteredIcons.entrySet()) {
             ResourceLocation resourcelocation = new ResourceLocation(entry.getKey());
-            TextureAtlasSprite textureAtlasSprite = entry.getValue();
+            ParticleAtlasIcon textureAtlasSprite = entry.getValue();
             ResourceLocation completeResourceLocation = this.completeResourceLocation(resourcelocation, 0);
 
             if (textureAtlasSprite.hasCustomLoader(resourceManager, resourcelocation)) {    //типо если есть кастомный загрузчик
@@ -386,12 +392,35 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
     }
 
     /**
+     * В зависимости от номера мипмапа формирует путь до ресурса.
+     * Путь до ресурса выглядит следующим образом:
+     * <p>
+     * Мипмап 0: atlasPath + "/" + iconLocation + ".png"
+     * <p>
+     * Мипмап не 0: atlasPath + "/" + mipmaps + "/" + iconLocation + "." + mipmapLevel + ".png"
+     * <p>
+     * Примеры:
+     * "atlasPath/iconTexture.png", "atlasPath/mipmaps/iconTexture.2.png"
+     */
+    private ResourceLocation completeResourceLocation(ResourceLocation iconLocation, int mipmapLevel) {
+        ResourceLocation location;
+
+        if (mipmapLevel == 0) {
+            location = new ResourceLocation(iconLocation.getResourceDomain(), String.format("%s/%s%s", this.atlasPath, iconLocation.getResourcePath(), ".png"));
+        } else {
+            location = new ResourceLocation(iconLocation.getResourceDomain(), String.format("%s/mipmaps/%s.%d%s", this.atlasPath, iconLocation.getResourcePath(), mipmapLevel, ".png"));
+        }
+
+        return location;
+    }
+
+    /**
      * Генерирование мипмапов для всех спрайтов в mapRegisteredSprites.
      */
     private void generateMipmap() {
-        for (TextureAtlasSprite textureAtlasSprite : this.mapRegisteredSprites.values()) {
+        for (ParticleAtlasIcon particleAtlasIcon : this.mapRegisteredIcons.values()) {
             try {
-                textureAtlasSprite.generateMipmaps(this.mipmapLevels);
+                particleAtlasIcon.generateMipmaps(this.mipmapLevels);
             } catch (Throwable throwable1) {
                 CrashReport crashreport = CrashReport.makeCrashReport(throwable1, "Applying mipmap");
                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Sprite being mipmapped");
@@ -400,7 +429,7 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
                     private static final String __OBFID = "CL_00001059";
 
                     public String call() {
-                        return textureAtlasSprite.getIconName();
+                        return particleAtlasIcon.getIconName();
                     }
                 });
 
@@ -408,7 +437,7 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
                     private static final String __OBFID = "CL_00001060";
 
                     public String call() {
-                        return textureAtlasSprite.getIconWidth() + " x " + textureAtlasSprite.getIconHeight();
+                        return particleAtlasIcon.getIconWidth() + " x " + particleAtlasIcon.getIconHeight();
                     }
                 });
 
@@ -416,7 +445,7 @@ public class ParticleTextureAtlas extends AbstractTexture implements ITickableTe
                     private static final String __OBFID = "CL_00001061";
 
                     public String call() {
-                        return textureAtlasSprite.getFrameCount() + " frames";
+                        return particleAtlasIcon.getFrameCount() + " frames";
                     }
                 });
 

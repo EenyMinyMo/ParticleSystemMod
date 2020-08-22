@@ -15,11 +15,10 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import ru.somber.clientutil.opengl.*;
-import ru.somber.clientutil.opengl.texture.TextureCoordAABB;
 import ru.somber.commonutil.SomberUtils;
 import ru.somber.particlesystem.ParticleSystemMod;
 import ru.somber.particlesystem.particle.IParticle;
-import ru.somber.particlesystem.texture.ParticleTextureAtlas;
+import ru.somber.particlesystem.texture.ParticleAtlasTexture;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
@@ -72,7 +71,7 @@ public class GeometryShaderParticleRenderer implements IParticleRenderer {
     /** Вынесено в переменные объекта, чтобы постоянное не создавать в методе. */
     private Vector3f particleCenterPosition, particleNormalVector;
 
-    private ParticleTextureAtlas textureAtlas;
+    private ParticleAtlasTexture textureAtlas;
 
 
     public GeometryShaderParticleRenderer() {
@@ -93,12 +92,12 @@ public class GeometryShaderParticleRenderer implements IParticleRenderer {
     }
 
     @Override
-    public ParticleTextureAtlas getParticleTextureAtlas() {
+    public ParticleAtlasTexture getParticleTextureAtlas() {
         return textureAtlas;
     }
 
     @Override
-    public void setParticleTextureAtlas(ParticleTextureAtlas textureAtlas) {
+    public void setParticleTextureAtlas(ParticleAtlasTexture textureAtlas) {
         this.textureAtlas = textureAtlas;
     }
 
@@ -363,7 +362,7 @@ public class GeometryShaderParticleRenderer implements IParticleRenderer {
             Vector3f localAngles = particle.getLocalRotateAngles();
             float[] colorFactor = particle.getColorFactor();
             String iconName = particle.getIconName();
-            IIcon icon = textureAtlas.getAtlasSprite(iconName);
+            IIcon icon = textureAtlas.getAtlasIcon(iconName);
 
 
             particleCenterPositionBuffer.put(particleCenterPosition.getX()).put(particleCenterPosition.getY()).put(particleCenterPosition.getZ());

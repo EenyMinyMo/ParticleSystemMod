@@ -3,7 +3,7 @@ package ru.somber.particlesystem.render;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import ru.somber.particlesystem.particle.IParticle;
-import ru.somber.particlesystem.texture.ParticleTextureAtlas;
+import ru.somber.particlesystem.texture.ParticleAtlasTexture;
 
 import java.util.List;
 
@@ -18,12 +18,12 @@ public interface IParticleRenderer {
     /**
      * Возращает текстурный атлас, из которого будут браться текстуры для отрисовки частиц.
      */
-    ParticleTextureAtlas getParticleTextureAtlas();
+    ParticleAtlasTexture getParticleTextureAtlas();
 
     /**
      * Устанавливает текстурный атлас, из которого будут браться текстуры для отрисовки частиц.
      */
-    void setParticleTextureAtlas(ParticleTextureAtlas textureAtlas);
+    void setParticleTextureAtlas(ParticleAtlasTexture textureAtlas);
 
     /**
      * Метод вызывается перед непосредственно рендером частиц, здесь осуществляется подготовка к отрисовке.

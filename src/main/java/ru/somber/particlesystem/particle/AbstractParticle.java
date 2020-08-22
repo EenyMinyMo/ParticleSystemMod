@@ -3,7 +3,6 @@ package ru.somber.particlesystem.particle;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import ru.somber.commonutil.Axis;
-import ru.somber.particlesystem.texture.ParticleAtlasSprite;
 
 /**
  * Абстрактный класс частицы, реализцющий наиболее общий функционал частиц.

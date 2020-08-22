@@ -1,10 +1,7 @@
 package ru.somber.particlesystem.particle;
 
-import net.minecraft.util.IIcon;
-import net.minecraft.util.ResourceLocation;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
-import ru.somber.clientutil.opengl.texture.TextureCoordAABB;
 import ru.somber.commonutil.Axis;
 
 /**
