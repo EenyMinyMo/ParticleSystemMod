@@ -336,31 +336,31 @@ public class ShaderIndividualParticleRenderer implements IParticleRenderer {
 
 
         countPrimitivePerBuffer = countParticles * 4 * 2;
-        vboDataManager.getEntry(particlePositionVBO).updateSize(countPrimitivePerBuffer, tickUpdate);
+        vboDataManager.getEntry(particlePositionVBO).updateSize(countPrimitivePerBuffer);
         particlePositionBuffer = vboDataManager.getDataBuffer(particlePositionVBO);
 
         countPrimitivePerBuffer = countParticles * 4 * 4;
-        vboDataManager.getEntry(particleColorFactorVBO).updateSize(countPrimitivePerBuffer, tickUpdate);
+        vboDataManager.getEntry(particleColorFactorVBO).updateSize(countPrimitivePerBuffer);
         particleColorFactorBuffer = vboDataManager.getDataBuffer(particleColorFactorVBO);
 
         countPrimitivePerBuffer = countParticles * 2 * 4;
-        vboDataManager.getEntry(particleSideScalesVBO).updateSize(countPrimitivePerBuffer, tickUpdate);
+        vboDataManager.getEntry(particleSideScalesVBO).updateSize(countPrimitivePerBuffer);
         particleSideScalesBuffer = vboDataManager.getDataBuffer(particleSideScalesVBO);
 
         countPrimitivePerBuffer = countParticles * 3 * 4;
-        vboDataManager.getEntry(particleCenterPositionVBO).updateSize(countPrimitivePerBuffer, tickUpdate);
+        vboDataManager.getEntry(particleCenterPositionVBO).updateSize(countPrimitivePerBuffer);
         particleCenterPositionBuffer = vboDataManager.getDataBuffer(particleCenterPositionVBO);
 
         countPrimitivePerBuffer = countParticles * 3 * 4;
-        vboDataManager.getEntry(particleNormalVectorVBO).updateSize(countPrimitivePerBuffer, tickUpdate);
+        vboDataManager.getEntry(particleNormalVectorVBO).updateSize(countPrimitivePerBuffer);
         particleNormalVectorBuffer = vboDataManager.getDataBuffer(particleNormalVectorVBO);
 
         countPrimitivePerBuffer = countParticles * 3 * 4;
-        vboDataManager.getEntry(particleLocalAnglesVBO).updateSize(countPrimitivePerBuffer, tickUpdate);
+        vboDataManager.getEntry(particleLocalAnglesVBO).updateSize(countPrimitivePerBuffer);
         particleLocalAnglesBuffer = vboDataManager.getDataBuffer(particleLocalAnglesVBO);
 
         countPrimitivePerBuffer = countParticles * 2 * 4;
-        vboDataManager.getEntry(particleTexCoordVBO).updateSize(countPrimitivePerBuffer, tickUpdate);
+        vboDataManager.getEntry(particleTexCoordVBO).updateSize(countPrimitivePerBuffer);
         particleTexCoordBuffer = vboDataManager.getDataBuffer(particleTexCoordVBO);
     }
 
