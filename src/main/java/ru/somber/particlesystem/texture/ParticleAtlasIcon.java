@@ -1,5 +1,7 @@
 package ru.somber.particlesystem.texture;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 /**
@@ -8,6 +10,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
  * Для использования прописывать имя чатиц следующим образом:"MOD_ID + ":название_файла_частицы"".
  * В качестве названия файла указывать только само название файла! Папки до файла не нужно!
  */
+@SideOnly(Side.CLIENT)
 public class ParticleAtlasIcon extends TextureAtlasSprite {
 
     /**

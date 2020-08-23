@@ -1,12 +1,15 @@
 package ru.somber.particlesystem.events;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import ru.somber.particlesystem.ParticleAPI;
 import ru.somber.particlesystem.manager.IParticleManager;
 
 import java.util.TreeMap;
 
+@SideOnly(Side.CLIENT)
 public class RenderEvent {
 
     private ParticleAPI particleAPI;

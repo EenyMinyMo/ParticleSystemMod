@@ -2,6 +2,8 @@ package ru.somber.particlesystem.texture;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.*;
 import net.minecraft.client.resources.IResource;
@@ -48,6 +50,7 @@ import java.util.concurrent.Callable;
  *
  * <p> При внесении изменений в атлас (добавление новой иконки и тд.) требуется пересоздавать атлас, иначе изменения не будут учтены.
  */
+@SideOnly(Side.CLIENT)
 public class ParticleAtlasTexture extends AbstractTexture implements ITickableTextureObject, IIconRegister {
 
     private static final Logger logger = LogManager.getLogger();

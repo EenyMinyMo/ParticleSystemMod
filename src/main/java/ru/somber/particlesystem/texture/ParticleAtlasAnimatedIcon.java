@@ -1,5 +1,8 @@
 package ru.somber.particlesystem.texture;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 /**
  * Класс для представления анимированных иконок.
  * Правила прописывания имени иконки аналогичные ParticleAtlasIcon.
@@ -13,6 +16,7 @@ package ru.somber.particlesystem.texture;
  * <p> Процесс выборки данных из анимированного атласа происходит следующим образом:
  * Кадры берутся в порядке слева направо, сверху вниз. Т.е. Левый верхний кадр - нулевой, нижний правый кадр - последний.
  */
+@SideOnly(Side.CLIENT)
 public class ParticleAtlasAnimatedIcon extends ParticleAtlasIcon {
 
     /** Количество колонок фреймов. */
