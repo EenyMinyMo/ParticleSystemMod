@@ -121,6 +121,18 @@ public class AbstractEmitter implements IParticleEmitter {
     }
 
 
+    @Override
+    public String toString() {
+        return "AbstractEmitter{" +
+                "isCreated=" + isCreated +
+                ", isDie=" + isDie +
+                ", x=" + x +
+                ", y=" + y +
+                ", z=" + z +
+                ", countParticles=" + getEmitterParticleList().size() +
+                '}';
+    }
+
     protected IParticleContainer getParticleContainer() {
         return particleContainer;
     }
