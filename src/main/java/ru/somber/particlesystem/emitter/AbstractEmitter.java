@@ -7,7 +7,7 @@ import ru.somber.particlesystem.particle.IParticle;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AbstractEmitter implements IParticleEmitter {
+public abstract class AbstractEmitter implements IParticleEmitter {
 
     /** true - эмиттер был создан через метод create и готов к работе, иначе false. */
     private boolean isCreated = false;
