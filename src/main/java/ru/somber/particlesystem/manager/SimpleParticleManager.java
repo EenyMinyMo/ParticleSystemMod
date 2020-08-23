@@ -5,14 +5,14 @@ import ru.somber.particlesystem.container.IParticleContainer;
 import ru.somber.particlesystem.container.comparator.ParticleComparator;
 import ru.somber.particlesystem.render.IParticleRenderer;
 
-public class TestParticleManager implements IParticleManager {
+public class SimpleParticleManager implements IParticleManager {
 
     private ParticleComparator particleComparator;
 
     private IParticleContainer particleContainer;
     private IParticleRenderer particleRenderer;
 
-    public TestParticleManager() {
+    public SimpleParticleManager() {
         particleComparator = new ParticleComparator(Minecraft.getMinecraft().thePlayer, 0);
     }
 
