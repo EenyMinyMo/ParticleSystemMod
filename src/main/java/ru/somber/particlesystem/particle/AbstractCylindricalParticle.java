@@ -34,7 +34,8 @@ public abstract class AbstractCylindricalParticle extends AbstractParticle {
         destination.z = particlePosition.z - zCamera;
     }
 
-
-    public abstract void update();
+    public void update() {
+        super.update();
+    }
 
 }

@@ -69,7 +69,8 @@ public abstract class AbstractUniversalParticle extends AbstractParticle {
         }
     }
 
-
-    public abstract void update();
+    public void update() {
+        super.update();
+    }
 
 }

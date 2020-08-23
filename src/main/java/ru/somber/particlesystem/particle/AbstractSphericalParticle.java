@@ -34,7 +34,8 @@ public abstract class AbstractSphericalParticle extends AbstractParticle {
         destination.z = particlePosition.z - zCamera;
     }
 
-
-    public abstract void update();
+    public void update() {
+        super.update();
+    }
 
 }

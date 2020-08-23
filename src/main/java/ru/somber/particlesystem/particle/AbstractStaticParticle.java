@@ -34,7 +34,8 @@ public abstract class AbstractStaticParticle extends AbstractParticle {
         destination.z = 1;
     }
 
-
-    public abstract void update();
+    public void update() {
+        super.update();
+    }
 
 }

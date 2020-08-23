@@ -31,6 +31,8 @@ public abstract class AbstractParticle implements IParticle {
     /** Здесь текстурные координаты. */
     protected String particleIconName;
 
+    private boolean isDie;
+
 
     public AbstractParticle(Vector3f newPosition, int maxLifeTime, String iconName) {
         this(newPosition, new Vector2f(0.5f, 0.5f), new Vector3f(0.0f, 0.0f, 0.0f), maxLifeTime, iconName);
@@ -50,6 +52,7 @@ public abstract class AbstractParticle implements IParticle {
         this.lifeTime = 0;
         this.particleIconName = iconName;
         this.colorFactor = new float[] {1, 1, 1, 1};
+        this.isDie = false;
     }
 
 
@@ -130,11 +133,6 @@ public abstract class AbstractParticle implements IParticle {
     }
 
     @Override
-    public boolean isDie() {
-        return getLifeTime() >= getMaxLifeTime();
-    }
-
-    @Override
     public void computeNormalVector(Vector3f destination, float xCamera, float yCamera, float zCamera, float interpolateFactor) {
         Vector3f interpolatePosition = new Vector3f();
         computeInterpolatedPosition(interpolatePosition, interpolateFactor);
@@ -142,11 +140,25 @@ public abstract class AbstractParticle implements IParticle {
         computeNormalVector(destination, xCamera, yCamera, zCamera, interpolatePosition);
     }
 
+    @Override
+    public boolean isDie() {
+        return isDie;
+    }
+
+    @Override
+    public void setDie() {
+        this.isDie = true;
+    }
+
+    public void update() {
+        if (getLifeTime() >= getMaxLifeTime()) {
+            setDie();
+        }
+    }
+
 
     public abstract Axis rotateAxis();
 
     public abstract void computeNormalVector(Vector3f destination, float xCamera, float yCamera, float zCamera, Vector3f particlePosition);
-
-    public abstract void update();
 
 }

@@ -103,8 +103,11 @@ public interface IParticle {
     /**
      * true - частица помечена мертвой.
      */
-    default boolean isDie() {
-        return getLifeTime() >= getMaxLifeTime();
-    }
+    boolean isDie();
+
+    /**
+     * Помечает частицу мертвой.
+     */
+    void setDie();
 
 }
