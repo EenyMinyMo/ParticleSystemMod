@@ -2,25 +2,23 @@ package ru.somber.particlesystem.render;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.*;
-import org.lwjgl.util.glu.GLU;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL31;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
-import ru.somber.clientutil.opengl.*;
+import ru.somber.clientutil.opengl.BufferObject;
+import ru.somber.clientutil.opengl.Shader;
+import ru.somber.clientutil.opengl.ShaderProgram;
+import ru.somber.clientutil.opengl.VertexAttribVBO;
 import ru.somber.commonutil.SomberUtils;
 import ru.somber.particlesystem.ParticleSystemMod;
 import ru.somber.particlesystem.particle.IParticle;
-import ru.somber.particlesystem.texture.ParticleAtlasTexture;
 
-import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.util.List;
 
@@ -54,33 +52,14 @@ public class InstanceShaderParticleRenderer extends AbstractShaderRenderer {
 
 
     @Override
-    protected void createShaderProgram() {
-        Shader vertexShader = new Shader(GL20.GL_VERTEX_SHADER);
-        Shader fragmentShader = new Shader(GL20.GL_FRAGMENT_SHADER);
+    protected void assembleShaderProgram() {
+        Shader vertexShader = Shader.createShaderObject(GL20.GL_VERTEX_SHADER,
+                new ResourceLocation(ParticleSystemMod.MOD_ID, "shaders/instance_shader_particle/particle_vert.glsl"));
 
-        try {
-            ResourceLocation vertexShaderCodeLocation =
-                    new ResourceLocation(ParticleSystemMod.MOD_ID, "shader/instance_shader_particle/particle_vert.glsl");
-            ResourceLocation fragmentShaderCodeLocation =
-                    new ResourceLocation(ParticleSystemMod.MOD_ID, "shader/instance_shader_particle/particle_frag.glsl");
+        Shader fragmentShader = Shader.createShaderObject(GL20.GL_FRAGMENT_SHADER,
+                new ResourceLocation(ParticleSystemMod.MOD_ID, "shaders/instance_shader_particle/particle_frag.glsl"));
 
-            vertexShader.setSourceCode(OpenGLUtils.loadShaderCode(vertexShaderCodeLocation));
-            fragmentShader.setSourceCode(OpenGLUtils.loadShaderCode(fragmentShaderCodeLocation));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        vertexShader.compileShader();
-        vertexShader.checkError();
-
-        fragmentShader.compileShader();
-        fragmentShader.checkError();
-
-        shaderProgram = new ShaderProgram();
-        shaderProgram.attachShader(vertexShader);
-        shaderProgram.attachShader(fragmentShader);
-        shaderProgram.linkProgram();
-        shaderProgram.checkError();
+        shaderProgram = ShaderProgram.createShaderProgram(vertexShader, fragmentShader);
     }
 
     @Override

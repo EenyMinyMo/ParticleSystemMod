@@ -5,11 +5,17 @@ import net.minecraft.entity.EntityLivingBase;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.*;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.glu.GLU;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
-import ru.somber.clientutil.opengl.*;
+import ru.somber.clientutil.opengl.ShaderProgram;
+import ru.somber.clientutil.opengl.VAO;
+import ru.somber.clientutil.opengl.VBODataManager;
+import ru.somber.clientutil.opengl.VertexAttribVBO;
 import ru.somber.commonutil.SomberUtils;
 import ru.somber.particlesystem.particle.IParticle;
 import ru.somber.particlesystem.texture.ParticleAtlasTexture;
@@ -140,7 +146,7 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
 
 
     protected void initShaderAndBuffers() {
-        createShaderProgram();
+        assembleShaderProgram();
         createVertexAttribVBOs();
         createVAO();
 
@@ -198,7 +204,7 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
 
     protected abstract void prepareUniforms();
 
-    protected abstract void createShaderProgram();
+    protected abstract void assembleShaderProgram();
 
     protected abstract void createVertexAttribVBOs();
 
