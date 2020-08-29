@@ -12,18 +12,13 @@ import java.util.TreeMap;
 @SideOnly(Side.CLIENT)
 public class RenderEvent {
 
-    private ParticleAPI particleAPI;
-    private TreeMap<Integer, IParticleManager> particleManagerTreeMap;
-
-    public RenderEvent() {
-        this.particleAPI = ParticleAPI.getInstance();
-        this.particleManagerTreeMap = this.particleAPI.getParticleManagerMap();
-    }
+    public RenderEvent() {}
 
     @SubscribeEvent
     public void renderParticleSystem(RenderWorldLastEvent event) {
         float interpolationFactor = event.partialTicks;
 
+        TreeMap<Integer, IParticleManager> particleManagerTreeMap = ParticleAPI.getInstance().getParticleManagerMap();
         particleManagerTreeMap.forEach((Integer priority, IParticleManager particleManager) -> {
             particleManager.render(interpolationFactor);
         });

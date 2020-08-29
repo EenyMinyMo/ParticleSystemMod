@@ -9,17 +9,12 @@ import java.util.TreeMap;
 
 public class UpdateEvent {
 
-    private ParticleAPI particleAPI;
-    private TreeMap<Integer, IParticleManager> particleManagerTreeMap;
-
-    public UpdateEvent() {
-        this.particleAPI = ParticleAPI.getInstance();
-        this.particleManagerTreeMap = this.particleAPI.getParticleManagerMap();
-    }
+    public UpdateEvent() {}
 
     @SubscribeEvent
     public void updateParticleSystem(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
+            TreeMap<Integer, IParticleManager> particleManagerTreeMap = ParticleAPI.getInstance().getParticleManagerMap();
             particleManagerTreeMap.forEach((Integer priority, IParticleManager particleManager) -> {
                 particleManager.update();
             });
