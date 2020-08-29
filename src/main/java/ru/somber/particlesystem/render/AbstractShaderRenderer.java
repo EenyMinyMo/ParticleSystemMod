@@ -130,7 +130,7 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
         GL11.glDisable(GL11.GL_BLEND);
 
 
-        checkError();
+        checkError(false);
     }
 
     @Override
@@ -185,7 +185,7 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
         }
     }
 
-    protected void checkError() {
+    protected void checkError(boolean throwException) {
         int i = GL11.glGetError();
 
         Logger logger = LogManager.getLogger();
@@ -197,7 +197,9 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
             logger.error("@ " + str);
             logger.error(i + ": " + s1);
 
-            throw new RuntimeException("########## GL ERROR ##########");
+            if (throwException) {
+                throw new RuntimeException("########## GL ERROR ##########");
+            }
         }
     }
 
