@@ -2,6 +2,7 @@ package ru.somber.particlesystem.texture;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.util.IIcon;
 
 /**
  * Класс для представления анимированных иконок.
@@ -68,30 +69,30 @@ public class ParticleAtlasAnimatedIcon extends ParticleAtlasIcon {
 
     @Override
     public float getMinV() {
-        if (isInvertedY()) {
-            return animatedMaxV;
-        } else {
-            return animatedMinV;
-        }
-    }
-
-    @Override
-    public float getMaxV() {
-        if (isInvertedY()) {
-            return animatedMinV;
-        } else {
-            return animatedMaxV;
-        }
-    }
-
-    @Override
-    public float getOriginalMinV() {
         return animatedMinV;
     }
 
     @Override
-    public float getOriginalMaxV() {
+    public float getMaxV() {
         return animatedMaxV;
+    }
+
+    @Override
+    public float getOriginalMinV() {
+        if (isInvertedY()) {
+            return animatedMaxV;
+        } else {
+            return animatedMinV;
+        }
+    }
+
+    @Override
+    public float getOriginalMaxV() {
+        if (isInvertedY()) {
+            return animatedMinV;
+        } else {
+            return animatedMaxV;
+        }
     }
 
     @Override
@@ -107,6 +108,11 @@ public class ParticleAtlasAnimatedIcon extends ParticleAtlasIcon {
         updateUVCoord();
     }
 
+    @Override
+    public void setInvertedY(boolean invertedY) {
+        super.setInvertedY(invertedY);
+        updateUVCoord();
+    }
 
     /**
      * Возвращает количество колонок фреймов.
@@ -162,6 +168,14 @@ public class ParticleAtlasAnimatedIcon extends ParticleAtlasIcon {
 
         animatedMinV = super.getOriginalMinV() + (currentFrameRow + 0.0F) / countFrameRow * (super.getOriginalMaxV() - super.getOriginalMinV());
         animatedMaxV = super.getOriginalMinV() + (currentFrameRow + 1.0F) / countFrameRow * (super.getOriginalMaxV() - super.getOriginalMinV());
+
+        if (isInvertedY()) {
+            animatedMinV = super.getOriginalMinV() + (currentFrameRow + 1.0F) / countFrameRow * (super.getOriginalMaxV() - super.getOriginalMinV());
+            animatedMaxV = super.getOriginalMinV() + (currentFrameRow + 0.0F) / countFrameRow * (super.getOriginalMaxV() - super.getOriginalMinV());
+        } else {
+            animatedMinV = super.getOriginalMinV() + (currentFrameRow + 0.0F) / countFrameRow * (super.getOriginalMaxV() - super.getOriginalMinV());
+            animatedMaxV = super.getOriginalMinV() + (currentFrameRow + 1.0F) / countFrameRow * (super.getOriginalMaxV() - super.getOriginalMinV());
+        }
     }
 
     /**
