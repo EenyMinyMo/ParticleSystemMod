@@ -15,9 +15,6 @@ public abstract class AbstractEmitter implements IParticleEmitter {
     private boolean isDie = false;
     /** Позиция эмиттера. */
     private float x, y, z;
-
-    /** Связанный контейнер частиц, в который будут помещаться создаваемые частицы. */
-    private IParticleContainer particleContainer;
     /** Список частиц, за которые отвечает данный эмитер. */
     private List<IParticle> emitterParticleList;
     /** Количество тиков с момента создания эмиттера, но на самом деле сюда можно записать все, что угодно. */
@@ -68,12 +65,11 @@ public abstract class AbstractEmitter implements IParticleEmitter {
 
 
     @Override
-    public void create(IParticleContainer container) {
+    public void create() {
         if (isCreated() || isDie()) {
             throw new RuntimeException("Emitter cannot be created!");
         }
 
-        this.particleContainer = container;
         this.emitterParticleList = new ArrayList<>(50);
         this.tick = 0;
 
@@ -99,7 +95,6 @@ public abstract class AbstractEmitter implements IParticleEmitter {
         emitterParticleList.forEach(IParticle::setDie);
 
         emitterParticleList = null;
-        particleContainer = null;
         tick = -1;
         isDie = true;
     }
@@ -133,12 +128,13 @@ public abstract class AbstractEmitter implements IParticleEmitter {
                 '}';
     }
 
-    protected IParticleContainer getParticleContainer() {
-        return particleContainer;
-    }
 
     protected List<IParticle> getEmitterParticleList() {
         return emitterParticleList;
+    }
+
+    protected void addParticleInEmitter(IParticle particle) {
+        getEmitterParticleList().add(particle);
     }
 
     protected int getTick() {
