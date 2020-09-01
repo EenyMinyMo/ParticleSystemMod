@@ -55,7 +55,9 @@ public class SimpleParticleManager implements IParticleManager {
         particleComparator.setEntity(Minecraft.getMinecraft().thePlayer);
         particleComparator.setInterpolationFactor(interpolationFactor);
 
-        particleContainer.sort(particleComparator.reversed());
+        try {
+            particleContainer.sort(particleComparator.reversed());
+        } catch (IllegalArgumentException e) {}
 
         particleRenderer.preRender(particleContainer.getParticleList(), interpolationFactor);
         particleRenderer.render(particleContainer.getParticleList(), interpolationFactor);
