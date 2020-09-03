@@ -2,6 +2,7 @@ package ru.somber.particlesystem.particle;
 
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 import ru.somber.commonutil.Axis;
 
 /**
@@ -10,33 +11,82 @@ import ru.somber.commonutil.Axis;
 public interface IParticle {
 
     /**
-     * Возвращает фактическую позицию частицы
+     * Записывает фактическую позицию частицы в переданный вектор
      * (позиция частицы после очередного обновления).
      */
-    Vector3f getNewPosition();
+    void getPosition(Vector3f dest);
 
     /**
-     * Предыдущая позиция частицы (нужно для интерполяции).
+     * Записывает значения позиции частицы с предыдущего обновления в переданный вектор (нужно для интерполяции).
      */
-    Vector3f getOldPosition();
+    void getOldPosition(Vector3f dest);
 
     /**
-     * Возвращает интерполированную между oldPosition и newPosition позицию частицы по интерполяционному коэффициенту.
+     * Записывает интерполированную между oldPosition и position позицию частицы по интерполяционному коэффициенту
+     * в переданный вектор.
      */
     void computeInterpolatedPosition(Vector3f destination, float interpolationFactor);
 
-    /**
-     * Половина размера частицы по высоте и ширине.
-     * <p>
-     * (x = width/2, y = height/2)
-     */
-    Vector2f getHalfSizes();
+    float getPositionX();
+    float getPositionY();
+    float getPositionZ();
+
+    float getOldPositionX();
+    float getOldPositionY();
+    float getOldPositionZ();
+
 
     /**
-     * Возвращает локальные углы поворота частицы.
-     * Эти углы должны применятся после мировых преобразований частицы.
+     * Записывает фактические размеры частицы по высоте и ширине в переданный вектор.
+     * <p> (x = width/2, y = height/2)
      */
-    Vector3f getLocalRotateAngles();
+    void getHalfSizes(Vector2f dest);
+
+    /**
+     * Записывает значения размеров частицы по высоте и ширине с предыдущего обновления в переданный вектор.
+     * <p> (x = width/2, y = height/2)
+     */
+    void getOldHalfSizes(Vector2f dest);
+
+    /**
+     * Записывает интерполированные между oldHalfSizes и halfSizes размеры частицы по интерполяционному коэффициенту
+     * в переданный вектор.
+     */
+    void computeInterpolatedHalfSizes(Vector2f destination, float interpolationFactor);
+
+    float getHalfWidth();
+    float getHalfHeight();
+
+    float getOldHalfWidth();
+    float getOldHalfHeight();
+
+
+    /**
+     * Записвает фактические локальные углы поворота частицы в переданный вектор.
+     * Эти углы должны применяются после мировых преобразований частицы.
+     */
+    void getRotateAngles(Vector3f dest);
+
+    /**
+     * Записывает значения локальных углов поворота частицы с предыдущего обновления в переданный вектор.
+     * Эти углы должны применяются после мировых преобразований частицы.
+     */
+    void getOldRotateAngles(Vector3f dest);
+
+    /**
+     * Записывает интерполированные между oldRotateAngles и rotateAngles локальные углы поворота частицы по интерполяционному коэффициенту
+     * в переданный вектор.
+     */
+    void computeInterpolatedRotateAngles(Vector3f destination, float interpolationFactor);
+
+    float getAngleX();
+    float getAngleY();
+    float getAngleZ();
+
+    float getOldAngleX();
+    float getOldAngleY();
+    float getOldAngleZ();
+
 
     /**
      * Возвращает ось, вокруг которой происходит вращение за игроком.
@@ -54,28 +104,43 @@ public interface IParticle {
     Axis rotateAxis();
 
     /**
-     * Запишет в передаваемый вектор координаты нормали к частице. Направление нормали должно быть в сторону камеры.
-     * Вектор нормали может быть произвиольной длины.
+     * Записывает в переданный вектор координаты нормали к частице. Вектор нормали может быть произвиольной длины.
      * <p>
      * (нормаль частицы зависит от позиции частицы, позиции камеры (которая передается в переметрах) и вокруг какой оси частица вращается)
      */
     void computeNormalVector(Vector3f destination, float xCamera, float yCamera, float zCamera, float interpolationFactor);
 
+
     /**
-     * Запишет в передаваемый вектор координаты нормали к частице. Направление нормали должно быть в сторону камеры.
-     * Вектор нормали может быть произвиольной длины.
-     * <p>
-     * Дополнительно передается позиция этой частицы
-     * (это нужно для того, чтобы не вычислять еще один раз интерполированную позицию частицы, а передать уже вычисленную).
-     * <p>
-     * (нормаль частицы зависит от позиции частицы, позиции камеры (которая передается в переметрах) и вокруг какой оси частица вращается)
+     * Записывает коэффициенты цветов в переданный вектор.
      */
-    void computeNormalVector(Vector3f destination, float xCamera, float yCamera, float zCamera, Vector3f particlePosition);
+    void getColorFactor(Vector4f destination);
+
+    /**
+     * Возвращает коэффициент красного цвета.
+     */
+    float getRedFactor();
+
+    /**
+     * Возвращает коэффициент зеленого цвета.
+     */
+    float getGreenFactor();
+
+    /**
+     * Возвращает коэффициент синего цвета.
+     */
+    float getBlueFactor();
+
+    /**
+     * Возвращает коэффициент альфа.
+     */
+    float getAlphaFactor();
 
     /**
      * Возвращает название иконки частицы.
      */
     String getIconName();
+
 
     /**
      * Текущее время жизни частицы.
@@ -89,16 +154,6 @@ public interface IParticle {
      */
     int getMaxLifeTime();
 
-    /**
-     * Возвращает коэффициенты цветов.
-     */
-    float[] getColorFactor();
-
-    /**
-     * Обновляет внутренние данные частицы
-     * (допустим позицию и т.д.).
-     */
-    void update();
 
     /**
      * true - частица помечена мертвой.
@@ -109,5 +164,12 @@ public interface IParticle {
      * Помечает частицу мертвой.
      */
     void setDie();
+
+
+    /**
+     * Обновляет внутренние данные частицы
+     * (допустим позицию и т.д.).
+     */
+    void update();
 
 }

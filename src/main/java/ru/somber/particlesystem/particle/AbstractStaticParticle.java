@@ -1,6 +1,5 @@
 package ru.somber.particlesystem.particle;
 
-import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import ru.somber.commonutil.Axis;
 
@@ -8,19 +7,16 @@ import ru.somber.commonutil.Axis;
  * Простейшая надстройка над {@code AbstractParticle}.
  * Представляет простой пример статической частицы.
  */
-public abstract class AbstractStaticParticle extends AbstractParticle {
+public abstract class AbstractStaticParticle extends AbstractParticleSimpleData {
 
-    public AbstractStaticParticle(Vector3f newPosition, int maxLifeTime, String iconName) {
-        super(newPosition, maxLifeTime, iconName);
+    public AbstractStaticParticle(float x, float y, float z, int maxLifeTime, String iconName) {
+        super(x, y, z, maxLifeTime, iconName);
     }
 
-    public AbstractStaticParticle(Vector3f newPosition, Vector2f halfSizes, int maxLifeTime, String iconName) {
-        super(newPosition, halfSizes, maxLifeTime, iconName);
+    public AbstractStaticParticle(Vector3f position, int maxLifeTime, String iconName) {
+        super(position.getX(), position.getY(), position.getZ(), maxLifeTime, iconName);
     }
 
-    public AbstractStaticParticle(Vector3f newPosition, Vector2f halfSizes, Vector3f localRotateAngles, int maxLifeTime, String iconName) {
-        super(newPosition, halfSizes, localRotateAngles, maxLifeTime, iconName);
-    }
 
     @Override
     public Axis rotateAxis() {
@@ -28,7 +24,7 @@ public abstract class AbstractStaticParticle extends AbstractParticle {
     }
 
     @Override
-    public void computeNormalVector(Vector3f destination, float xCamera, float yCamera, float zCamera, Vector3f particlePosition) {
+    public void computeNormalVector(Vector3f destination, float xCamera, float yCamera, float zCamera, Vector3f interpolatePosition) {
         destination.x = 0;
         destination.y = 0;
         destination.z = 1;
