@@ -11,30 +11,30 @@ import ru.somber.commonutil.Axis;
 public abstract class AbstractParticleVectorData implements IModifiableParticle {
 
     /** Количество тиков, которое существует частица. */
-    protected final int maxLifeTime;
+    private final int maxLifeTime;
     /** Количество тиков, которое частица уже существует. */
-    protected int lifeTime;
+    private int lifeTime;
 
     /** Новая позиция частицы. */
-    protected Vector3f position;
-    protected Vector3f oldPosition;
+    private Vector3f position;
+    private Vector3f oldPosition;
 
     /** Половина размера частицы (x = width/2, y = height/2). */
-    protected Vector2f halfSizes;
-    protected Vector2f oldHalfSizes;
+    private Vector2f halfSizes;
+    private Vector2f oldHalfSizes;
 
     /**
      * Вектор, содержащий локальные углы поворота частицы
      * (эти углы должны применятся после мировых преобразований частицы).
      */
-    protected Vector3f rotateAngles;
-    protected Vector3f oldRotateAngles;
+    private Vector3f rotateAngles;
+    private Vector3f oldRotateAngles;
 
     /** Коэффициенты цветов. */
-    protected Vector4f colorFactor;
+    private Vector4f colorFactor;
 
     /** Здесь название иконки частицы. */
-    protected String particleIconName;
+    private String particleIconName;
 
     /** Флаг для определени жива ли частица. */
     private boolean isDie;
@@ -42,13 +42,13 @@ public abstract class AbstractParticleVectorData implements IModifiableParticle 
 
     public AbstractParticleVectorData(Vector3f position, int maxLifeTime, String iconName) {
         this.position = position;
-        this.oldPosition = new Vector3f(position);
+        this.oldPosition = new Vector3f(this.position);
 
         this.halfSizes = new Vector2f(0.5F, 0.5F);
-        this.oldHalfSizes = new Vector2f(halfSizes);
+        this.oldHalfSizes = new Vector2f(this.halfSizes);
 
         this.rotateAngles = new Vector3f(0, 0, 0);
-        this.oldRotateAngles = new Vector3f(rotateAngles);
+        this.oldRotateAngles = new Vector3f(this.rotateAngles);
 
         this.lifeTime = 0;
         this.maxLifeTime = maxLifeTime;
@@ -69,14 +69,6 @@ public abstract class AbstractParticleVectorData implements IModifiableParticle 
         dest.set(oldPosition);
     }
 
-    @Override
-    public void computeInterpolatedPosition(Vector3f dest, float interpolationFactor) {
-        float x = oldPosition.getX() + (position.getX() - oldPosition.getX()) * interpolationFactor;
-        float y = oldPosition.getY() + (position.getY() - oldPosition.getY()) * interpolationFactor;
-        float z = oldPosition.getZ() + (position.getZ() - oldPosition.getZ()) * interpolationFactor;
-
-        dest.set(x, y, z);
-    }
 
     @Override
     public float getPositionX() {
@@ -119,13 +111,6 @@ public abstract class AbstractParticleVectorData implements IModifiableParticle 
         dest.set(oldHalfSizes);
     }
 
-    @Override
-    public void computeInterpolatedHalfSizes(Vector2f dest, float interpolationFactor) {
-        float x = oldHalfSizes.getX() + (halfSizes.getX() - oldHalfSizes.getX()) * interpolationFactor;
-        float y = oldHalfSizes.getY() + (halfSizes.getY() - oldHalfSizes.getY()) * interpolationFactor;
-
-        dest.set(x, y);
-    }
 
     @Override
     public float getHalfWidth() {
@@ -158,14 +143,6 @@ public abstract class AbstractParticleVectorData implements IModifiableParticle 
         dest.set(oldRotateAngles);
     }
 
-    @Override
-    public void computeInterpolatedRotateAngles(Vector3f dest, float interpolationFactor) {
-        float x = oldRotateAngles.getX() + (rotateAngles.getX() - oldRotateAngles.getX()) * interpolationFactor;
-        float y = oldRotateAngles.getY() + (rotateAngles.getY() - oldRotateAngles.getY()) * interpolationFactor;
-        float z = oldRotateAngles.getZ() + (rotateAngles.getZ() - oldRotateAngles.getZ()) * interpolationFactor;
-
-        dest.set(x, y, z);
-    }
 
     @Override
     public float getAngleX() {
@@ -262,6 +239,11 @@ public abstract class AbstractParticleVectorData implements IModifiableParticle 
 
     @Override
     public void update() {
+        setOldPosition(getPositionX(), getPositionY(), getPositionZ());
+        setOldHalfSizes(getHalfWidth(), getHalfHeight());
+        setOldRotateAngles(getAngleX(), getAngleY(), getAngleZ());
+
+        lifeTime++;
         if (getLifeTime() >= getMaxLifeTime()) {
             setDie();
         }

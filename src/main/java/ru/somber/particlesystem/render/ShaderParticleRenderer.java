@@ -102,7 +102,7 @@ public class ShaderParticleRenderer extends AbstractShaderRenderer {
         vertexAttributes[3] = new VertexAttribVBO(3, 3, GL11.GL_FLOAT, BufferObject.createVBO(), null, vboDataManager, GL15.GL_STREAM_DRAW);
         //particle normal vector VBO
         vertexAttributes[4] = new VertexAttribVBO(4, 3, GL11.GL_FLOAT, BufferObject.createVBO(), null, vboDataManager, GL15.GL_STREAM_DRAW);
-        //particle local angles VBO
+        //particle rotated angles VBO
         vertexAttributes[5] = new VertexAttribVBO(5, 3, GL11.GL_FLOAT, BufferObject.createVBO(), null, vboDataManager, GL15.GL_STREAM_DRAW);
         //particle texCoord VBO
         vertexAttributes[6] = new VertexAttribVBO(6, 2, GL11.GL_FLOAT, BufferObject.createVBO(), null, vboDataManager, GL15.GL_STREAM_DRAW);
@@ -136,10 +136,9 @@ public class ShaderParticleRenderer extends AbstractShaderRenderer {
 
         for (IParticle particle : particleList) {
             particle.computeInterpolatedPosition(particleCenterPosition, interpolationFactor);
-            particle.computeNormalVector(particleNormalVector, xCamera, yCamera, zCamera, particleCenterPosition);
-            Vector2f halfSizes = particle.getHalfSizes();
-            Vector3f localAngles = particle.getLocalRotateAngles();
-            float[] colorFactor = particle.getColorFactor();
+            particle.computeNormalVector(particleNormalVector, xCamera, yCamera, zCamera, interpolationFactor);
+            particle.computeInterpolatedHalfSizes(particleHalfSizes, interpolationFactor);
+            particle.computeInterpolatedRotateAngles(particleRotationAngles, interpolationFactor);
             String iconName = particle.getIconName();
             IIcon icon = getParticleTextureAtlas().getAtlasIcon(iconName);
 
@@ -149,15 +148,15 @@ public class ShaderParticleRenderer extends AbstractShaderRenderer {
             particlePositionBuffer.put(+0.5F).put(+0.5F);
             particlePositionBuffer.put(-0.5F).put(+0.5F);
 
-            particleColorFactorBuffer.put(colorFactor[0]).put(colorFactor[1]).put(colorFactor[2]).put(colorFactor[3]);
-            particleColorFactorBuffer.put(colorFactor[0]).put(colorFactor[1]).put(colorFactor[2]).put(colorFactor[3]);
-            particleColorFactorBuffer.put(colorFactor[0]).put(colorFactor[1]).put(colorFactor[2]).put(colorFactor[3]);
-            particleColorFactorBuffer.put(colorFactor[0]).put(colorFactor[1]).put(colorFactor[2]).put(colorFactor[3]);
+            particleColorFactorBuffer.put(particle.getRedFactor()).put(particle.getGreenFactor()).put(particle.getBlueFactor()).put(particle.getAlphaFactor());
+            particleColorFactorBuffer.put(particle.getRedFactor()).put(particle.getGreenFactor()).put(particle.getBlueFactor()).put(particle.getAlphaFactor());
+            particleColorFactorBuffer.put(particle.getRedFactor()).put(particle.getGreenFactor()).put(particle.getBlueFactor()).put(particle.getAlphaFactor());
+            particleColorFactorBuffer.put(particle.getRedFactor()).put(particle.getGreenFactor()).put(particle.getBlueFactor()).put(particle.getAlphaFactor());
 
-            particleSideScalesBuffer.put(halfSizes.getX()).put(halfSizes.getY());
-            particleSideScalesBuffer.put(halfSizes.getX()).put(halfSizes.getY());
-            particleSideScalesBuffer.put(halfSizes.getX()).put(halfSizes.getY());
-            particleSideScalesBuffer.put(halfSizes.getX()).put(halfSizes.getY());
+            particleSideScalesBuffer.put(particleHalfSizes.getX()).put(particleHalfSizes.getY());
+            particleSideScalesBuffer.put(particleHalfSizes.getX()).put(particleHalfSizes.getY());
+            particleSideScalesBuffer.put(particleHalfSizes.getX()).put(particleHalfSizes.getY());
+            particleSideScalesBuffer.put(particleHalfSizes.getX()).put(particleHalfSizes.getY());
 
             particleCenterPositionBuffer.put(particleCenterPosition.getX()).put(particleCenterPosition.getY()).put(particleCenterPosition.getZ());
             particleCenterPositionBuffer.put(particleCenterPosition.getX()).put(particleCenterPosition.getY()).put(particleCenterPosition.getZ());
@@ -169,10 +168,10 @@ public class ShaderParticleRenderer extends AbstractShaderRenderer {
             particleNormalVectorBuffer.put(particleNormalVector.getX()).put(particleNormalVector.getY()).put(particleNormalVector.getZ());
             particleNormalVectorBuffer.put(particleNormalVector.getX()).put(particleNormalVector.getY()).put(particleNormalVector.getZ());
 
-            particleLocalAnglesBuffer.put(localAngles.getX()).put(localAngles.getY()).put(localAngles.getZ());
-            particleLocalAnglesBuffer.put(localAngles.getX()).put(localAngles.getY()).put(localAngles.getZ());
-            particleLocalAnglesBuffer.put(localAngles.getX()).put(localAngles.getY()).put(localAngles.getZ());
-            particleLocalAnglesBuffer.put(localAngles.getX()).put(localAngles.getY()).put(localAngles.getZ());
+            particleLocalAnglesBuffer.put(particleRotationAngles.getX()).put(particleRotationAngles.getY()).put(particleRotationAngles.getZ());
+            particleLocalAnglesBuffer.put(particleRotationAngles.getX()).put(particleRotationAngles.getY()).put(particleRotationAngles.getZ());
+            particleLocalAnglesBuffer.put(particleRotationAngles.getX()).put(particleRotationAngles.getY()).put(particleRotationAngles.getZ());
+            particleLocalAnglesBuffer.put(particleRotationAngles.getX()).put(particleRotationAngles.getY()).put(particleRotationAngles.getZ());
 
             particleTexCoordBuffer.put(icon.getMinU()).put(icon.getMinV());
             particleTexCoordBuffer.put(icon.getMaxU()).put(icon.getMinV());

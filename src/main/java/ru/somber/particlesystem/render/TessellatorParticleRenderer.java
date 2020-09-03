@@ -4,7 +4,6 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.IIcon;
 import org.lwjgl.opengl.GL11;
@@ -22,13 +21,27 @@ import java.util.List;
 public class TessellatorParticleRenderer implements IParticleRenderer {
 
     /** Вынесено в переменные объекта, чтобы постоянное не создавать в методе. */
-    private Vector3f particleToCamera;
+    private Vector3f interpolatedCenterPosition;
+    private Vector3f interpolatedNormalVector;
+    private Vector3f interpolatedRotatedAngles;
+    private Vector2f interpolatedHalfSizes;
+
+    private float xCamera;
+    private float yCamera;
+    private float zCamera;
+
+    private Vector3f upAux;
 
     private ParticleAtlasTexture textureAtlas;
 
 
     public TessellatorParticleRenderer() {
-        particleToCamera = new Vector3f();
+        interpolatedCenterPosition = new Vector3f();
+        interpolatedNormalVector = new Vector3f();
+        interpolatedRotatedAngles = new Vector3f();
+        interpolatedHalfSizes = new Vector2f();
+
+        upAux = new Vector3f();
     }
 
 
@@ -53,6 +66,14 @@ public class TessellatorParticleRenderer implements IParticleRenderer {
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureAtlas.getGlTextureId());
+
+        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+        xCamera = SomberUtils.interpolateMoveX(player, interpolationFactor);
+        yCamera = SomberUtils.interpolateMoveY(player, interpolationFactor);
+        zCamera = SomberUtils.interpolateMoveZ(player, interpolationFactor);
+
+        GL11.glPushMatrix();
+        GL11.glTranslatef(-xCamera, -yCamera, -zCamera);
     }
 
     @Override
@@ -64,6 +85,8 @@ public class TessellatorParticleRenderer implements IParticleRenderer {
 
     @Override
     public void postRender(List<IParticle> particleList, float interpolationFactor) {
+        GL11.glPopMatrix();
+
         GL11.glPopAttrib();
 
         GL11.glDisable(GL11.GL_BLEND);
@@ -75,29 +98,27 @@ public class TessellatorParticleRenderer implements IParticleRenderer {
 
     private void renderParticle(IParticle particle, float interpolationFactor) {
         Tessellator tessellator = Tessellator.instance;
-        Minecraft minecraft = Minecraft.getMinecraft();
-        EntityPlayer player = minecraft.thePlayer;
 
-        particle.computeInterpolatedPosition(particleToCamera, interpolationFactor);
-        particleToCamera.translate(-SomberUtils.interpolateMoveX(player, interpolationFactor), -SomberUtils.interpolateMoveY((Entity)player, interpolationFactor), -SomberUtils.interpolateMoveZ((Entity)player, interpolationFactor));
-
-        Vector2f halfSizes = particle.getHalfSizes();
+        particle.computeInterpolatedPosition(interpolatedCenterPosition, interpolationFactor);
+        particle.computeInterpolatedHalfSizes(interpolatedHalfSizes, interpolationFactor);
+        particle.computeInterpolatedRotateAngles(interpolatedRotatedAngles, interpolationFactor);
         String iconName = particle.getIconName();
         IIcon icon = textureAtlas.getAtlasIcon(iconName);
 
         GL11.glPushMatrix();
-        GL11.glTranslatef(particleToCamera.getX(), particleToCamera.getY(), particleToCamera.getZ());
+        GL11.glTranslatef(interpolatedCenterPosition.getX(), interpolatedCenterPosition.getY(), interpolatedCenterPosition.getZ());
+        GL11.glScalef(0.5F, 0.5F, 0.5F);
 
-        this.applyParticleTransform(particle, particleToCamera);
+        this.applyParticleTransform(particle, interpolatedCenterPosition);
 
         tessellator.startDrawingQuads();
-        tessellator.setColorRGBA_F(particle.getColorFactor()[0], particle.getColorFactor()[1], particle.getColorFactor()[2], particle.getColorFactor()[3]);
-        tessellator.setBrightness(240);
+        tessellator.setColorRGBA_F(particle.getRedFactor(), particle.getGreenFactor(), particle.getBlueFactor(), particle.getAlphaFactor());
+//        tessellator.setBrightness(240);
 
-        tessellator.addVertexWithUV(-(0.5F) * halfSizes.getX(), -(0.5F) * halfSizes.getY(), 0.0, icon.getMinU(), icon.getMinV());
-        tessellator.addVertexWithUV((0.5F) * halfSizes.getX(),  -(0.5F) * halfSizes.getY(), 0.0, icon.getMaxU(), icon.getMinV());
-        tessellator.addVertexWithUV((0.5F) * halfSizes.getX(),  (0.5F) * halfSizes.getY(),  0.0, icon.getMaxU(), icon.getMaxV());
-        tessellator.addVertexWithUV(-(0.5F) * halfSizes.getX(), (0.5F) * halfSizes.getY(),  0.0, icon.getMinU(), icon.getMaxV());
+        tessellator.addVertexWithUV(-interpolatedHalfSizes.getX(), -interpolatedHalfSizes.getY(), 0.0, icon.getMinU(), icon.getMinV());
+        tessellator.addVertexWithUV(interpolatedHalfSizes.getX(),  -interpolatedHalfSizes.getY(), 0.0, icon.getMaxU(), icon.getMinV());
+        tessellator.addVertexWithUV(interpolatedHalfSizes.getX(),  interpolatedHalfSizes.getY(),  0.0, icon.getMaxU(), icon.getMaxV());
+        tessellator.addVertexWithUV(-interpolatedHalfSizes.getX(), interpolatedHalfSizes.getY(),  0.0, icon.getMinU(), icon.getMaxV());
 
         tessellator.draw();
 
@@ -105,8 +126,8 @@ public class TessellatorParticleRenderer implements IParticleRenderer {
     }
 
     private void applyParticleTransform(IParticle particle, Vector3f particleToCamera) {
-        particleToCamera.negate();
-        Vector3f upAux = new Vector3f(0.0f, 0.0f, 1.0f);
+        particleToCamera.set(xCamera - interpolatedCenterPosition.getX(), yCamera - interpolatedCenterPosition.getY(), zCamera - interpolatedCenterPosition.getZ());
+        upAux.set(0.0f, 0.0f, 1.0f);
 
         if (particle.rotateAxis() != Axis.NONE_AXIS) {
 
@@ -161,10 +182,9 @@ public class TessellatorParticleRenderer implements IParticleRenderer {
             }
         }
 
-        Vector3f rotateAngles = particle.getLocalRotateAngles();
-        GL11.glRotatef((float) Math.toDegrees(rotateAngles.getX()), 1.0f, 0.0f, 0.0f);
-        GL11.glRotatef((float) Math.toDegrees(rotateAngles.getY()), 0.0f, 1.0f, 0.0f);
-        GL11.glRotatef((float) Math.toDegrees(rotateAngles.getZ()), 0.0f, 0.0f, 1.0f);
+        GL11.glRotatef((float) Math.toDegrees(interpolatedRotatedAngles.getX()), 1.0f, 0.0f, 0.0f);
+        GL11.glRotatef((float) Math.toDegrees(interpolatedRotatedAngles.getY()), 0.0f, 1.0f, 0.0f);
+        GL11.glRotatef((float) Math.toDegrees(interpolatedRotatedAngles.getZ()), 0.0f, 0.0f, 1.0f);
     }
 
 }

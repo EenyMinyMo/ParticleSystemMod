@@ -25,7 +25,21 @@ public interface IParticle {
      * Записывает интерполированную между oldPosition и position позицию частицы по интерполяционному коэффициенту
      * в переданный вектор.
      */
-    void computeInterpolatedPosition(Vector3f destination, float interpolationFactor);
+    default void computeInterpolatedPosition(Vector3f dest, float interpolationFactor) {
+        float x = getPositionX();
+        float y = getPositionY();
+        float z = getPositionZ();
+
+        float xOld = getOldPositionX();
+        float yOld = getOldPositionY();
+        float zOld = getOldPositionZ();
+
+        float interpolatedX = xOld + (x - xOld) * interpolationFactor;
+        float interpolatedY = yOld + (y - yOld) * interpolationFactor;
+        float interpolatedZ = zOld + (z - zOld) * interpolationFactor;
+
+        dest.set(interpolatedX, interpolatedY, interpolatedZ);
+    }
 
     float getPositionX();
     float getPositionY();
@@ -52,7 +66,18 @@ public interface IParticle {
      * Записывает интерполированные между oldHalfSizes и halfSizes размеры частицы по интерполяционному коэффициенту
      * в переданный вектор.
      */
-    void computeInterpolatedHalfSizes(Vector2f destination, float interpolationFactor);
+    default void computeInterpolatedHalfSizes(Vector2f dest, float interpolationFactor) {
+        float halfWidth = getHalfWidth();
+        float halfHeight = getHalfHeight();
+
+        float oldHalfWidth = getOldHalfWidth();
+        float oldHalfHeight = getOldHalfHeight();
+
+        float interpolatedHalfWidth = oldHalfWidth + (halfWidth - oldHalfWidth) * interpolationFactor;
+        float interpolatedHalfHeight = oldHalfHeight + (halfHeight - oldHalfHeight) * interpolationFactor;
+
+        dest.set(interpolatedHalfWidth, interpolatedHalfHeight);
+    }
 
     float getHalfWidth();
     float getHalfHeight();
@@ -77,7 +102,21 @@ public interface IParticle {
      * Записывает интерполированные между oldRotateAngles и rotateAngles локальные углы поворота частицы по интерполяционному коэффициенту
      * в переданный вектор.
      */
-    void computeInterpolatedRotateAngles(Vector3f destination, float interpolationFactor);
+    default void computeInterpolatedRotateAngles(Vector3f dest, float interpolationFactor) {
+        float angleX = getAngleX();
+        float angleY = getAngleY();
+        float angleZ = getAngleZ();
+
+        float oldAngleX = getOldAngleX();
+        float oldAngleY = getOldAngleY();
+        float oldAngleZ = getOldAngleZ();
+
+        float interpolatedAngleX = oldAngleX + (angleX - oldAngleX) * interpolationFactor;
+        float interpolatedAngleY = oldAngleY + (angleY - oldAngleY) * interpolationFactor;
+        float interpolatedAngleZ = oldAngleZ + (angleZ - oldAngleZ) * interpolationFactor;
+
+        dest.set(interpolatedAngleX, interpolatedAngleY, interpolatedAngleZ);
+    }
 
     float getAngleX();
     float getAngleY();

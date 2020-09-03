@@ -103,7 +103,7 @@ public class GeometryShaderParticleRenderer extends AbstractShaderRenderer {
         vertexAttributes[1] = new VertexAttribVBO(1, 2, GL11.GL_FLOAT, BufferObject.createVBO(), null, vboDataManager, GL15.GL_STREAM_DRAW);
         //particle normal vector VBO
         vertexAttributes[2] = new VertexAttribVBO(2, 3, GL11.GL_FLOAT, BufferObject.createVBO(), null, vboDataManager, GL15.GL_STREAM_DRAW);
-        //particle local angles VBO
+        //particle rotate angles VBO
         vertexAttributes[3] = new VertexAttribVBO(3, 3, GL11.GL_FLOAT, BufferObject.createVBO(), null, vboDataManager, GL15.GL_STREAM_DRAW);
         //particle color factor VBO
         vertexAttributes[4] = new VertexAttribVBO(4, 4, GL11.GL_FLOAT, BufferObject.createVBO(), null, vboDataManager, GL15.GL_STREAM_DRAW);
@@ -123,37 +123,36 @@ public class GeometryShaderParticleRenderer extends AbstractShaderRenderer {
         FloatBuffer particleCenterPositionBuffer = vertexAttributes[0].getVboBuffer();
         FloatBuffer particleSideScalesBuffer = vertexAttributes[1].getVboBuffer();
         FloatBuffer particleNormalVectorBuffer = vertexAttributes[2].getVboBuffer();
-        FloatBuffer particleLocalAnglesBuffer = vertexAttributes[3].getVboBuffer();
+        FloatBuffer particleAnglesBuffer = vertexAttributes[3].getVboBuffer();
         FloatBuffer particleColorFactorBuffer = vertexAttributes[4].getVboBuffer();
         FloatBuffer particleTextureCoordAABBBuffer = vertexAttributes[5].getVboBuffer();
 
         particleCenterPositionBuffer.clear();
         particleSideScalesBuffer.clear();
         particleNormalVectorBuffer.clear();
-        particleLocalAnglesBuffer.clear();
+        particleAnglesBuffer.clear();
         particleColorFactorBuffer.clear();
         particleTextureCoordAABBBuffer.clear();
 
 
         for (IParticle particle : particleList) {
             particle.computeInterpolatedPosition(particleCenterPosition, interpolationFactor);
-            particle.computeNormalVector(particleNormalVector, xCamera, yCamera, zCamera, particleCenterPosition);
-            Vector2f halfSizes = particle.getHalfSizes();
-            Vector3f localAngles = particle.getLocalRotateAngles();
-            float[] colorFactor = particle.getColorFactor();
+            particle.computeNormalVector(particleNormalVector, xCamera, yCamera, zCamera, interpolationFactor);
+            particle.computeInterpolatedHalfSizes(particleHalfSizes, interpolationFactor);
+            particle.computeInterpolatedRotateAngles(particleRotationAngles, interpolationFactor);
             String iconName = particle.getIconName();
             IIcon icon = getParticleTextureAtlas().getAtlasIcon(iconName);
 
 
             particleCenterPositionBuffer.put(particleCenterPosition.getX()).put(particleCenterPosition.getY()).put(particleCenterPosition.getZ());
 
-            particleSideScalesBuffer.put(halfSizes.getX()).put(halfSizes.getY());
+            particleSideScalesBuffer.put(particleHalfSizes.getX()).put(particleHalfSizes.getY());
 
             particleNormalVectorBuffer.put(particleNormalVector.getX()).put(particleNormalVector.getY()).put(particleNormalVector.getZ());
 
-            particleLocalAnglesBuffer.put(localAngles.getX()).put(localAngles.getY()).put(localAngles.getZ());
+            particleAnglesBuffer.put(particleRotationAngles.getX()).put(particleRotationAngles.getY()).put(particleRotationAngles.getZ());
 
-            particleColorFactorBuffer.put(colorFactor);
+            particleColorFactorBuffer.put(particle.getRedFactor()).put(particle.getGreenFactor()).put(particle.getBlueFactor()).put(particle.getAlphaFactor());
 
             particleTextureCoordAABBBuffer.put(icon.getMinU()).put(icon.getMinV()).put(icon.getMaxU()).put(icon.getMaxV());
         }
@@ -162,7 +161,7 @@ public class GeometryShaderParticleRenderer extends AbstractShaderRenderer {
         particleCenterPositionBuffer.flip();
         particleSideScalesBuffer.flip();
         particleNormalVectorBuffer.flip();
-        particleLocalAnglesBuffer.flip();
+        particleAnglesBuffer.flip();
         particleColorFactorBuffer.flip();
         particleTextureCoordAABBBuffer.flip();
 

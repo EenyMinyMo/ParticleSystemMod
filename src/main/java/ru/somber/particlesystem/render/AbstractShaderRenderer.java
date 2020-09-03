@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.glu.GLU;
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import ru.somber.clientutil.opengl.ShaderProgram;
 import ru.somber.clientutil.opengl.VAO;
@@ -47,7 +48,8 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
     protected float zCamera;
 
     /** Вынесено в переменные объекта, чтобы постоянное не создавать в методе. */
-    protected Vector3f particleCenterPosition, particleNormalVector;
+    protected Vector3f particleCenterPosition, particleNormalVector, particleRotationAngles;
+    protected Vector2f particleHalfSizes;
 
 
     public AbstractShaderRenderer() {
@@ -61,6 +63,8 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
 
         particleCenterPosition = new Vector3f();
         particleNormalVector = new Vector3f();
+        particleRotationAngles = new Vector3f();
+        particleHalfSizes = new Vector2f();
 
         vboDataManager = new VBODataManager();
         tickUpdate = 0;
@@ -88,6 +92,7 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
         zCamera = SomberUtils.interpolateBetween((float) renderViewEntity.lastTickPosZ, (float) renderViewEntity.posZ, interpolationFactor);
 
 
+        GL11.glDepthMask(false);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glDisable(GL11.GL_CULL_FACE);
 

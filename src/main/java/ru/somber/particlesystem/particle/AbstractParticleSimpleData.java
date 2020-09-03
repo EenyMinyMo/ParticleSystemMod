@@ -11,30 +11,30 @@ import ru.somber.commonutil.Axis;
 public abstract class AbstractParticleSimpleData implements IModifiableParticle {
 
     /** Количество тиков, которое существует частица. */
-    protected final int maxLifeTime;
+    private final int maxLifeTime;
     /** Количество тиков, которое частица уже существует. */
-    protected int lifeTime;
+    private int lifeTime;
 
     /** Новая позиция частицы. */
-    protected float x, y, z;
-    protected float xOld, yOld, zOld;
+    private float x, y, z;
+    private float xOld, yOld, zOld;
 
     /** Половина размера частицы (halfWidth = width/2, halfHeight = height/2). */
-    protected float halfWidth, halfHeight;
-    protected float halfWidthOld, halfHeightOld;
+    private float halfWidth, halfHeight;
+    private float halfWidthOld, halfHeightOld;
 
     /**
      * Вектор, содержащий локальные углы поворота частицы
      * (эти углы должны применятся после мировых преобразований частицы).
      */
-    protected float xAngle, yAngle, zAngle;
-    protected float xAngleOld, yAngleOld, zAngleOld;
+    private float xAngle, yAngle, zAngle;
+    private float xAngleOld, yAngleOld, zAngleOld;
 
     /** Коэффициенты цветов. */
-    protected float r, g, b, a;
+    private float r, g, b, a;
 
     /** Здесь название иконки частицы. */
-    protected String particleIconName;
+    private String particleIconName;
 
     /** Флаг для определени жива ли частица. */
     private boolean isDie;
@@ -85,14 +85,6 @@ public abstract class AbstractParticleSimpleData implements IModifiableParticle 
         dest.set(xOld, yOld, zOld);
     }
 
-    @Override
-    public void computeInterpolatedPosition(Vector3f dest, float interpolationFactor) {
-        float x = this.xOld + (this.x - this.xOld) * interpolationFactor;
-        float y = this.yOld + (this.y - this.yOld) * interpolationFactor;
-        float z = this.zOld + (this.z - this.zOld) * interpolationFactor;
-
-        dest.set(x, y, z);
-    }
 
     @Override
     public float getPositionX() {
@@ -135,13 +127,6 @@ public abstract class AbstractParticleSimpleData implements IModifiableParticle 
         dest.set(halfWidthOld, halfHeightOld);
     }
 
-    @Override
-    public void computeInterpolatedHalfSizes(Vector2f dest, float interpolationFactor) {
-        float x = halfWidthOld + (halfWidth - halfWidthOld) * interpolationFactor;
-        float y = halfHeightOld + (halfHeight - halfHeightOld) * interpolationFactor;
-
-        dest.set(x, y);
-    }
 
     @Override
     public float getHalfWidth() {
@@ -174,14 +159,6 @@ public abstract class AbstractParticleSimpleData implements IModifiableParticle 
         dest.set(xAngleOld, yAngleOld, zAngleOld);
     }
 
-    @Override
-    public void computeInterpolatedRotateAngles(Vector3f dest, float interpolationFactor) {
-        float x = xAngleOld + (xAngle - xAngleOld) * interpolationFactor;
-        float y = yAngleOld + (yAngle - yAngleOld) * interpolationFactor;
-        float z = zAngleOld + (zAngle - zAngleOld) * interpolationFactor;
-
-        dest.set(x, y, z);
-    }
 
     @Override
     public float getAngleX() {
@@ -278,6 +255,11 @@ public abstract class AbstractParticleSimpleData implements IModifiableParticle 
 
     @Override
     public void update() {
+        setOldPosition(getPositionX(), getPositionY(), getPositionZ());
+        setOldHalfSizes(getHalfWidth(), getHalfHeight());
+        setOldRotateAngles(getAngleX(), getAngleY(), getAngleZ());
+
+        lifeTime++;
         if (getLifeTime() >= getMaxLifeTime()) {
             setDie();
         }
