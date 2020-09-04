@@ -5,17 +5,14 @@ layout (location = 1) in vec4 particleColorFactor;
 layout (location = 2) in vec2 particleSideScales;
 layout (location = 3) in vec3 particleCenterPosition;
 layout (location = 4) in vec3 particleNormalVector;
-layout (location = 5) in vec3 particleLocalAngles;
+layout (location = 5) in vec3 particleRotateAngles;
 layout (location = 6) in vec2 particleTexCoord;
-
 
 uniform vec3 cameraPosition;
 uniform mat4 projectionCameraMatrix;
 
-
 out vec4 colorFactor;
 out vec2 texCoord;
-
 
 /*
 Вычисляет матрицу трансформации модели.
@@ -34,51 +31,46 @@ mat4 computeModelTranformMat(vec3 particleCenterPos, vec3 particleNormalVec) {
     //Устанавливаем новый базис для матрицы трансформации.
     //строка здесь - столбец для матрицы на самом деле.
     mat4 modelTransformMat = mat4(
-                left.x,                 left.y,                 left.z,                 0,
-                up.x,                   up.y,                   up.z,                   0,
-                forward.x,              forward.y,              forward.z,              0,
-                translatePosition.x,    translatePosition.y,    translatePosition.z,    1
+        left.x,                 left.y,                 left.z,                 0,
+        up.x,                   up.y,                   up.z,                   0,
+        forward.x,              forward.y,              forward.z,              0,
+        translatePosition.x,    translatePosition.y,    translatePosition.z,    1
     );
 
 //    mat4 modelTransformMat = mat4(
-//                1,                      0,                      0,                      0,
-//                0,                      1,                      0,                      0,
-//                0,                      0,                      1,                      0,
-//                translatePosition.x,    translatePosition.y,    translatePosition.z,    1
+//        1,                      0,                      0,                      0,
+//        0,                      1,                      0,                      0,
+//        0,                      0,                      1,                      0,
+//        translatePosition.x,    translatePosition.y,    translatePosition.z,    1
 //    );
 
     return modelTransformMat;
 }
 
-
-mat4 computeLocalRotateMat(vec3 localAngles) {
-    float pitch = localAngles.x;
-    float yaw = localAngles.y;
-    float roll = localAngles.z;
+mat4 computeRotateMat(vec3 rotateAngles) {
+    float sinPitch = sin(rotateAngles.x);
+    float cosPitch = cos(rotateAngles.x);
+    float sinYaw = sin(rotateAngles.y);
+    float cosYaw = cos(rotateAngles.y);
+    float sinRoll = sin(rotateAngles.z);
+    float cosRoll = cos(rotateAngles.z);
 
     mat4 rotateMat = mat4(
-            cos(yaw) * cos(roll),   sin(pitch) * sin(yaw) * cos(roll) + cos(pitch) * sin(roll),     - cos(pitch) * sin(yaw) * cos(roll) + sin(pitch) * sin(roll),   0,
-            - cos(yaw) * sin(roll), - sin(pitch) * sin(yaw) * sin(roll) + cos(pitch) * cos(roll),   cos(pitch) * sin(yaw) * sin(roll) + sin(pitch) * cos(roll),     0,
-            sin(yaw),               - sin(pitch) * cos(yaw),                                        cos(pitch) * cos(yaw),                                          0,
-            0,                      0,                                                              0,                                                              1
+        cosYaw * cosRoll,   sinPitch * sinYaw * cosRoll + cosPitch * sinRoll,   -cosPitch * sinYaw * cosRoll + sinPitch * sinRoll,  0,
+        -cosYaw * sinRoll,  -sinPitch * sinYaw * sinRoll + cosPitch * cosRoll,  cosPitch * sinYaw * sinRoll + sinPitch * cosRoll,   0,
+        sinYaw,             -sinPitch * cosYaw,                                 cosPitch * cosYaw,                                  0,
+        0,                  0,                                                  0,                                                  1
     );
 
     return rotateMat;
 }
 
-
 void main() {
     mat4 modelTransformMat = computeModelTranformMat(particleCenterPosition, particleNormalVector);
-    mat4 localAnglesTransformMat = computeLocalRotateMat(particleLocalAngles);
+    mat4 rotateMat = computeRotateMat(particleRotateAngles);
 
-    /*
-    particleAttribute совмещает в себе текстурные координаты частицы (0 и 1 компонента),
-    коэффициент альфы частицы (3я компонента),
-    коэффициент освещенности (4ая компонента).
-    Так сделано для уменьшения количества входных типов данных вершины.
-    */
     texCoord = particleTexCoord;
     colorFactor = particleColorFactor;
 
-    gl_Position = projectionCameraMatrix * modelTransformMat * localAnglesTransformMat * vec4(particleVertPosition * particleSideScales, 0, 1);
+    gl_Position = projectionCameraMatrix * modelTransformMat * rotateMat * vec4(particleVertPosition * particleSideScales, 0, 1);
 }
