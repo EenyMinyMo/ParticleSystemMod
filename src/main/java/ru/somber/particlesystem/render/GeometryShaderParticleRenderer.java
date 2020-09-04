@@ -2,9 +2,11 @@ package ru.somber.particlesystem.render;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.*;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL32;
 import org.lwjgl.util.vector.Matrix4f;
 import ru.somber.clientutil.opengl.BufferObject;
 import ru.somber.clientutil.opengl.Shader;
