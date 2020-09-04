@@ -15,6 +15,7 @@ import ru.somber.clientutil.opengl.VertexAttribVBO;
 import ru.somber.commonutil.SomberUtils;
 import ru.somber.particlesystem.ParticleSystemMod;
 import ru.somber.particlesystem.particle.IParticle;
+import ru.somber.particlesystem.texture.ParticleAtlasIcon;
 
 import java.nio.FloatBuffer;
 import java.util.List;
@@ -94,8 +95,8 @@ public class ShaderParticleRenderer extends AbstractShaderRenderer {
         vertexAttributes[0] = new VertexAttribVBO(0, 2, GL11.GL_FLOAT, BufferObject.createVBO(), null, vboDataManager, GL15.GL_STREAM_DRAW);
         //particle color factor VBO
         vertexAttributes[1] = new VertexAttribVBO(1, 4, GL11.GL_FLOAT, BufferObject.createVBO(), null, vboDataManager, GL15.GL_STREAM_DRAW);
-        //particle side scales VBO
-        vertexAttributes[2] = new VertexAttribVBO(2, 2, GL11.GL_FLOAT, BufferObject.createVBO(), null, vboDataManager, GL15.GL_STREAM_DRAW);
+        //particle side scales and light & blend VBO
+        vertexAttributes[2] = new VertexAttribVBO(2, 4, GL11.GL_FLOAT, BufferObject.createVBO(), null, vboDataManager, GL15.GL_STREAM_DRAW);
         //particle center position VBO
         vertexAttributes[3] = new VertexAttribVBO(3, 3, GL11.GL_FLOAT, BufferObject.createVBO(), null, vboDataManager, GL15.GL_STREAM_DRAW);
         //particle normal vector VBO
@@ -117,7 +118,7 @@ public class ShaderParticleRenderer extends AbstractShaderRenderer {
     protected void prepareDataVBOs(List<IParticle> particleList, float interpolationFactor) {
         FloatBuffer particlePositionBuffer = vertexAttributes[0].getVboBuffer();
         FloatBuffer particleColorFactorBuffer = vertexAttributes[1].getVboBuffer();
-        FloatBuffer particleSideScalesBuffer = vertexAttributes[2].getVboBuffer();
+        FloatBuffer particleSideScalesAndLightBlendBuffer = vertexAttributes[2].getVboBuffer();
         FloatBuffer particleCenterPositionBuffer = vertexAttributes[3].getVboBuffer();
         FloatBuffer particleNormalVectorBuffer = vertexAttributes[4].getVboBuffer();
         FloatBuffer particleLocalAnglesBuffer = vertexAttributes[5].getVboBuffer();
@@ -125,7 +126,7 @@ public class ShaderParticleRenderer extends AbstractShaderRenderer {
 
         particlePositionBuffer.clear();
         particleColorFactorBuffer.clear();
-        particleSideScalesBuffer.clear();
+        particleSideScalesAndLightBlendBuffer.clear();
         particleCenterPositionBuffer.clear();
         particleNormalVectorBuffer.clear();
         particleLocalAnglesBuffer.clear();
@@ -137,8 +138,9 @@ public class ShaderParticleRenderer extends AbstractShaderRenderer {
             particle.computeNormalVector(particleNormalVector, xCamera, yCamera, zCamera, interpolationFactor);
             particle.computeInterpolatedHalfSizes(particleHalfSizes, interpolationFactor);
             particle.computeInterpolatedRotateAngles(particleRotationAngles, interpolationFactor);
-            String iconName = particle.getIconName();
-            IIcon icon = getParticleTextureAtlas().getAtlasIcon(iconName);
+            ParticleAtlasIcon icon = particle.getParticleIcon();
+            float light = particle.getLightFactor();
+            float blend = particle.getBlendFactor();
 
 
             particlePositionBuffer.put(-0.5F).put(-0.5F);
@@ -151,10 +153,10 @@ public class ShaderParticleRenderer extends AbstractShaderRenderer {
             particleColorFactorBuffer.put(particle.getRedFactor()).put(particle.getGreenFactor()).put(particle.getBlueFactor()).put(particle.getAlphaFactor());
             particleColorFactorBuffer.put(particle.getRedFactor()).put(particle.getGreenFactor()).put(particle.getBlueFactor()).put(particle.getAlphaFactor());
 
-            particleSideScalesBuffer.put(particleHalfSizes.getX()).put(particleHalfSizes.getY());
-            particleSideScalesBuffer.put(particleHalfSizes.getX()).put(particleHalfSizes.getY());
-            particleSideScalesBuffer.put(particleHalfSizes.getX()).put(particleHalfSizes.getY());
-            particleSideScalesBuffer.put(particleHalfSizes.getX()).put(particleHalfSizes.getY());
+            particleSideScalesAndLightBlendBuffer.put(particleHalfSizes.getX()).put(particleHalfSizes.getY()).put(light).put(blend);
+            particleSideScalesAndLightBlendBuffer.put(particleHalfSizes.getX()).put(particleHalfSizes.getY()).put(light).put(blend);
+            particleSideScalesAndLightBlendBuffer.put(particleHalfSizes.getX()).put(particleHalfSizes.getY()).put(light).put(blend);
+            particleSideScalesAndLightBlendBuffer.put(particleHalfSizes.getX()).put(particleHalfSizes.getY()).put(light).put(blend);
 
             particleCenterPositionBuffer.put(particleCenterPosition.getX()).put(particleCenterPosition.getY()).put(particleCenterPosition.getZ());
             particleCenterPositionBuffer.put(particleCenterPosition.getX()).put(particleCenterPosition.getY()).put(particleCenterPosition.getZ());
@@ -180,7 +182,7 @@ public class ShaderParticleRenderer extends AbstractShaderRenderer {
 
         particlePositionBuffer.flip();
         particleColorFactorBuffer.flip();
-        particleSideScalesBuffer.flip();
+        particleSideScalesAndLightBlendBuffer.flip();
         particleCenterPositionBuffer.flip();
         particleNormalVectorBuffer.flip();
         particleLocalAnglesBuffer.flip();

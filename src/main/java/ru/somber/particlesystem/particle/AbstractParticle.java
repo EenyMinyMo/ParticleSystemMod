@@ -1,5 +1,7 @@
 package ru.somber.particlesystem.particle;
 
+import ru.somber.particlesystem.texture.ParticleAtlasIcon;
+
 /**
  * Абстрактный класс частицы, реализцющий наиболее общий функционал частиц.
  */
@@ -15,18 +17,18 @@ public abstract class AbstractParticle implements IModifiableParticle {
     /** Коэффициент смешивания частицы. */
     private float blendFactor;
 
-    /** Здесь название иконки частицы. */
-    private String particleIconName;
+    /** Иконка частицы с текстурными координатами. */
+    private ParticleAtlasIcon particleIcon;
 
     /** Флаг для определени жива ли частица. */
     private boolean isDie;
 
-    public AbstractParticle(int maxLifeTime, String iconName) {
+    public AbstractParticle(int maxLifeTime, ParticleAtlasIcon particleIcon) {
         this.maxLifeTime = maxLifeTime;
-        this.particleIconName = iconName;
+        this.particleIcon = particleIcon;
 
-        this.lightFactor = 1;
-        this.blendFactor = 1;
+        this.lightFactor = 1F;
+        this.blendFactor = 0F;
 
         this.lifeTime = 1;
         this.isDie = false;
@@ -56,8 +58,8 @@ public abstract class AbstractParticle implements IModifiableParticle {
 
 
     @Override
-    public String getIconName() {
-        return particleIconName;
+    public ParticleAtlasIcon getParticleIcon() {
+        return particleIcon;
     }
 
 
@@ -83,8 +85,8 @@ public abstract class AbstractParticle implements IModifiableParticle {
     }
 
     @Override
-    public void setParticleIconName(String particleIconName) {
-        this.particleIconName = particleIconName;
+    public void setParticleIcon(ParticleAtlasIcon particleIcon) {
+        this.particleIcon = particleIcon;
     }
 
 

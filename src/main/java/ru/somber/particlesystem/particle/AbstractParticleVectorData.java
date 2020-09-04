@@ -4,6 +4,7 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 import ru.somber.commonutil.Axis;
+import ru.somber.particlesystem.texture.ParticleAtlasIcon;
 
 /**
  * Абстрактный класс частицы.
@@ -30,7 +31,7 @@ public abstract class AbstractParticleVectorData extends AbstractParticle {
     private Vector4f colorFactor;
 
 
-    public AbstractParticleVectorData(Vector3f position, int maxLifeTime, String iconName) {
+    public AbstractParticleVectorData(Vector3f position, int maxLifeTime, ParticleAtlasIcon iconName) {
         super(maxLifeTime, iconName);
 
         this.position = position;

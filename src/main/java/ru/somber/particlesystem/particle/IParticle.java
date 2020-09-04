@@ -4,6 +4,7 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 import ru.somber.commonutil.Axis;
+import ru.somber.particlesystem.texture.ParticleAtlasIcon;
 
 /**
  * Интерфейс для частиц.
@@ -186,9 +187,9 @@ public interface IParticle {
     float getBlendFactor();
 
     /**
-     * Возвращает название иконки частицы.
+     * Возвращает иконку частицы.
      */
-    String getIconName();
+    ParticleAtlasIcon getParticleIcon();
 
 
     /**

@@ -3,9 +3,11 @@ package ru.somber.particlesystem.particle;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
+import ru.somber.particlesystem.texture.ParticleAtlasIcon;
 
 /**
  * Интерфейс для частиц, данные которых в открытую доступны для модификации.
+ * Сеттеры этого интерфейса аналогичны геттерам интефейса IParticle.
  */
 public interface IModifiableParticle extends IParticle {
 
@@ -85,6 +87,6 @@ public interface IModifiableParticle extends IParticle {
     void setBlendFactor(float blendFactor);
 
 
-    void setParticleIconName(String particleIconName);
+    void setParticleIcon(ParticleAtlasIcon particleIcon);
 
 }

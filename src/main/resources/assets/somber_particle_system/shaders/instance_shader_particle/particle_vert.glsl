@@ -1,19 +1,27 @@
 #version 330
 
-layout (location = 0) in vec2 particlePosition;             //per vertex
-layout (location = 1) in vec3 particleCenterPosition;       //per primitive
-layout (location = 2) in vec3 particleNormalVector;         //per primitive
-layout (location = 3) in vec3 particleRotateAngles;         //per primitive
-layout (location = 4) in vec4 particleColorFactor;          //per primitive
-layout (location = 5) in vec4 particleTextureCoordAABB;     //per primitive
-layout (location = 6) in vec2 particleSideScale;            //per primitive
+layout (location = 0) in vec2 particlePosition;                 //per vertex
+layout (location = 1) in vec3 particleCenterPosition;           //per primitive
+layout (location = 2) in vec3 particleNormalVector;             //per primitive
+layout (location = 3) in vec3 particleRotateAngles;             //per primitive
+layout (location = 4) in vec4 particleColorFactor;              //per primitive
+layout (location = 5) in vec4 particleTextureCoordAABB;         //per primitive
+layout (location = 6) in vec4 particleSideScalesLightBlend;     //per primitive
 
 uniform vec3 cameraPosition;
 uniform mat4 projectionCameraMatrix;
 
 out vec4 colorFactor;
 out vec2 texCoord;
+out float light;
+out float blend;
 
+/*
+Вычисляет матрицу трансформации модели.
+Матрица трансформации модели - по сути совмещенная матрица
+для поворота за вектором lookAtParticle (вектор направления частицы)
+и переносом в позицию частицы.
+*/
 mat4 computeModelTranformMat(vec3 particleCenterPos, vec3 particleNormalVec, vec3 cameraPos) {
     vec3 translatePosition = particleCenterPos - cameraPos;
 
@@ -84,6 +92,8 @@ void main() {
     vec2 texCoordSideSizes = vec2(particleTextureCoordAABB.zw - particleTextureCoordAABB.xy);
     texCoord = vec2(texCoordCenter.xy) + vec2(particlePosition.xy * texCoordSideSizes.xy);
     colorFactor = particleColorFactor;
+    light = particleSideScalesLightBlend.z;
+    blend = particleSideScalesLightBlend.w;
 
-    gl_Position = commonTransformMat * vec4(particlePosition * particleSideScale, 0, 1);
+    gl_Position = commonTransformMat * vec4(particlePosition * particleSideScalesLightBlend.xy, 0, 1);
 }

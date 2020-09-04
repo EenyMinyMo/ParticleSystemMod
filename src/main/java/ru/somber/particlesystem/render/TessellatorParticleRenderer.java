@@ -13,6 +13,7 @@ import org.lwjgl.util.vector.Vector3f;
 import ru.somber.commonutil.Axis;
 import ru.somber.commonutil.SomberUtils;
 import ru.somber.particlesystem.particle.IParticle;
+import ru.somber.particlesystem.texture.ParticleAtlasIcon;
 import ru.somber.particlesystem.texture.ParticleAtlasTexture;
 
 import java.util.List;
@@ -102,8 +103,7 @@ public class TessellatorParticleRenderer implements IParticleRenderer {
         particle.computeInterpolatedPosition(interpolatedCenterPosition, interpolationFactor);
         particle.computeInterpolatedHalfSizes(interpolatedHalfSizes, interpolationFactor);
         particle.computeInterpolatedRotateAngles(interpolatedRotatedAngles, interpolationFactor);
-        String iconName = particle.getIconName();
-        IIcon icon = textureAtlas.getAtlasIcon(iconName);
+        ParticleAtlasIcon icon = particle.getParticleIcon();
 
         GL11.glPushMatrix();
         GL11.glTranslatef(interpolatedCenterPosition.getX(), interpolatedCenterPosition.getY(), interpolatedCenterPosition.getZ());

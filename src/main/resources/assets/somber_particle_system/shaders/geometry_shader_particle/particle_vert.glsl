@@ -1,7 +1,7 @@
 #version 330
 
 layout (location = 0) in vec3 particleCenterPosition;
-layout (location = 1) in vec2 particleSideScales;
+layout (location = 1) in vec4 particleSideScalesLightBlend;
 layout (location = 2) in vec3 particleNormalVector;
 layout (location = 3) in vec3 particleRotateAngles;
 layout (location = 4) in vec4 particleColorFactor;
@@ -12,14 +12,14 @@ layout (location = 5) in vec4 particleTextureCoordAABB;
 //uniform mat4 projectionMatrix;
 
 out vec4 particleColorFact;
-out vec2 particleSScales;
+out vec4 particleSScalesLightBlend;
 out vec3 particleNormalVec;
 out vec3 particleRotateAng;
 out vec4 texCoordAABB;
 
 void main() {
     particleColorFact = particleColorFactor;
-    particleSScales = particleSideScales;
+    particleSScalesLightBlend = particleSideScalesLightBlend;
     particleNormalVec = particleNormalVector;
     particleRotateAng = particleRotateAngles;
     /*

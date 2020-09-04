@@ -16,6 +16,7 @@ import ru.somber.clientutil.opengl.VertexAttribVBO;
 import ru.somber.commonutil.SomberUtils;
 import ru.somber.particlesystem.ParticleSystemMod;
 import ru.somber.particlesystem.particle.IParticle;
+import ru.somber.particlesystem.texture.ParticleAtlasIcon;
 
 import java.nio.FloatBuffer;
 import java.util.List;
@@ -109,8 +110,8 @@ public class InstanceShaderParticleRenderer extends AbstractShaderRenderer {
         //particle texCoord VBO
         vertexAttributes[5] = new VertexAttribVBO(5, 4, GL11.GL_FLOAT, BufferObject.createVBO(), null, vboDataManager, GL15.GL_STREAM_DRAW);
         vertexAttributes[5].setVertexAttribDivisor(1);
-        //particle side scales VBO
-        vertexAttributes[6] = new VertexAttribVBO(6, 2, GL11.GL_FLOAT, BufferObject.createVBO(), null, vboDataManager, GL15.GL_STREAM_DRAW);
+        //particle side scales and light & blend VBO
+        vertexAttributes[6] = new VertexAttribVBO(6, 4, GL11.GL_FLOAT, BufferObject.createVBO(), null, vboDataManager, GL15.GL_STREAM_DRAW);
         vertexAttributes[6].setVertexAttribDivisor(1);
 
         int intervalTimeUpdate = SomberUtils.timeToTick(0, 1, 0);
@@ -163,21 +164,17 @@ public class InstanceShaderParticleRenderer extends AbstractShaderRenderer {
             particle.computeNormalVector(particleNormalVector, xCamera, yCamera, zCamera, interpolationFactor);
             particle.computeInterpolatedHalfSizes(particleHalfSizes, interpolationFactor);
             particle.computeInterpolatedRotateAngles(particleRotationAngles, interpolationFactor);
-            String iconName = particle.getIconName();
-            IIcon icon = getParticleTextureAtlas().getAtlasIcon(iconName);
+            ParticleAtlasIcon icon = particle.getParticleIcon();
+            float light = particle.getLightFactor();
+            float blend = particle.getBlendFactor();
 
 
             particleCenterPositionBuffer.put(particleCenterPosition.getX()).put(particleCenterPosition.getY()).put(particleCenterPosition.getZ());
-
             particleNormalVectorBuffer.put(particleNormalVector.getX()).put(particleNormalVector.getY()).put(particleNormalVector.getZ());
-
             particleAnglesBuffer.put(particleRotationAngles.getX()).put(particleRotationAngles.getY()).put(particleRotationAngles.getZ());
-
             particleColorFactorBuffer.put(particle.getRedFactor()).put(particle.getGreenFactor()).put(particle.getBlueFactor()).put(particle.getAlphaFactor());
-
             particleTextureCoordAABBBuffer.put(icon.getMinU()).put(icon.getMinV()).put(icon.getMaxU()).put(icon.getMaxV());
-
-            particleScaleBuffer.put(particleHalfSizes.getX()).put(particleHalfSizes.getY());
+            particleScaleBuffer.put(particleHalfSizes.getX()).put(particleHalfSizes.getY()).put(light).put(blend);
         }
 
 

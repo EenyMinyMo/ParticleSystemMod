@@ -2,7 +2,7 @@
 
 layout (location = 0) in vec2 particleVertPosition;
 layout (location = 1) in vec4 particleColorFactor;
-layout (location = 2) in vec2 particleSideScales;
+layout (location = 2) in vec4 particleSideScalesLightBlend;
 layout (location = 3) in vec3 particleCenterPosition;
 layout (location = 4) in vec3 particleNormalVector;
 layout (location = 5) in vec3 particleRotateAngles;
@@ -12,7 +12,9 @@ uniform vec3 cameraPosition;
 uniform mat4 projectionCameraMatrix;
 
 out vec4 colorFactor;
-out vec2 texCoord;
+out vec2 textureCoord;
+out float light;
+out float blend;
 
 /*
 Вычисляет матрицу трансформации модели.
@@ -69,8 +71,10 @@ void main() {
     mat4 modelTransformMat = computeModelTranformMat(particleCenterPosition, particleNormalVector);
     mat4 rotateMat = computeRotateMat(particleRotateAngles);
 
-    texCoord = particleTexCoord;
+    textureCoord = particleTexCoord;
     colorFactor = particleColorFactor;
+    light = particleSideScalesLightBlend.z;
+    blend = particleSideScalesLightBlend.w;
 
-    gl_Position = projectionCameraMatrix * modelTransformMat * rotateMat * vec4(particleVertPosition * particleSideScales, 0, 1);
+    gl_Position = projectionCameraMatrix * modelTransformMat * rotateMat * vec4(particleVertPosition * particleSideScalesLightBlend.xy, 0, 1);
 }
