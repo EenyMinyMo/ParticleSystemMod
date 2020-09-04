@@ -6,14 +6,10 @@ import org.lwjgl.util.vector.Vector4f;
 import ru.somber.commonutil.Axis;
 
 /**
- * Абстрактный класс частицы, реализцющий наиболее общий функционал частиц.
+ * Абстрактный класс частицы.
+ * Данные частицы хранятся в переменных-примитивах.
  */
-public abstract class AbstractParticleSimpleData implements IModifiableParticle {
-
-    /** Количество тиков, которое существует частица. */
-    private final int maxLifeTime;
-    /** Количество тиков, которое частица уже существует. */
-    private int lifeTime;
+public abstract class AbstractParticleSimpleData extends AbstractParticle {
 
     /** Новая позиция частицы. */
     private float x, y, z;
@@ -33,22 +29,13 @@ public abstract class AbstractParticleSimpleData implements IModifiableParticle 
     /** Коэффициенты цветов. */
     private float r, g, b, a;
 
-    /** Здесь название иконки частицы. */
-    private String particleIconName;
-
-    /** Флаг для определени жива ли частица. */
-    private boolean isDie;
-
 
     public AbstractParticleSimpleData(float x, float y, float z, int maxLifeTime, String iconName) {
+        super(maxLifeTime, iconName);
+
         this.x = x;
         this.y = y;
         this.z = z;
-
-        this.lifeTime = 0;
-        this.maxLifeTime = maxLifeTime;
-
-        this.particleIconName = iconName;
 
         this.xOld = this.x;
         this.yOld = this.y;
@@ -70,8 +57,6 @@ public abstract class AbstractParticleSimpleData implements IModifiableParticle 
         this.g = 1;
         this.b = 1;
         this.a = 1;
-
-        this.isDie = false;
     }
 
 
@@ -192,17 +177,6 @@ public abstract class AbstractParticleSimpleData implements IModifiableParticle 
 
 
     @Override
-    public int getLifeTime() {
-        return lifeTime;
-    }
-
-    @Override
-    public int getMaxLifeTime() {
-        return maxLifeTime;
-    }
-
-
-    @Override
     public void getColorFactor(Vector4f dest) {
         dest.set(r, g, b, a);
     }
@@ -229,40 +203,11 @@ public abstract class AbstractParticleSimpleData implements IModifiableParticle 
 
 
     @Override
-    public String getIconName() {
-        return particleIconName;
-    }
-
-
-    @Override
     public void computeNormalVector(Vector3f destination, float xCamera, float yCamera, float zCamera, float interpolateFactor) {
         Vector3f interpolatePosition = new Vector3f();
         computeInterpolatedPosition(interpolatePosition, interpolateFactor);
 
         computeNormalVector(destination, xCamera, yCamera, zCamera, interpolatePosition);
-    }
-
-
-    @Override
-    public boolean isDie() {
-        return isDie;
-    }
-
-    @Override
-    public void setDie() {
-        this.isDie = true;
-    }
-
-    @Override
-    public void update() {
-        setOldPosition(getPositionX(), getPositionY(), getPositionZ());
-        setOldHalfSizes(getHalfWidth(), getHalfHeight());
-        setOldRotateAngles(getAngleX(), getAngleY(), getAngleZ());
-
-        lifeTime++;
-        if (getLifeTime() >= getMaxLifeTime()) {
-            setDie();
-        }
     }
 
 
@@ -446,29 +391,29 @@ public abstract class AbstractParticleSimpleData implements IModifiableParticle 
     }
 
     @Override
-    public void setColorFactorR(float r) {
+    public void setRedFactor(float r) {
         this.r = r;
     }
 
     @Override
-    public void setColorFactorG(float g) {
+    public void setGreenFactor(float g) {
         this.g = g;
     }
 
     @Override
-    public void setColorFactorB(float b) {
+    public void setBlueFactor(float b) {
         this.b = b;
     }
 
     @Override
-    public void setColorFactorA(float a) {
+    public void setAlphaFactor(float a) {
         this.a = a;
     }
 
 
     @Override
-    public void setParticleIconName(String particleIconName) {
-        this.particleIconName = particleIconName;
+    public void update() {
+        super.update();
     }
 
 

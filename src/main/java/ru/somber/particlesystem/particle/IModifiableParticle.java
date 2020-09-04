@@ -72,13 +72,17 @@ public interface IModifiableParticle extends IParticle {
 
     void setColorFactor(Vector4f colorFactor);
 
-    void setColorFactorR(float r);
+    void setRedFactor(float r);
 
-    void setColorFactorG(float g);
+    void setGreenFactor(float g);
 
-    void setColorFactorB(float b);
+    void setBlueFactor(float b);
 
-    void setColorFactorA(float a);
+    void setAlphaFactor(float a);
+
+    void setLightFactor(float lightFactor);
+
+    void setBlendFactor(float blendFactor);
 
 
     void setParticleIconName(String particleIconName);

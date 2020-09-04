@@ -176,6 +176,16 @@ public interface IParticle {
     float getAlphaFactor();
 
     /**
+     * Возвращает коэффициент освещенности частицы.
+     */
+    float getLightFactor();
+
+    /**
+     * Возвращает коэффициент смешивания.
+     */
+    float getBlendFactor();
+
+    /**
      * Возвращает название иконки частицы.
      */
     String getIconName();
