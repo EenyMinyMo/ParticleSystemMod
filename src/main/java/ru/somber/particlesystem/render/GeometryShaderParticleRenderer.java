@@ -9,8 +9,6 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL32;
 import org.lwjgl.util.vector.Matrix4f;
-import org.lwjgl.util.vector.Vector2f;
-import org.lwjgl.util.vector.Vector3f;
 import ru.somber.clientutil.opengl.BufferObject;
 import ru.somber.clientutil.opengl.Shader;
 import ru.somber.clientutil.opengl.ShaderProgram;

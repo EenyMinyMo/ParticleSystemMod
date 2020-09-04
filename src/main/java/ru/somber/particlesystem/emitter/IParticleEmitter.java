@@ -1,7 +1,6 @@
 package ru.somber.particlesystem.emitter;
 
 import org.lwjgl.util.vector.Vector3f;
-import ru.somber.particlesystem.container.IParticleContainer;
 
 /**
  * Интерфейс для представления эмиттера частиц.

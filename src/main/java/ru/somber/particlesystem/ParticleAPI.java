@@ -3,7 +3,9 @@ package ru.somber.particlesystem;
 import ru.somber.particlesystem.container.IEmitterContainer;
 import ru.somber.particlesystem.manager.IParticleManager;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeMap;
 
 public final class ParticleAPI {
     private static ParticleAPI instance;

@@ -2,7 +2,6 @@ package ru.somber.particlesystem.texture;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.util.IIcon;
 
 /**
  * Класс для представления анимированных иконок.

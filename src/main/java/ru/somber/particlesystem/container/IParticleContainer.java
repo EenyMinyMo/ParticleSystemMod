@@ -1,6 +1,5 @@
 package ru.somber.particlesystem.container;
 
-import ru.somber.particlesystem.emitter.IParticleEmitter;
 import ru.somber.particlesystem.particle.IParticle;
 
 import java.util.Comparator;
