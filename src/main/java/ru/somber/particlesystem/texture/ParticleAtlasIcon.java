@@ -18,7 +18,7 @@ public class ParticleAtlasIcon extends TextureAtlasSprite {
      * Т.е. низ текстуры будет интерпритироваться как верх и наоборот.
      * Если false, то текстурные координаты берутся в стандартном режиме.
      */
-    private boolean isInvertedY;
+    private final boolean isInvertedY;
 
 
     /**
@@ -118,14 +118,6 @@ public class ParticleAtlasIcon extends TextureAtlasSprite {
      */
     public boolean isInvertedY() {
         return isInvertedY;
-    }
-
-    /**
-     * @param invertedY нужно ли делать текстурные координаты по оси Y инвертированными (нижние координаты будут верхними и наоборот).
-     * Использовать true, если иконка для текстуры, загруженной через майнкрафт (как пример).
-     */
-    public void setInvertedY(boolean invertedY) {
-        isInvertedY = invertedY;
     }
 
     /**

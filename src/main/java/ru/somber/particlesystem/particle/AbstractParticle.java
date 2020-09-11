@@ -102,4 +102,17 @@ public abstract class AbstractParticle implements IModifiableParticle {
         }
     }
 
+    @Override
+    public boolean hasAnimation() {
+        return false;
+    }
+
+    @Override
+    public int getAnimatedFrame() {
+        return 0;
+    }
+
+    @Override
+    public void setAnimatedFrame(int frameNumber) {}
+
 }

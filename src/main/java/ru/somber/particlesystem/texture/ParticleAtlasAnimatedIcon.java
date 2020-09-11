@@ -23,18 +23,22 @@ public class ParticleAtlasAnimatedIcon extends ParticleAtlasIcon {
     private final int countFrameColumn;
     /** Количество строк фреймов. */
     private final int countFrameRow;
+    private final int countFrames;
+
     /** Номер текущего используемого фрейма. На основе этого номера вычисляются текстурные координаты. */
     private int currentAnimationFrame;
 
-    /**
-     * Координаты текстуры с учетом смещения анимационного фрейма
-     * (координаты в пределах координат анимационной текстуры,
-     * вычисляются на основе значений countFrameColumn, countFrameRow и currentAnimationFrame).
-     */
-    private float animatedMinU,
-            animatedMaxU,
-            animatedMinV,
-            animatedMaxV;
+//    /**
+//     * Координаты текстуры с учетом смещения анимационного фрейма
+//     * (координаты в пределах координат анимационной текстуры,
+//     * вычисляются на основе значений countFrameColumn, countFrameRow и currentAnimationFrame).
+//     */
+//    private float animatedMinU,
+//            animatedMaxU,
+//            animatedMinV,
+//            animatedMaxV;
+
+    private float[][] frameCoords;
 
 
     /**
@@ -50,47 +54,77 @@ public class ParticleAtlasAnimatedIcon extends ParticleAtlasIcon {
 
         this.countFrameColumn = countFrameColumn;
         this.countFrameRow = countFrameRow;
+        this.countFrames = countFrameColumn * countFrameRow;
+
         this.currentAnimationFrame = 0;
 
-        updateUVCoord();
+        frameCoords = new float[countFrames][4];
+
+//        updateUVCoord();
     }
 
+    @Override
+    public void initSprite(int width, int height, int originX, int originY, boolean rotated) {
+        super.initSprite(width, height, originX, originY, rotated);
+
+        for (int i = 0; i < countFrames; i++) {
+            int currentFrameColumn = i % countFrameColumn;
+            int currentFrameRow = i / countFrameColumn;
+
+            float animatedMinU = super.getMinU() + (currentFrameColumn + 0.0F) / countFrameColumn * (super.getMaxU() - super.getMinU());
+            float animatedMaxU = super.getMinU() + (currentFrameColumn + 1.0F) / countFrameColumn * (super.getMaxU() - super.getMinU());
+
+            float animatedMinV = super.getOriginalMinV() + (currentFrameRow + 0.0F) / countFrameRow * (super.getOriginalMaxV() - super.getOriginalMinV());
+            float animatedMaxV = super.getOriginalMinV() + (currentFrameRow + 1.0F) / countFrameRow * (super.getOriginalMaxV() - super.getOriginalMinV());
+
+            if (isInvertedY()) {
+                animatedMinV = super.getOriginalMinV() + (currentFrameRow + 1.0F) / countFrameRow * (super.getOriginalMaxV() - super.getOriginalMinV());
+                animatedMaxV = super.getOriginalMinV() + (currentFrameRow + 0.0F) / countFrameRow * (super.getOriginalMaxV() - super.getOriginalMinV());
+            }
+
+            frameCoords[i][0] = animatedMinU;
+            frameCoords[i][1] = animatedMinV;
+            frameCoords[i][2] = animatedMaxU;
+            frameCoords[i][3] = animatedMaxV;
+        }
+
+    }
 
     @Override
     public float getMinU() {
-        return animatedMinU;
+        return frameCoords[currentAnimationFrame][0];
     }
 
     @Override
     public float getMaxU() {
-        return animatedMaxU;
+        return frameCoords[currentAnimationFrame][2];
     }
 
     @Override
     public float getMinV() {
-        return animatedMinV;
+        return frameCoords[currentAnimationFrame][1];
     }
 
     @Override
     public float getMaxV() {
-        return animatedMaxV;
+        return frameCoords[currentAnimationFrame][3];
     }
 
     @Override
     public float getOriginalMinV() {
         if (isInvertedY()) {
-            return animatedMaxV;
+            return getMaxV();
         } else {
-            return animatedMinV;
+            return getMinV();
         }
     }
 
     @Override
     public float getOriginalMaxV() {
         if (isInvertedY()) {
-            return animatedMinV;
+            return getMinV();
         } else {
-            return animatedMaxV;
+            return getMaxV();
         }
     }
 
@@ -104,13 +138,12 @@ public class ParticleAtlasAnimatedIcon extends ParticleAtlasIcon {
         currentAnimationFrame++;
         currentAnimationFrame %= countFrameColumn * countFrameRow;
 
-        updateUVCoord();
+//        updateUVCoord();
     }
 
     @Override
-    public void setInvertedY(boolean invertedY) {
-        super.setInvertedY(invertedY);
-        updateUVCoord();
+    public int getFrameCount() {
+        return countFrames;
     }
 
     /**
@@ -139,7 +172,7 @@ public class ParticleAtlasAnimatedIcon extends ParticleAtlasIcon {
      */
     public void setCurrentAnimationFrame(int currentAnimationFrame) {
         this.currentAnimationFrame = currentAnimationFrame;
-        this.currentAnimationFrame %= countFrameColumn * countFrameRow;
+        this.currentAnimationFrame %= getFrameCount();
     }
 
     /**
@@ -155,27 +188,27 @@ public class ParticleAtlasAnimatedIcon extends ParticleAtlasIcon {
         this.currentAnimationFrame = countFrameColumn * newFrameRow + newFrameColumn;
     }
 
-    /**
-     * Обновляет текстурные координаты на основе текущего номера анимационного фрейма.
-     */
-    public void updateUVCoord() {
-        int currentFrameColumn = currentAnimationFrame % countFrameColumn;
-        int currentFrameRow = currentAnimationFrame / countFrameColumn;
-
-        animatedMinU = super.getMinU() + (currentFrameColumn + 0.0F) / countFrameColumn * (super.getMaxU() - super.getMinU());
-        animatedMaxU = super.getMinU() + (currentFrameColumn + 1.0F) / countFrameColumn * (super.getMaxU() - super.getMinU());
-
-        animatedMinV = super.getOriginalMinV() + (currentFrameRow + 0.0F) / countFrameRow * (super.getOriginalMaxV() - super.getOriginalMinV());
-        animatedMaxV = super.getOriginalMinV() + (currentFrameRow + 1.0F) / countFrameRow * (super.getOriginalMaxV() - super.getOriginalMinV());
-
-        if (isInvertedY()) {
-            animatedMinV = super.getOriginalMinV() + (currentFrameRow + 1.0F) / countFrameRow * (super.getOriginalMaxV() - super.getOriginalMinV());
-            animatedMaxV = super.getOriginalMinV() + (currentFrameRow + 0.0F) / countFrameRow * (super.getOriginalMaxV() - super.getOriginalMinV());
-        } else {
-            animatedMinV = super.getOriginalMinV() + (currentFrameRow + 0.0F) / countFrameRow * (super.getOriginalMaxV() - super.getOriginalMinV());
-            animatedMaxV = super.getOriginalMinV() + (currentFrameRow + 1.0F) / countFrameRow * (super.getOriginalMaxV() - super.getOriginalMinV());
-        }
-    }
+//    /**
+//     * Обновляет текстурные координаты на основе текущего номера анимационного фрейма.
+//     */
+//    public void updateUVCoord() {
+//        int currentFrameColumn = currentAnimationFrame % countFrameColumn;
+//        int currentFrameRow = currentAnimationFrame / countFrameColumn;
+//
+//        animatedMinU = super.getMinU() + (currentFrameColumn + 0.0F) / countFrameColumn * (super.getMaxU() - super.getMinU());
+//        animatedMaxU = super.getMinU() + (currentFrameColumn + 1.0F) / countFrameColumn * (super.getMaxU() - super.getMinU());
+//
+//        animatedMinV = super.getOriginalMinV() + (currentFrameRow + 0.0F) / countFrameRow * (super.getOriginalMaxV() - super.getOriginalMinV());
+//        animatedMaxV = super.getOriginalMinV() + (currentFrameRow + 1.0F) / countFrameRow * (super.getOriginalMaxV() - super.getOriginalMinV());
+//
+//        if (isInvertedY()) {
+//            animatedMinV = super.getOriginalMinV() + (currentFrameRow + 1.0F) / countFrameRow * (super.getOriginalMaxV() - super.getOriginalMinV());
+//            animatedMaxV = super.getOriginalMinV() + (currentFrameRow + 0.0F) / countFrameRow * (super.getOriginalMaxV() - super.getOriginalMinV());
+//        } else {
+//            animatedMinV = super.getOriginalMinV() + (currentFrameRow + 0.0F) / countFrameRow * (super.getOriginalMaxV() - super.getOriginalMinV());
+//            animatedMaxV = super.getOriginalMinV() + (currentFrameRow + 1.0F) / countFrameRow * (super.getOriginalMaxV() - super.getOriginalMinV());
+//        }
+//    }
 
     /**
      * Возвращает левую текстурную координату текстуры со всеми фреймами.
