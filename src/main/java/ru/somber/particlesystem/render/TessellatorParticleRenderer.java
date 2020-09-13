@@ -10,7 +10,7 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import ru.somber.commonutil.Axis;
-import ru.somber.commonutil.SomberUtils;
+import ru.somber.commonutil.SomberCommonUtils;
 import ru.somber.particlesystem.particle.IParticle;
 import ru.somber.particlesystem.texture.ParticleAtlasIcon;
 import ru.somber.particlesystem.texture.ParticleAtlasTexture;
@@ -68,9 +68,9 @@ public class TessellatorParticleRenderer implements IParticleRenderer {
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureAtlas.getGlTextureId());
 
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-        xCamera = SomberUtils.interpolateMoveX(player, interpolationFactor);
-        yCamera = SomberUtils.interpolateMoveY(player, interpolationFactor);
-        zCamera = SomberUtils.interpolateMoveZ(player, interpolationFactor);
+        xCamera = SomberCommonUtils.interpolateMoveX(player, interpolationFactor);
+        yCamera = SomberCommonUtils.interpolateMoveY(player, interpolationFactor);
+        zCamera = SomberCommonUtils.interpolateMoveZ(player, interpolationFactor);
 
         GL11.glPushMatrix();
         GL11.glTranslatef(-xCamera, -yCamera, -zCamera);

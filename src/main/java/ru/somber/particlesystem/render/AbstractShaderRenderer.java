@@ -12,9 +12,9 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import ru.somber.clientutil.opengl.ShaderProgram;
 import ru.somber.clientutil.opengl.VAO;
-import ru.somber.clientutil.opengl.VBODataManager;
-import ru.somber.clientutil.opengl.VertexAttribVBO;
-import ru.somber.commonutil.SomberUtils;
+import ru.somber.clientutil.opengl.vbo.VBODataManagerMap;
+import ru.somber.clientutil.opengl.vbo.VertexAttribVBO;
+import ru.somber.commonutil.SomberCommonUtils;
 import ru.somber.particlesystem.particle.IParticle;
 import ru.somber.particlesystem.texture.ParticleAtlasTexture;
 
@@ -23,29 +23,40 @@ import java.util.List;
 
 public abstract class AbstractShaderRenderer implements IParticleRenderer {
 
+    /** Текстурный атлас, из которого будут браться текстуры для отрисовки частиц. */
     private ParticleAtlasTexture textureAtlas;
 
+    /** true - шейдеры инициализированы, иначе false. */
     protected boolean isShaderInit;
+    /** Объект шейдерной программы, через которую рисуются частицы. */
     protected ShaderProgram shaderProgram;
 
-    protected VBODataManager vboDataManager;
+    /** Менеджер VBO и буферов данных, связанный с VBO. */
+    protected VBODataManagerMap vboDataManagerMap;
+    /** VAO для хранения точек привязки вершинных атрибутов с VBO, а также других модификаторов атрибутов вершин. */
     protected VAO vao;
+    /** Массив объектов, связывающих VBO и вертексные атрибуты. */
     protected VertexAttribVBO[] vertexAttributes;
 
+    /** Номер тика обновления. */
     protected int tickUpdate;
 
+    /** Сюда перед рендером должна быть записана матрица проекции. */
     protected Matrix4f projectionMatrix;
+    /** Сюда перед рендером должна быть записана матрица преобразования камеры. */
     protected Matrix4f cameraMatrix;
+    /** Сюда перед рендером должна быть записана матрица проекции и матрица преобразования камеры. */
     protected Matrix4f projectionAndCameraMatrix;
 
+    /** Служебный буфер на 16 float элементов. */
     protected FloatBuffer buffer16;
 
-    protected float xCamera;
-    protected float yCamera;
-    protected float zCamera;
+    /** Позиция камеры. */
+    protected float xCamera, yCamera, zCamera;
 
-    /** Вынесено в переменные объекта, чтобы постоянное не создавать в методе. */
+    /** Вынесено в переменные объекта, чтобы постоянное не выделять объекты в методе. */
     protected Vector3f particleCenterPosition, particleNormalVector, particleRotationAngles;
+    /** Вынесено в переменные объекта, чтобы постоянное не выделять объекты в методе. */
     protected Vector2f particleHalfSizes;
 
 
@@ -63,7 +74,7 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
         particleRotationAngles = new Vector3f();
         particleHalfSizes = new Vector2f();
 
-        vboDataManager = new VBODataManager();
+        vboDataManagerMap = new VBODataManagerMap();
         tickUpdate = 0;
     }
 
@@ -84,9 +95,9 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
         }
 
         EntityLivingBase renderViewEntity = Minecraft.getMinecraft().renderViewEntity;
-        xCamera = SomberUtils.interpolateBetween((float) renderViewEntity.lastTickPosX, (float) renderViewEntity.posX, interpolationFactor);
-        yCamera = SomberUtils.interpolateBetween((float) renderViewEntity.lastTickPosY, (float) renderViewEntity.posY, interpolationFactor);
-        zCamera = SomberUtils.interpolateBetween((float) renderViewEntity.lastTickPosZ, (float) renderViewEntity.posZ, interpolationFactor);
+        xCamera = SomberCommonUtils.interpolateBetween((float) renderViewEntity.lastTickPosX, (float) renderViewEntity.posX, interpolationFactor);
+        yCamera = SomberCommonUtils.interpolateBetween((float) renderViewEntity.lastTickPosY, (float) renderViewEntity.posY, interpolationFactor);
+        zCamera = SomberCommonUtils.interpolateBetween((float) renderViewEntity.lastTickPosZ, (float) renderViewEntity.posZ, interpolationFactor);
 
 
         GL11.glDepthMask(false);
@@ -155,13 +166,16 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
 
 
     protected void initShaderAndBuffers() {
-        assembleShaderProgram();
-        createVertexAttribVBOs();
+        createShaderProgram();
+        createVBOsAndVertAttribVBOs();
         createVAO();
 
         isShaderInit = true;
     }
 
+    /**
+     * Создает VAO с данными из массива атрибутов вершин.
+     */
     protected void createVAO() {
         vao = VAO.createVAO();
 
@@ -184,6 +198,9 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
         }
     }
 
+    /**
+     * Производит выделение памяти VBO в зависимости от размеров переданного листа.
+     */
     protected void allocateVBOs(List<IParticle> particleList) {
         //Резервиуется место под 1000 частиц,
         //чтобы на малых количествах частиц не нужно было постояноо изменять размеры памяти.
@@ -194,6 +211,10 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
         }
     }
 
+    /**
+     * Проверяет наличие OpenGL ошибок и логирует их, если они найдены.
+     * Если throwException = true, то выбрасывается исключение времени выполнения.
+     */
     protected void checkError(boolean throwException) {
         int i = GL11.glGetError();
 
@@ -213,12 +234,24 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
     }
 
 
+    /**
+     * Подготавливает юниформы шейдерной программы для отрисовки.
+     */
     protected abstract void prepareUniforms();
 
-    protected abstract void assembleShaderProgram();
+    /**
+     * Создает шейдерную программу для отрисовки частиц.
+     */
+    protected abstract void createShaderProgram();
 
-    protected abstract void createVertexAttribVBOs();
+    /**
+     * Создает VBO-буферы, устанавливает данные и заполняет атрибуты вершин с этими VBO, формирует vboDataManagerMap.
+     */
+    protected abstract void createVBOsAndVertAttribVBOs();
 
+    /**
+     * Подготавливает VBO перед отрисовкой.
+     */
     protected abstract void prepareDataVBOs(List<IParticle> particleList, float interpolationFactor);
 
 }

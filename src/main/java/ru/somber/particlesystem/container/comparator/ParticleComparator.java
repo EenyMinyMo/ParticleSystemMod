@@ -2,7 +2,7 @@ package ru.somber.particlesystem.container.comparator;
 
 import net.minecraft.entity.Entity;
 import org.lwjgl.util.vector.Vector3f;
-import ru.somber.commonutil.SomberUtils;
+import ru.somber.commonutil.SomberCommonUtils;
 import ru.somber.particlesystem.particle.IParticle;
 
 import java.util.Comparator;
@@ -46,7 +46,7 @@ public class ParticleComparator implements Comparator<IParticle> {
     public int compare(IParticle p1, IParticle p2) {
         p1.computeInterpolatedPosition(pos1, interpolationFactor);
         p2.computeInterpolatedPosition(pos2, interpolationFactor);
-        SomberUtils.interpolateMove(entityPos, entity, interpolationFactor);
+        SomberCommonUtils.interpolateMove(entityPos, entity, interpolationFactor);
 
         Vector3f.sub(entityPos, pos1, pos1);
         Vector3f.sub(entityPos, pos2, pos2);
@@ -54,7 +54,7 @@ public class ParticleComparator implements Comparator<IParticle> {
         float len1 = pos1.lengthSquared();
         float len2 = pos2.lengthSquared();
 
-        if (Math.abs(len1 - len2) < SomberUtils.NUMBER_ERROR_8) {
+        if (Math.abs(len1 - len2) < SomberCommonUtils.NUMBER_ERROR_8) {
             return 0;
         } else if (len1 > len2) {
             return 1;

@@ -3,16 +3,18 @@ package ru.somber.particlesystem.render;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL31;
 import org.lwjgl.util.vector.Matrix4f;
-import ru.somber.clientutil.opengl.BufferObject;
+import ru.somber.clientutil.opengl.vbo.VBO;
 import ru.somber.clientutil.opengl.Shader;
 import ru.somber.clientutil.opengl.ShaderProgram;
-import ru.somber.clientutil.opengl.VertexAttribVBO;
-import ru.somber.commonutil.SomberUtils;
+import ru.somber.clientutil.opengl.vbo.VBODataManager;
+import ru.somber.clientutil.opengl.vbo.VertexAttribVBO;
+import ru.somber.commonutil.SomberCommonUtils;
 import ru.somber.particlesystem.ParticleSystemMod;
 import ru.somber.particlesystem.particle.IParticle;
 import ru.somber.particlesystem.texture.ParticleAtlasIcon;
@@ -50,7 +52,7 @@ public class InstanceShaderParticleRenderer extends AbstractShaderRenderer {
 
 
     @Override
-    protected void assembleShaderProgram() {
+    protected void createShaderProgram() {
         Shader vertexShader = Shader.createShaderObject(GL20.GL_VERTEX_SHADER,
                 new ResourceLocation(ParticleSystemMod.MOD_ID, "shaders/instance_shader_particle/particle_vert.glsl"));
 
@@ -88,37 +90,63 @@ public class InstanceShaderParticleRenderer extends AbstractShaderRenderer {
     }
 
     @Override
-    protected void createVertexAttribVBOs() {
+    protected void createVBOsAndVertAttribVBOs() {
         vertexAttributes = new VertexAttribVBO[7];
 
-        //particle position VBO
-        vertexAttributes[0] = new VertexAttribVBO(0, 2, GL11.GL_FLOAT, BufferObject.createVBO(), null, vboDataManager, GL15.GL_STREAM_DRAW);
-        vertexAttributes[0].setVertexAttribDivisor(0);
-        //particle center position VBO
-        vertexAttributes[1] = new VertexAttribVBO(1, 3, GL11.GL_FLOAT, BufferObject.createVBO(), null, vboDataManager, GL15.GL_STREAM_DRAW);
-        vertexAttributes[1].setVertexAttribDivisor(1);
-        //particle normal vector VBO
-        vertexAttributes[2] = new VertexAttribVBO(2, 3, GL11.GL_FLOAT, BufferObject.createVBO(), null, vboDataManager, GL15.GL_STREAM_DRAW);
-        vertexAttributes[2].setVertexAttribDivisor(1);
-        //particle rotation angles VBO
-        vertexAttributes[3] = new VertexAttribVBO(3, 3, GL11.GL_FLOAT, BufferObject.createVBO(), null, vboDataManager, GL15.GL_STREAM_DRAW);
-        vertexAttributes[3].setVertexAttribDivisor(1);
-        //particle color factor VBO
-        vertexAttributes[4] = new VertexAttribVBO(4, 4, GL11.GL_FLOAT, BufferObject.createVBO(), null, vboDataManager, GL15.GL_STREAM_DRAW);
-        vertexAttributes[4].setVertexAttribDivisor(1);
-        //particle texCoord VBO
-        vertexAttributes[5] = new VertexAttribVBO(5, 4, GL11.GL_FLOAT, BufferObject.createVBO(), null, vboDataManager, GL15.GL_STREAM_DRAW);
-        vertexAttributes[5].setVertexAttribDivisor(1);
-        //particle side scales and light & blend VBO
-        vertexAttributes[6] = new VertexAttribVBO(6, 4, GL11.GL_FLOAT, BufferObject.createVBO(), null, vboDataManager, GL15.GL_STREAM_DRAW);
-        vertexAttributes[6].setVertexAttribDivisor(1);
-
-        int intervalTimeUpdate = SomberUtils.timeToTick(0, 1, 0);
+        int intervalTimeUpdate = SomberCommonUtils.timeToTick(0, 1, 0);
         float expansionFactor = 1.5F;
 
-        for (int i = 0; i < vertexAttributes.length; i++) {
-            vertexAttributes[i].addVBOInVBODataManager(intervalTimeUpdate, expansionFactor);
-        }
+        VBO positionVBO = VBO.createVBO(GL15.GL_STREAM_DRAW);
+        VBODataManager positionVBOManager = new VBODataManager(positionVBO, BufferUtils.createFloatBuffer(0), intervalTimeUpdate, expansionFactor);
+
+        VBO centerPositionVBO = VBO.createVBO(GL15.GL_STREAM_DRAW);
+        VBODataManager centerPositionVBOManager = new VBODataManager(centerPositionVBO, BufferUtils.createFloatBuffer(0), intervalTimeUpdate, expansionFactor);
+
+        VBO normalVectorVBO = VBO.createVBO(GL15.GL_STREAM_DRAW);
+        VBODataManager normalVectorVBOManager = new VBODataManager(normalVectorVBO, BufferUtils.createFloatBuffer(0), intervalTimeUpdate, expansionFactor);
+
+        VBO rotationAnglesVBO = VBO.createVBO(GL15.GL_STREAM_DRAW);
+        VBODataManager rotationAnglesVBOManager = new VBODataManager(rotationAnglesVBO, BufferUtils.createFloatBuffer(0), intervalTimeUpdate, expansionFactor);
+
+        VBO colorFactorVBO = VBO.createVBO(GL15.GL_STREAM_DRAW);
+        VBODataManager colorFactorVBOManager = new VBODataManager(colorFactorVBO, BufferUtils.createFloatBuffer(0), intervalTimeUpdate, expansionFactor);
+
+        VBO textureCoordVBO = VBO.createVBO(GL15.GL_STREAM_DRAW);
+        VBODataManager textureCoordVBOManager = new VBODataManager(textureCoordVBO, BufferUtils.createFloatBuffer(0), intervalTimeUpdate, expansionFactor);
+
+        VBO sideScalesAndLightBlendFactorVBO = VBO.createVBO(GL15.GL_STREAM_DRAW);
+        VBODataManager sideScalesAndLightBlendFactorVBOManager = new VBODataManager(sideScalesAndLightBlendFactorVBO, BufferUtils.createFloatBuffer(0), intervalTimeUpdate, expansionFactor);
+
+        //particle position VBO
+        vertexAttributes[0] = new VertexAttribVBO(positionVBOManager, 0, 2);
+        vertexAttributes[0].setVertexAttribDivisor(0);
+        //particle center position VBO
+        vertexAttributes[1] = new VertexAttribVBO(centerPositionVBOManager, 1, 3);
+        vertexAttributes[1].setVertexAttribDivisor(1);
+        //particle normal vector VBO
+        vertexAttributes[2] = new VertexAttribVBO(normalVectorVBOManager, 2, 3);
+        vertexAttributes[2].setVertexAttribDivisor(1);
+        //particle rotation angles VBO
+        vertexAttributes[3] = new VertexAttribVBO(rotationAnglesVBOManager, 3, 3);
+        vertexAttributes[3].setVertexAttribDivisor(1);
+        //particle color factor VBO
+        vertexAttributes[4] = new VertexAttribVBO(colorFactorVBOManager, 4, 4);
+        vertexAttributes[4].setVertexAttribDivisor(1);
+        //particle texture coord VBO
+        vertexAttributes[5] = new VertexAttribVBO(textureCoordVBOManager, 5, 4);
+        vertexAttributes[5].setVertexAttribDivisor(1);
+        //particle side scales and light & blend VBO
+        vertexAttributes[6] = new VertexAttribVBO(sideScalesAndLightBlendFactorVBOManager, 6, 4);
+        vertexAttributes[6].setVertexAttribDivisor(1);
+
+
+        vboDataManagerMap.addVBODataManager(positionVBOManager);
+        vboDataManagerMap.addVBODataManager(centerPositionVBOManager);
+        vboDataManagerMap.addVBODataManager(normalVectorVBOManager);
+        vboDataManagerMap.addVBODataManager(rotationAnglesVBOManager);
+        vboDataManagerMap.addVBODataManager(colorFactorVBOManager);
+        vboDataManagerMap.addVBODataManager(textureCoordVBOManager);
+        vboDataManagerMap.addVBODataManager(sideScalesAndLightBlendFactorVBOManager);
     }
 
     @Override
@@ -135,13 +163,13 @@ public class InstanceShaderParticleRenderer extends AbstractShaderRenderer {
 
     @Override
     protected void prepareDataVBOs(List<IParticle> particleList, float interpolationFactor) {
-        FloatBuffer particlePositionBuffer = vertexAttributes[0].getVboBuffer();
-        FloatBuffer particleCenterPositionBuffer = vertexAttributes[1].getVboBuffer();
-        FloatBuffer particleNormalVectorBuffer = vertexAttributes[2].getVboBuffer();
-        FloatBuffer particleAnglesBuffer = vertexAttributes[3].getVboBuffer();
-        FloatBuffer particleColorFactorBuffer = vertexAttributes[4].getVboBuffer();
-        FloatBuffer particleTextureCoordAABBBuffer = vertexAttributes[5].getVboBuffer();
-        FloatBuffer particleScaleBuffer = vertexAttributes[6].getVboBuffer();
+        FloatBuffer particlePositionBuffer = vertexAttributes[0].getVboDataManager().getDataBuffer();
+        FloatBuffer particleCenterPositionBuffer = vertexAttributes[1].getVboDataManager().getDataBuffer();
+        FloatBuffer particleNormalVectorBuffer = vertexAttributes[2].getVboDataManager().getDataBuffer();
+        FloatBuffer particleAnglesBuffer = vertexAttributes[3].getVboDataManager().getDataBuffer();
+        FloatBuffer particleColorFactorBuffer = vertexAttributes[4].getVboDataManager().getDataBuffer();
+        FloatBuffer particleTextureCoordAABBBuffer = vertexAttributes[5].getVboDataManager().getDataBuffer();
+        FloatBuffer particleScaleBuffer = vertexAttributes[6].getVboDataManager().getDataBuffer();
 
         particlePositionBuffer.clear();
         particleCenterPositionBuffer.clear();
@@ -187,7 +215,12 @@ public class InstanceShaderParticleRenderer extends AbstractShaderRenderer {
 
 
         for (int i = 0; i < vertexAttributes.length; i++) {
-            vertexAttributes[i].bufferSubData(0);
+            VBODataManager vboManager = vertexAttributes[i].getVboDataManager();
+            VBO vbo = vboManager.getVbo();
+            FloatBuffer buffer = vboManager.getDataBuffer();
+
+            vbo.bindBuffer();
+            vbo.bufferSubData(0, buffer);
         }
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
     }
