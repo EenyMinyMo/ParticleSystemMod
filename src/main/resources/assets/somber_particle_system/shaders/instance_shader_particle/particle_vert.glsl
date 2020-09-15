@@ -12,7 +12,7 @@ uniform vec3 cameraPosition;
 uniform mat4 projectionCameraMatrix;
 
 out vec4 colorFactor;
-out vec2 texCoord;
+out vec2 textureCoord;
 out float light;
 out float blend;
 
@@ -90,7 +90,7 @@ void main() {
     */
     vec2 texCoordCenter = vec2(particleTextureCoordAABB.xy + particleTextureCoordAABB.zw) / 2;
     vec2 texCoordSideSizes = vec2(particleTextureCoordAABB.zw - particleTextureCoordAABB.xy);
-    texCoord = vec2(texCoordCenter.xy) + vec2(particlePosition.xy * texCoordSideSizes.xy);
+    textureCoord = vec2(texCoordCenter.xy) + vec2(particlePosition.xy * texCoordSideSizes.xy);
     colorFactor = particleColorFactor;
     light = particleSideScalesLightBlend.z;
     blend = particleSideScalesLightBlend.w;
