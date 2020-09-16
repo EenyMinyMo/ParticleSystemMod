@@ -11,6 +11,8 @@ import ru.somber.particlesystem.texture.ParticleAtlasIcon;
  */
 public interface IModifiableParticle extends IParticle {
 
+    void setLifeTime(int lifeTime);
+
     void setPosition(float x, float y, float z);
 
     void setPosition(Vector3f position);

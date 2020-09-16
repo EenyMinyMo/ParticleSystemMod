@@ -206,14 +206,14 @@ public interface IParticle {
 
 
     /**
-     * true - частица помечена мертвой.
+     * @return true - частица помечается мертвой, false - частица помечается живой.
      */
     boolean isDie();
 
     /**
-     * Помечает частицу мертвой.
+     * @param die true - частица помечается мертвой, false - частица помечается живой.
      */
-    void setDie();
+    void setDie(boolean die);
 
 
     /**

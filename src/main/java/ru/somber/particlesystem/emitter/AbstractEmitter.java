@@ -91,7 +91,7 @@ public abstract class AbstractEmitter implements IParticleEmitter {
             throw new RuntimeException("Emitter cannot be deleted!");
         }
 
-        emitterParticleList.forEach(IParticle::setDie);
+        emitterParticleList.forEach((particle) -> { particle.setDie(true); });
 
         emitterParticleList = null;
         tick = -1;

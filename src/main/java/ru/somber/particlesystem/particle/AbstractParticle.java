@@ -69,10 +69,15 @@ public abstract class AbstractParticle implements IModifiableParticle {
     }
 
     @Override
-    public void setDie() {
-        this.isDie = true;
+    public void setDie(boolean die) {
+        this.isDie = die;
     }
 
+
+    @Override
+    public void setLifeTime(int lifeTime) {
+        this.lifeTime = lifeTime;
+    }
 
     @Override
     public void setLightFactor(float lightFactor) {
@@ -98,7 +103,7 @@ public abstract class AbstractParticle implements IModifiableParticle {
 
         lifeTime++;
         if (getLifeTime() >= getMaxLifeTime()) {
-            setDie();
+            setDie(true);
         }
     }
 
