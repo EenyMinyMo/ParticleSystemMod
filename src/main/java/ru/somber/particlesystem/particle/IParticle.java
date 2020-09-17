@@ -222,14 +222,4 @@ public interface IParticle {
      */
     void update();
 
-    /**
-     * Должен возращать true, если частица имеет анимированную текстуру.
-     */
-    boolean hasAnimation();
-
-    /**
-     * Возвращает номер кадра из текстуры, который соответствует частице.
-     */
-    int getAnimatedFrame();
-
 }

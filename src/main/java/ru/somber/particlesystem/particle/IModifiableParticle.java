@@ -91,6 +91,4 @@ public interface IModifiableParticle extends IParticle {
 
     void setParticleIcon(ParticleAtlasIcon particleIcon);
 
-    void setAnimatedFrame(int frameNumber);
-
 }
