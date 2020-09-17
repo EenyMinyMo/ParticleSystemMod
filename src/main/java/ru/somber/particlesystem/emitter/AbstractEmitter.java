@@ -8,15 +8,15 @@ import java.util.List;
 
 public abstract class AbstractEmitter implements IParticleEmitter {
 
-    /** true - эмиттер был создан через метод create и готов к работе, иначе false. */
-    private boolean isCreated = false;
-    /** true - эмиттер помечен мертвым и не может быть более использован. */
-    private boolean isDie = false;
     /** Позиция эмиттера. */
     private float x, y, z;
     /** Список частиц, за которые отвечает данный эмитер. */
     private List<IParticle> emitterParticleList;
-    /** Количество тиков с момента создания эмиттера, но на самом деле сюда можно записать все, что угодно. */
+    /** true - эмиттер был создан через метод create и готов к работе, иначе false. */
+    private boolean isCreated;
+    /** true - эмиттер помечен мертвым и не может быть более использован. */
+    private boolean isDie;
+    /** Количество тиков с момента создания эмиттера, но на самом деле сюда можно записать любое число. */
     private int tick;
 
 
