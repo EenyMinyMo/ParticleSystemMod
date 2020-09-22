@@ -1,7 +1,6 @@
 package ru.somber.particlesystem.particle;
 
 import ru.somber.clientutil.textureatlas.icon.AtlasIcon;
-import ru.somber.particlesystem.texture.ParticleAtlasIcon;
 
 /**
  * Абстрактный класс частицы, реализцющий наиболее общий функционал частиц.

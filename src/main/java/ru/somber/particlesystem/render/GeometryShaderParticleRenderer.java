@@ -18,7 +18,6 @@ import ru.somber.clientutil.textureatlas.icon.AtlasIcon;
 import ru.somber.commonutil.SomberCommonUtils;
 import ru.somber.particlesystem.ParticleSystemMod;
 import ru.somber.particlesystem.particle.IParticle;
-import ru.somber.particlesystem.texture.ParticleAtlasIcon;
 
 import java.nio.FloatBuffer;
 import java.util.List;

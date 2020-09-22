@@ -4,7 +4,6 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import ru.somber.clientutil.textureatlas.AtlasTexture;
 import ru.somber.particlesystem.particle.IParticle;
-import ru.somber.particlesystem.texture.ParticleAtlasTexture;
 
 import java.util.List;
 

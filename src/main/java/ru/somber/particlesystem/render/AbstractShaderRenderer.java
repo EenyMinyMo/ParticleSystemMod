@@ -17,7 +17,6 @@ import ru.somber.clientutil.opengl.vbo.VertexAttribVBO;
 import ru.somber.clientutil.textureatlas.AtlasTexture;
 import ru.somber.commonutil.SomberCommonUtils;
 import ru.somber.particlesystem.particle.IParticle;
-import ru.somber.particlesystem.texture.ParticleAtlasTexture;
 
 import java.nio.FloatBuffer;
 import java.util.List;
