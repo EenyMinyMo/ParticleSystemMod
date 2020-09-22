@@ -1,6 +1,7 @@
 package ru.somber.particlesystem.particle;
 
 import org.lwjgl.util.vector.Vector3f;
+import ru.somber.clientutil.textureatlas.icon.AtlasIcon;
 import ru.somber.commonutil.Axis;
 import ru.somber.particlesystem.texture.ParticleAtlasIcon;
 
@@ -25,12 +26,12 @@ public abstract class AbstractUniversalParticle extends AbstractParticleSimpleDa
     protected Axis rotateAxis;
 
 
-    public AbstractUniversalParticle(float x, float y, float z, int maxLifeTime, ParticleAtlasIcon icon, Axis rotateAxis) {
+    public AbstractUniversalParticle(float x, float y, float z, int maxLifeTime, AtlasIcon icon, Axis rotateAxis) {
         super(x, y, z, maxLifeTime, icon);
         this.rotateAxis = rotateAxis;
     }
 
-    public AbstractUniversalParticle(Vector3f position, int maxLifeTime, ParticleAtlasIcon icon, Axis rotateAxis) {
+    public AbstractUniversalParticle(Vector3f position, int maxLifeTime, AtlasIcon icon, Axis rotateAxis) {
         super(position.getX(), position.getY(), position.getZ(), maxLifeTime, icon);
         this.rotateAxis = rotateAxis;
     }

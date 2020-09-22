@@ -3,6 +3,7 @@ package ru.somber.particlesystem.particle;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
+import ru.somber.clientutil.textureatlas.icon.AtlasIcon;
 import ru.somber.commonutil.Axis;
 import ru.somber.particlesystem.texture.ParticleAtlasIcon;
 
@@ -189,7 +190,7 @@ public interface IParticle {
     /**
      * Возвращает иконку частицы.
      */
-    ParticleAtlasIcon getParticleIcon();
+    AtlasIcon getParticleIcon();
 
 
     /**

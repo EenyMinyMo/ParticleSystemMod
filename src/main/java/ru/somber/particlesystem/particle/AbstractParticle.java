@@ -1,5 +1,6 @@
 package ru.somber.particlesystem.particle;
 
+import ru.somber.clientutil.textureatlas.icon.AtlasIcon;
 import ru.somber.particlesystem.texture.ParticleAtlasIcon;
 
 /**
@@ -18,12 +19,12 @@ public abstract class AbstractParticle implements IModifiableParticle {
     private float blendFactor;
 
     /** Иконка частицы с текстурными координатами. */
-    private ParticleAtlasIcon particleIcon;
+    private AtlasIcon particleIcon;
 
     /** Флаг для определени жива ли частица. */
     private boolean isDie;
 
-    public AbstractParticle(int maxLifeTime, ParticleAtlasIcon particleIcon) {
+    public AbstractParticle(int maxLifeTime, AtlasIcon particleIcon) {
         this.maxLifeTime = maxLifeTime;
         this.particleIcon = particleIcon;
 
@@ -58,7 +59,7 @@ public abstract class AbstractParticle implements IModifiableParticle {
 
 
     @Override
-    public ParticleAtlasIcon getParticleIcon() {
+    public AtlasIcon getParticleIcon() {
         return particleIcon;
     }
 
@@ -90,7 +91,7 @@ public abstract class AbstractParticle implements IModifiableParticle {
     }
 
     @Override
-    public void setParticleIcon(ParticleAtlasIcon particleIcon) {
+    public void setParticleIcon(AtlasIcon particleIcon) {
         this.particleIcon = particleIcon;
     }
 

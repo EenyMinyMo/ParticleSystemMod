@@ -3,6 +3,7 @@ package ru.somber.particlesystem.particle;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
+import ru.somber.clientutil.textureatlas.icon.AtlasIcon;
 import ru.somber.commonutil.Axis;
 import ru.somber.particlesystem.texture.ParticleAtlasIcon;
 
@@ -31,7 +32,7 @@ public abstract class AbstractParticleVectorData extends AbstractParticle {
     private Vector4f colorFactor;
 
 
-    public AbstractParticleVectorData(Vector3f position, int maxLifeTime, ParticleAtlasIcon iconName) {
+    public AbstractParticleVectorData(Vector3f position, int maxLifeTime, AtlasIcon iconName) {
         super(maxLifeTime, iconName);
 
         this.position = position;

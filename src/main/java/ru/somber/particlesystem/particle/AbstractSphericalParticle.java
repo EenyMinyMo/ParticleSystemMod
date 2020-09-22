@@ -1,6 +1,7 @@
 package ru.somber.particlesystem.particle;
 
 import org.lwjgl.util.vector.Vector3f;
+import ru.somber.clientutil.textureatlas.icon.AtlasIcon;
 import ru.somber.commonutil.Axis;
 import ru.somber.particlesystem.texture.ParticleAtlasIcon;
 
@@ -10,11 +11,11 @@ import ru.somber.particlesystem.texture.ParticleAtlasIcon;
  */
 public abstract class AbstractSphericalParticle extends AbstractParticleSimpleData {
 
-    public AbstractSphericalParticle(float x, float y, float z, int maxLifeTime, ParticleAtlasIcon icon) {
+    public AbstractSphericalParticle(float x, float y, float z, int maxLifeTime, AtlasIcon icon) {
         super(x, y, z, maxLifeTime, icon);
     }
 
-    public AbstractSphericalParticle(Vector3f position, int maxLifeTime, ParticleAtlasIcon icon) {
+    public AbstractSphericalParticle(Vector3f position, int maxLifeTime, AtlasIcon icon) {
         super(position.getX(), position.getY(), position.getZ(), maxLifeTime, icon);
     }
 

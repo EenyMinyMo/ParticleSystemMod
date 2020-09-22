@@ -14,6 +14,7 @@ import ru.somber.clientutil.opengl.ShaderProgram;
 import ru.somber.clientutil.opengl.VAO;
 import ru.somber.clientutil.opengl.vbo.VBODataManagerMap;
 import ru.somber.clientutil.opengl.vbo.VertexAttribVBO;
+import ru.somber.clientutil.textureatlas.AtlasTexture;
 import ru.somber.commonutil.SomberCommonUtils;
 import ru.somber.particlesystem.particle.IParticle;
 import ru.somber.particlesystem.texture.ParticleAtlasTexture;
@@ -24,7 +25,7 @@ import java.util.List;
 public abstract class AbstractShaderRenderer implements IParticleRenderer {
 
     /** Текстурный атлас, из которого будут браться текстуры для отрисовки частиц. */
-    private ParticleAtlasTexture textureAtlas;
+    private AtlasTexture atlasTexture;
 
     /** true - шейдеры инициализированы, иначе false. */
     protected boolean isShaderInit;
@@ -79,13 +80,13 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
     }
 
     @Override
-    public ParticleAtlasTexture getParticleTextureAtlas() {
-        return textureAtlas;
+    public AtlasTexture getAtlasTexture() {
+        return atlasTexture;
     }
 
     @Override
-    public void setParticleTextureAtlas(ParticleAtlasTexture textureAtlas) {
-        this.textureAtlas = textureAtlas;
+    public void setAtlasTexture(AtlasTexture atlasTexture) {
+        this.atlasTexture = atlasTexture;
     }
 
     @Override
@@ -124,7 +125,7 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
 
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureAtlas.getGlTextureId());
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, atlasTexture.getGlTextureId());
     }
 
     @Override

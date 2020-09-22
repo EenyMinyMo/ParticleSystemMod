@@ -13,6 +13,7 @@ import ru.somber.clientutil.opengl.ShaderProgram;
 import ru.somber.clientutil.opengl.vbo.VBO;
 import ru.somber.clientutil.opengl.vbo.VBODataManager;
 import ru.somber.clientutil.opengl.vbo.VertexAttribVBO;
+import ru.somber.clientutil.textureatlas.icon.AtlasIcon;
 import ru.somber.commonutil.SomberCommonUtils;
 import ru.somber.particlesystem.ParticleSystemMod;
 import ru.somber.particlesystem.particle.IParticle;
@@ -178,7 +179,7 @@ public class ShaderParticleRenderer extends AbstractShaderRenderer {
             particle.computeNormalVector(particleNormalVector, xCamera, yCamera, zCamera, interpolationFactor);
             particle.computeInterpolatedHalfSizes(particleHalfSizes, interpolationFactor);
             particle.computeInterpolatedRotateAngles(particleRotationAngles, interpolationFactor);
-            ParticleAtlasIcon icon = particle.getParticleIcon();
+            AtlasIcon icon = particle.getParticleIcon();
             float light = particle.getLightFactor();
             float blend = particle.getBlendFactor();
 
