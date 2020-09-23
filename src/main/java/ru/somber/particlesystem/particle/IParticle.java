@@ -204,6 +204,13 @@ public interface IParticle {
      */
     int getMaxLifeTime();
 
+    /**
+     * Возвращает коэффициент соотношения текущего времени жизни к максимальному времени жизни.
+     */
+    default float getLifeFactor() {
+        return (float) getLifeTime() / getMaxLifeTime();
+    }
+
 
     /**
      * @return true - частица помечается мертвой, false - частица помечается живой.
