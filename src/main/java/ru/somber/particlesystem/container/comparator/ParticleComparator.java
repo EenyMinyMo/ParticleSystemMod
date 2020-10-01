@@ -8,7 +8,6 @@ import ru.somber.particlesystem.particle.IParticle;
 import java.util.Comparator;
 
 public class ParticleComparator implements Comparator<IParticle> {
-    private Entity entity;
     private float interpolationFactor;
     /**
      * Векторы вынесены в переменные объекта, чтобы постоянное не создавать их в методе compare.
@@ -17,25 +16,21 @@ public class ParticleComparator implements Comparator<IParticle> {
     private Vector3f entityPos, pos1, pos2;
 
 
-    public ParticleComparator(Entity entity, float interpolationFactor) {
-        this.entity = entity;
-        this.interpolationFactor = interpolationFactor;
+    public ParticleComparator() {
+        this.interpolationFactor = 0;
 
         entityPos = new Vector3f();
         pos1 = new Vector3f();
         pos2 = new Vector3f();
     }
 
-    public Entity getEntity() {
-        return entity;
-    }
 
     public float getInterpolationFactor() {
         return interpolationFactor;
     }
 
-    public void setEntity(Entity entity) {
-        this.entity = entity;
+    public void setEntityPos(Entity entity, float interpolationFactor) {
+        SomberCommonUtils.interpolateMove(entityPos, entity, interpolationFactor);
     }
 
     public void setInterpolationFactor(float interpolationFactor) {
@@ -46,7 +41,6 @@ public class ParticleComparator implements Comparator<IParticle> {
     public int compare(IParticle p1, IParticle p2) {
         p1.computeInterpolatedPosition(pos1, interpolationFactor);
         p2.computeInterpolatedPosition(pos2, interpolationFactor);
-        SomberCommonUtils.interpolateMove(entityPos, entity, interpolationFactor);
 
         Vector3f.sub(entityPos, pos1, pos1);
         Vector3f.sub(entityPos, pos2, pos2);
@@ -57,9 +51,9 @@ public class ParticleComparator implements Comparator<IParticle> {
         if (Math.abs(len1 - len2) < SomberCommonUtils.NUMBER_ERROR_8) {
             return 0;
         } else if (len1 > len2) {
-            return 1;
-        } else {
             return -1;
+        } else {
+            return 1;
         }
     }
 

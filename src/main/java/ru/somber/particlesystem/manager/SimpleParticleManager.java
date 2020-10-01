@@ -3,17 +3,18 @@ package ru.somber.particlesystem.manager;
 import net.minecraft.client.Minecraft;
 import ru.somber.particlesystem.container.IParticleContainer;
 import ru.somber.particlesystem.container.comparator.ParticleComparator;
+import ru.somber.particlesystem.container.comparator.ParticleComparatorLowAccuracy;
 import ru.somber.particlesystem.render.IParticleRenderer;
 
 public class SimpleParticleManager implements IParticleManager {
 
-    private ParticleComparator particleComparator;
+    private ParticleComparatorLowAccuracy particleComparatorLowAccuracy;
 
     private IParticleContainer particleContainer;
     private IParticleRenderer particleRenderer;
 
     public SimpleParticleManager() {
-        particleComparator = new ParticleComparator(Minecraft.getMinecraft().thePlayer, 0);
+        particleComparatorLowAccuracy = new ParticleComparatorLowAccuracy();
     }
 
     @Override
@@ -44,6 +45,11 @@ public class SimpleParticleManager implements IParticleManager {
 
         particleContainer.update();
         particleRenderer.update(particleContainer.getParticleList());
+
+        particleComparatorLowAccuracy.setEntityPos(Minecraft.getMinecraft().renderViewEntity, 0);
+        try {
+            particleContainer.sort(particleComparatorLowAccuracy);
+        } catch (IllegalArgumentException e) {}
     }
 
     @Override
@@ -52,12 +58,10 @@ public class SimpleParticleManager implements IParticleManager {
             throw new RuntimeException("ParticleContainer or ParticleRenderer is null.");
         }
 
-        particleComparator.setEntity(Minecraft.getMinecraft().thePlayer);
-        particleComparator.setInterpolationFactor(interpolationFactor);
-
-        try {
-            particleContainer.sort(particleComparator.reversed());
-        } catch (IllegalArgumentException e) {}
+//        particleComparatorLowAccuracy.setEntityPos(Minecraft.getMinecraft().renderViewEntity, interpolationFactor);
+//        try {
+//            particleContainer.sort(particleComparatorLowAccuracy);
+//        } catch (IllegalArgumentException e) {}
 
         particleRenderer.preRender(particleContainer.getParticleList(), interpolationFactor);
         particleRenderer.render(particleContainer.getParticleList(), interpolationFactor);
