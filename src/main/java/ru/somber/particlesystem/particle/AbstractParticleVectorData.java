@@ -190,15 +190,6 @@ public abstract class AbstractParticleVectorData extends AbstractParticle {
 
 
     @Override
-    public void computeNormalVector(Vector3f destination, float xCamera, float yCamera, float zCamera, float interpolateFactor) {
-        Vector3f interpolatePosition = new Vector3f();
-        computeInterpolatedPosition(interpolatePosition, interpolateFactor);
-
-        computeNormalVector(destination, xCamera, yCamera, zCamera, interpolatePosition);
-    }
-
-
-    @Override
     public void setPosition(float x, float y, float z) {
         this.position.set(x, y, z);
     }
@@ -248,6 +239,20 @@ public abstract class AbstractParticleVectorData extends AbstractParticle {
         oldPosition.setZ(z);
     }
 
+    @Override
+    public void addToPosition(float x, float y, float z) {
+        position.setX(position.getX() + x);
+        position.setY(position.getY() + y);
+        position.setZ(position.getZ() + z);
+    }
+
+    @Override
+    public void addToOldPosition(float x, float y, float z) {
+        oldPosition.setX(oldPosition.getX() + x);
+        oldPosition.setY(oldPosition.getY() + y);
+        oldPosition.setZ(oldPosition.getZ() + z);
+    }
+
 
     @Override
     public void setHalfSizes(float halfWidth, float halfHeight) {
@@ -287,6 +292,18 @@ public abstract class AbstractParticleVectorData extends AbstractParticle {
     @Override
     public void setOldHalfHeight(float halfHeight) {
         oldHalfSizes.setY(halfHeight);
+    }
+
+    @Override
+    public void addToHalfSizes(float halfWidth, float halfHeight) {
+        halfSizes.setX(halfSizes.getX() + halfWidth);
+        halfSizes.setY(halfSizes.getY() + halfHeight);
+    }
+
+    @Override
+    public void addToOldHalfSizes(float halfWidth, float halfHeight) {
+        oldHalfSizes.setX(oldHalfSizes.getX() + halfWidth);
+        oldHalfSizes.setY(oldHalfSizes.getY() + halfHeight);
     }
 
 
@@ -340,6 +357,20 @@ public abstract class AbstractParticleVectorData extends AbstractParticle {
         oldRotateAngles.setZ(z);
     }
 
+    @Override
+    public void addToRotateAngles(float x, float y, float z) {
+        rotateAngles.setX(rotateAngles.getX() + x);
+        rotateAngles.setY(rotateAngles.getY() + y);
+        rotateAngles.setZ(rotateAngles.getZ() + z);
+    }
+
+    @Override
+    public void addToOldRotateAngles(float x, float y, float z) {
+        oldRotateAngles.setX(oldRotateAngles.getX() + x);
+        oldRotateAngles.setY(oldRotateAngles.getY() + y);
+        oldRotateAngles.setZ(oldRotateAngles.getZ() + z);
+    }
+
 
     @Override
     public void setColorFactor(float r, float g, float b, float a) {
@@ -379,8 +410,6 @@ public abstract class AbstractParticleVectorData extends AbstractParticle {
 
 
 
-    public abstract Axis rotateAxis();
-
-    public abstract void computeNormalVector(Vector3f destination, float xCamera, float yCamera, float zCamera, Vector3f interpolatePosition);
+    public abstract void computeNormalVector(Vector3f destination, float lookAtX, float lookAtY, float lookAtZ, float interpolateFactor);
 
 }

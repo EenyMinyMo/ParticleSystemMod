@@ -22,26 +22,6 @@ public interface IParticle {
      */
     void getOldPosition(Vector3f dest);
 
-    /**
-     * Записывает интерполированную между oldPosition и position позицию частицы по интерполяционному коэффициенту
-     * в переданный вектор.
-     */
-    default void computeInterpolatedPosition(Vector3f dest, float interpolationFactor) {
-        float x = getPositionX();
-        float y = getPositionY();
-        float z = getPositionZ();
-
-        float xOld = getOldPositionX();
-        float yOld = getOldPositionY();
-        float zOld = getOldPositionZ();
-
-        float interpolatedX = xOld + (x - xOld) * interpolationFactor;
-        float interpolatedY = yOld + (y - yOld) * interpolationFactor;
-        float interpolatedZ = zOld + (z - zOld) * interpolationFactor;
-
-        dest.set(interpolatedX, interpolatedY, interpolatedZ);
-    }
-
     float getPositionX();
     float getPositionY();
     float getPositionZ();
@@ -63,23 +43,6 @@ public interface IParticle {
      */
     void getOldHalfSizes(Vector2f dest);
 
-    /**
-     * Записывает интерполированные между oldHalfSizes и halfSizes размеры частицы по интерполяционному коэффициенту
-     * в переданный вектор.
-     */
-    default void computeInterpolatedHalfSizes(Vector2f dest, float interpolationFactor) {
-        float halfWidth = getHalfWidth();
-        float halfHeight = getHalfHeight();
-
-        float oldHalfWidth = getOldHalfWidth();
-        float oldHalfHeight = getOldHalfHeight();
-
-        float interpolatedHalfWidth = oldHalfWidth + (halfWidth - oldHalfWidth) * interpolationFactor;
-        float interpolatedHalfHeight = oldHalfHeight + (halfHeight - oldHalfHeight) * interpolationFactor;
-
-        dest.set(interpolatedHalfWidth, interpolatedHalfHeight);
-    }
-
     float getHalfWidth();
     float getHalfHeight();
 
@@ -99,26 +62,6 @@ public interface IParticle {
      */
     void getOldRotateAngles(Vector3f dest);
 
-    /**
-     * Записывает интерполированные между oldRotateAngles и rotateAngles локальные углы поворота частицы по интерполяционному коэффициенту
-     * в переданный вектор.
-     */
-    default void computeInterpolatedRotateAngles(Vector3f dest, float interpolationFactor) {
-        float angleX = getAngleX();
-        float angleY = getAngleY();
-        float angleZ = getAngleZ();
-
-        float oldAngleX = getOldAngleX();
-        float oldAngleY = getOldAngleY();
-        float oldAngleZ = getOldAngleZ();
-
-        float interpolatedAngleX = oldAngleX + (angleX - oldAngleX) * interpolationFactor;
-        float interpolatedAngleY = oldAngleY + (angleY - oldAngleY) * interpolationFactor;
-        float interpolatedAngleZ = oldAngleZ + (angleZ - oldAngleZ) * interpolationFactor;
-
-        dest.set(interpolatedAngleX, interpolatedAngleY, interpolatedAngleZ);
-    }
-
     float getAngleX();
     float getAngleY();
     float getAngleZ();
@@ -129,26 +72,17 @@ public interface IParticle {
 
 
     /**
-     * Возвращает ось, вокруг которой происходит вращение за игроком.
-     * <p>
-     * ABSCISSA_AXIS - вращение только вокруг оси X.
-     * <p>
-     * ORDINATE_AXIS - вращение только вокруг оси Y - классическая цилиндрическая частица.
-     * <p>
-     * APPLICATE_AXIS - вращение только вокруг оси Z.
-     * <p>
-     * ALL_AXIS - частица вращается вокруг всех осей - сферическая частица.
-     * <p>
-     * NONE_AXIS - частица не вращается за игроком - статическая частица.
+     * Записывает в переданный вектор координаты нормали частицы. Вектор нормали может быть произвольной длины.
+     * В зависимости от класса частицы результат может и не учитывать параметры lookAt и тд,
+     * т.е. метод может быть переопределен произвольным образом.
+     *
+     * @param destination вектор, куда запишутся данные нормали.
+     * @param lookAtX позиция X точки, куда может быть направлена нормаль частицы.
+     * @param lookAtY позиция Y точки, куда может быть направлена нормаль частицы.
+     * @param lookAtZ позиция Z точки, куда может быть направлена нормаль частицы.
+     * @param interpolationFactor коэффициент интерполяции между старой и новой позициями частицы.
      */
-    Axis rotateAxis();
-
-    /**
-     * Записывает в переданный вектор координаты нормали к частице. Вектор нормали может быть произвиольной длины.
-     * <p>
-     * (нормаль частицы зависит от позиции частицы, позиции камеры (которая передается в переметрах) и вокруг какой оси частица вращается)
-     */
-    void computeNormalVector(Vector3f destination, float xCamera, float yCamera, float zCamera, float interpolationFactor);
+    void computeNormalVector(Vector3f destination, float lookAtX, float lookAtY, float lookAtZ, float interpolationFactor);
 
 
     /**
@@ -193,23 +127,16 @@ public interface IParticle {
 
 
     /**
-     * Текущее время жизни частицы.
+     * Возвращает текущее время жизни частицы.
      * (На основе этого времени может вычисляться позиция частицы.
      * Если время превышает максимальное время жизни, то частица должна помечаться мертвой.)
      */
     int getLifeTime();
 
     /**
-     * Максимальное время жизни частицы.
+     * Возвращает максимальное время жизни частицы.
      */
     int getMaxLifeTime();
-
-    /**
-     * Возвращает коэффициент соотношения текущего времени жизни к максимальному времени жизни.
-     */
-    default float getLifeFactor() {
-        return (float) getLifeTime() / getMaxLifeTime();
-    }
 
 
     /**
@@ -224,9 +151,73 @@ public interface IParticle {
 
 
     /**
-     * Обновляет внутренние данные частицы
-     * (допустим позицию и т.д.).
+     * Обновляет внутренние данные частицы (допустим позицию и т.д.).
      */
     void update();
+
+
+    /**
+     * Записывает интерполированную между oldPosition и position позицию частицы по интерполяционному коэффициенту
+     * в переданный вектор.
+     */
+    default void computeInterpolatedPosition(Vector3f dest, float interpolationFactor) {
+        float x = getPositionX();
+        float y = getPositionY();
+        float z = getPositionZ();
+
+        float xOld = getOldPositionX();
+        float yOld = getOldPositionY();
+        float zOld = getOldPositionZ();
+
+        float interpolatedX = xOld + (x - xOld) * interpolationFactor;
+        float interpolatedY = yOld + (y - yOld) * interpolationFactor;
+        float interpolatedZ = zOld + (z - zOld) * interpolationFactor;
+
+        dest.set(interpolatedX, interpolatedY, interpolatedZ);
+    }
+
+    /**
+     * Записывает интерполированные между oldHalfSizes и halfSizes размеры частицы по интерполяционному коэффициенту
+     * в переданный вектор.
+     */
+    default void computeInterpolatedHalfSizes(Vector2f dest, float interpolationFactor) {
+        float halfWidth = getHalfWidth();
+        float halfHeight = getHalfHeight();
+
+        float oldHalfWidth = getOldHalfWidth();
+        float oldHalfHeight = getOldHalfHeight();
+
+        float interpolatedHalfWidth = oldHalfWidth + (halfWidth - oldHalfWidth) * interpolationFactor;
+        float interpolatedHalfHeight = oldHalfHeight + (halfHeight - oldHalfHeight) * interpolationFactor;
+
+        dest.set(interpolatedHalfWidth, interpolatedHalfHeight);
+    }
+
+    /**
+     * Записывает интерполированные между oldRotateAngles и rotateAngles локальные углы поворота частицы по интерполяционному коэффициенту
+     * в переданный вектор.
+     */
+    default void computeInterpolatedRotateAngles(Vector3f dest, float interpolationFactor) {
+        float angleX = getAngleX();
+        float angleY = getAngleY();
+        float angleZ = getAngleZ();
+
+        float oldAngleX = getOldAngleX();
+        float oldAngleY = getOldAngleY();
+        float oldAngleZ = getOldAngleZ();
+
+        float interpolatedAngleX = oldAngleX + (angleX - oldAngleX) * interpolationFactor;
+        float interpolatedAngleY = oldAngleY + (angleY - oldAngleY) * interpolationFactor;
+        float interpolatedAngleZ = oldAngleZ + (angleZ - oldAngleZ) * interpolationFactor;
+
+        dest.set(interpolatedAngleX, interpolatedAngleY, interpolatedAngleZ);
+    }
+
+    /**
+     * Возвращает коэффициент соотношения текущего времени жизни к максимальному времени жизни.
+     */
+    default float getLifeFactor() {
+        return (float) getLifeTime() / getMaxLifeTime();
+    }
 
 }

@@ -33,6 +33,10 @@ public interface IModifiableParticle extends IParticle {
 
     void setOldPositionZ(float z);
 
+    void addToPosition(float x, float y, float z);
+
+    void addToOldPosition(float x, float y, float z);
+
 
     void setHalfSizes(float halfWidth, float halfHeight);
 
@@ -49,6 +53,10 @@ public interface IModifiableParticle extends IParticle {
     void setOldHalfWidth(float halfWidth);
 
     void setOldHalfHeight(float halfHeight);
+
+    void addToHalfSizes(float halfWidth, float halfHeight);
+
+    void addToOldHalfSizes(float halfWidth, float halfHeight);
 
 
     void setRotateAngles(float x, float y, float z);
@@ -70,6 +78,10 @@ public interface IModifiableParticle extends IParticle {
     void setOldRotateAnglesY(float y);
 
     void setOldRotateAnglesZ(float z);
+
+    void addToRotateAngles(float x, float y, float z);
+
+    void addToOldRotateAngles(float x, float y, float z);
 
 
     void setColorFactor(float r, float g, float b, float a);
