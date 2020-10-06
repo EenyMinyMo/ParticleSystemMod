@@ -2,7 +2,7 @@ package ru.somber.particlesystem.particle;
 
 import org.lwjgl.util.vector.Vector3f;
 import ru.somber.clientutil.textureatlas.icon.AtlasIcon;
-import ru.somber.commonutil.SomberCommonUtils;
+import ru.somber.commonutil.SomberCommonUtil;
 
 /**
  * Абстрактный класс частицы, реализцющий наиболее общий функционал частиц.
@@ -135,9 +135,9 @@ public abstract class AbstractParticle implements IModifiableParticle {
      * @param interpolationFactor коэффициент интерполяции между старой и новой позициями частицы.
      */
     protected final void computeNormalVectorSphericalParticle(Vector3f destination, float lookAtX, float lookAtY, float lookAtZ, float interpolationFactor) {
-        float interpolateX = SomberCommonUtils.interpolateBetween(getOldPositionX(), getPositionX(), interpolationFactor);
-        float interpolateY = SomberCommonUtils.interpolateBetween(getOldPositionY(), getPositionY(), interpolationFactor);
-        float interpolateZ = SomberCommonUtils.interpolateBetween(getOldPositionZ(), getPositionZ(), interpolationFactor);
+        float interpolateX = SomberCommonUtil.interpolateBetween(getOldPositionX(), getPositionX(), interpolationFactor);
+        float interpolateY = SomberCommonUtil.interpolateBetween(getOldPositionY(), getPositionY(), interpolationFactor);
+        float interpolateZ = SomberCommonUtil.interpolateBetween(getOldPositionZ(), getPositionZ(), interpolationFactor);
 
         destination.x = interpolateX - lookAtX;
         destination.y = interpolateY - lookAtY;
@@ -167,8 +167,8 @@ public abstract class AbstractParticle implements IModifiableParticle {
      * @param interpolationFactor коэффициент интерполяции между старой и новой позициями частицы.
      */
     protected final void computeNormalVectorCylindricalParticle(Vector3f destination, float lookAtX, float lookAtZ, float interpolationFactor) {
-        float interpolateX = SomberCommonUtils.interpolateBetween(getOldPositionX(), getPositionX(), interpolationFactor);
-        float interpolateZ = SomberCommonUtils.interpolateBetween(getOldPositionZ(), getPositionZ(), interpolationFactor);
+        float interpolateX = SomberCommonUtil.interpolateBetween(getOldPositionX(), getPositionX(), interpolationFactor);
+        float interpolateZ = SomberCommonUtil.interpolateBetween(getOldPositionZ(), getPositionZ(), interpolationFactor);
 
         destination.x = interpolateX - lookAtX;
         destination.y = 0;

@@ -15,7 +15,7 @@ import ru.somber.clientutil.opengl.vbo.VBO;
 import ru.somber.clientutil.opengl.vbo.VBODataManager;
 import ru.somber.clientutil.opengl.vbo.VertexAttribVBO;
 import ru.somber.clientutil.textureatlas.icon.AtlasIcon;
-import ru.somber.commonutil.SomberCommonUtils;
+import ru.somber.commonutil.SomberCommonUtil;
 import ru.somber.particlesystem.ParticleSystemMod;
 import ru.somber.particlesystem.particle.IParticle;
 
@@ -97,7 +97,7 @@ public class GeometryShaderParticleRenderer extends AbstractShaderRenderer {
     protected void createVBOsAndVertAttribVBOs() {
         vertexAttributes = new VertexAttribVBO[6];
 
-        int intervalTimeUpdate = SomberCommonUtils.timeToTick(0, 5, 0);
+        int intervalTimeUpdate = SomberCommonUtil.timeToTick(0, 5, 0);
         float expansionFactor = 1.5F;
 
         VBO centerPositionVBO = VBO.createVBO(GL15.GL_STREAM_DRAW);

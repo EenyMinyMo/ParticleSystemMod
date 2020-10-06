@@ -15,7 +15,7 @@ import ru.somber.clientutil.opengl.VAO;
 import ru.somber.clientutil.opengl.vbo.VBODataManagerMap;
 import ru.somber.clientutil.opengl.vbo.VertexAttribVBO;
 import ru.somber.clientutil.textureatlas.AtlasTexture;
-import ru.somber.commonutil.SomberCommonUtils;
+import ru.somber.commonutil.SomberCommonUtil;
 import ru.somber.particlesystem.particle.IParticle;
 
 import java.nio.FloatBuffer;
@@ -95,9 +95,9 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
         }
 
         EntityLivingBase renderViewEntity = Minecraft.getMinecraft().renderViewEntity;
-        xCamera = SomberCommonUtils.interpolateBetween((float) renderViewEntity.lastTickPosX, (float) renderViewEntity.posX, interpolationFactor);
-        yCamera = SomberCommonUtils.interpolateBetween((float) renderViewEntity.lastTickPosY, (float) renderViewEntity.posY, interpolationFactor);
-        zCamera = SomberCommonUtils.interpolateBetween((float) renderViewEntity.lastTickPosZ, (float) renderViewEntity.posZ, interpolationFactor);
+        xCamera = SomberCommonUtil.interpolateBetween((float) renderViewEntity.lastTickPosX, (float) renderViewEntity.posX, interpolationFactor);
+        yCamera = SomberCommonUtil.interpolateBetween((float) renderViewEntity.lastTickPosY, (float) renderViewEntity.posY, interpolationFactor);
+        zCamera = SomberCommonUtil.interpolateBetween((float) renderViewEntity.lastTickPosZ, (float) renderViewEntity.posZ, interpolationFactor);
 
 
         GL11.glDepthMask(false);
