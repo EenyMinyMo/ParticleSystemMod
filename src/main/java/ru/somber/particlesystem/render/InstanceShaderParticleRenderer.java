@@ -54,10 +54,10 @@ public class InstanceShaderParticleRenderer extends AbstractShaderRenderer {
     @Override
     protected void createShaderProgram() {
         Shader vertexShader = Shader.createShaderObject(GL20.GL_VERTEX_SHADER,
-                new ResourceLocation(ParticleSystemMod.MOD_ID, "shaders/instance_shader_particle/particle_vert.glsl"));
+                new ResourceLocation(ParticleSystemMod.MOD_ID, "shader/instance_shader_particle/particle_vert.glsl"));
 
         Shader fragmentShader = Shader.createShaderObject(GL20.GL_FRAGMENT_SHADER,
-                new ResourceLocation(ParticleSystemMod.MOD_ID, "shaders/instance_shader_particle/particle_frag.glsl"));
+                new ResourceLocation(ParticleSystemMod.MOD_ID, "shader/instance_shader_particle/particle_frag.glsl"));
 
         shaderProgram = ShaderProgram.createShaderProgram(vertexShader, fragmentShader);
     }

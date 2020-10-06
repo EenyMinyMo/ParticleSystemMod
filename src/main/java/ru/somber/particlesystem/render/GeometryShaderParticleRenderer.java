@@ -54,13 +54,13 @@ public class GeometryShaderParticleRenderer extends AbstractShaderRenderer {
     @Override
     protected void createShaderProgram() {
         Shader vertexShader = Shader.createShaderObject(GL20.GL_VERTEX_SHADER,
-                new ResourceLocation(ParticleSystemMod.MOD_ID, "shaders/geometry_shader_particle/particle_vert.glsl"));
+                new ResourceLocation(ParticleSystemMod.MOD_ID, "shader/geometry_shader_particle/particle_vert.glsl"));
 
         Shader geomShader = Shader.createShaderObject(GL32.GL_GEOMETRY_SHADER,
-                new ResourceLocation(ParticleSystemMod.MOD_ID, "shaders/geometry_shader_particle/particle_geom.glsl"));
+                new ResourceLocation(ParticleSystemMod.MOD_ID, "shader/geometry_shader_particle/particle_geom.glsl"));
 
         Shader fragmentShader = Shader.createShaderObject(GL20.GL_FRAGMENT_SHADER,
-                new ResourceLocation(ParticleSystemMod.MOD_ID, "shaders/geometry_shader_particle/particle_frag.glsl"));
+                new ResourceLocation(ParticleSystemMod.MOD_ID, "shader/geometry_shader_particle/particle_frag.glsl"));
 
         shaderProgram = ShaderProgram.createShaderProgram(vertexShader, geomShader, fragmentShader);
     }
