@@ -1,4 +1,4 @@
-package ru.somber.particlesystem.events;
+package ru.somber.particlesystem.event;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
