@@ -2,7 +2,6 @@ package ru.somber.particlesystem.manager;
 
 import net.minecraft.client.Minecraft;
 import ru.somber.particlesystem.container.IParticleContainer;
-import ru.somber.particlesystem.container.comparator.ParticleComparator;
 import ru.somber.particlesystem.container.comparator.ParticleComparatorLowAccuracy;
 import ru.somber.particlesystem.render.IParticleRenderer;
 

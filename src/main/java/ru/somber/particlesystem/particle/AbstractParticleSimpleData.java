@@ -4,7 +4,6 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 import ru.somber.clientutil.textureatlas.icon.AtlasIcon;
-import ru.somber.commonutil.Axis;
 
 /**
  * Абстрактный класс частицы.
