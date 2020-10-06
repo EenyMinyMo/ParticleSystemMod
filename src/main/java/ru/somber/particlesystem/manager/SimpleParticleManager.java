@@ -45,10 +45,14 @@ public class SimpleParticleManager implements IParticleManager {
         particleContainer.update();
         particleRenderer.update(particleContainer.getParticleList());
 
-        particleComparatorLowAccuracy.setEntityPos(Minecraft.getMinecraft().renderViewEntity, 0);
         try {
+            particleComparatorLowAccuracy.setEntityPos(Minecraft.getMinecraft().renderViewEntity, 0);
             particleContainer.sort(particleComparatorLowAccuracy);
-        } catch (IllegalArgumentException e) {}
+        } catch (Exception e) {
+            //обработка исключений при сортировке массива частиц.
+            //вообще обрабатывать исключение мне кажется бесполезно, т.к. некоторые исключения просто сложно исправить (городить проверки и т.д.)
+            //если исключени выпало, просто оставим список частиц без сортировки.
+        }
     }
 
     @Override
