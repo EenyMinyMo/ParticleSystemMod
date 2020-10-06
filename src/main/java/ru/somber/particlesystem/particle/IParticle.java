@@ -83,22 +83,22 @@ public interface IParticle {
      */
     void computeNormalVector(Vector3f destination, float lookAtX, float lookAtY, float lookAtZ, float interpolationFactor);
 
-    /**
-     * Записывает в переданные вектора координаты интерполированной позиции, размеров, углов поворота и нормали частицы.
-     * Вектор нормали может быть произвольной длины.
-     * В зависимости от класса частицы нормаль может и не учитывать параметры lookAt и тд,
-     * т.е. метод может быть переопределен произвольным образом.
-     *
-     * @param destPosition вектор, куда запишутся данные интерполированной позиции.
-     * @param destHalfSizes вектор, куда запишутся данные интерполированных размеров.
-     * @param destRotationAngles вектор, куда запишутся данные интерполированных углов поворота.
-     * @param destNormalVector вектор, куда запишутся данные нормали.
-     * @param lookAtX позиция X точки, куда может быть направлена нормаль частицы.
-     * @param lookAtY позиция Y точки, куда может быть направлена нормаль частицы.
-     * @param lookAtZ позиция Z точки, куда может быть направлена нормаль частицы.
-     * @param interpolationFactor коэффициент интерполяции между старой и новой позициями частицы.
-     */
-    void computeInterpolateData(Vector3f destPosition, Vector2f destHalfSizes, Vector3f destRotationAngles, Vector3f destNormalVector, float lookAtX, float lookAtY, float lookAtZ, float interpolationFactor);
+//    /**
+//     * Записывает в переданные вектора координаты интерполированной позиции, размеров, углов поворота и нормали частицы.
+//     * Вектор нормали может быть произвольной длины.
+//     * В зависимости от класса частицы нормаль может и не учитывать параметры lookAt и тд,
+//     * т.е. метод может быть переопределен произвольным образом.
+//     *
+//     * @param destPosition вектор, куда запишутся данные интерполированной позиции.
+//     * @param destHalfSizes вектор, куда запишутся данные интерполированных размеров.
+//     * @param destRotationAngles вектор, куда запишутся данные интерполированных углов поворота.
+//     * @param destNormalVector вектор, куда запишутся данные нормали.
+//     * @param lookAtX позиция X точки, куда может быть направлена нормаль частицы.
+//     * @param lookAtY позиция Y точки, куда может быть направлена нормаль частицы.
+//     * @param lookAtZ позиция Z точки, куда может быть направлена нормаль частицы.
+//     * @param interpolationFactor коэффициент интерполяции между старой и новой позициями частицы.
+//     */
+//    void computeInterpolateData(Vector3f destPosition, Vector2f destHalfSizes, Vector3f destRotationAngles, Vector3f destNormalVector, float lookAtX, float lookAtY, float lookAtZ, float interpolationFactor);
 
 
     /**
