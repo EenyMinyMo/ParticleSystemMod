@@ -61,10 +61,10 @@ public class SimpleParticleManager implements IParticleManager {
             throw new RuntimeException("ParticleContainer or ParticleRenderer is null.");
         }
 
-//        particleComparatorLowAccuracy.setEntityPos(Minecraft.getMinecraft().renderViewEntity, interpolationFactor);
-//        try {
-//            particleContainer.sort(particleComparatorLowAccuracy);
-//        } catch (IllegalArgumentException e) {}
+        particleComparatorLowAccuracy.setEntityPos(Minecraft.getMinecraft().renderViewEntity, interpolationFactor);
+        try {
+            particleContainer.sort(particleComparatorLowAccuracy);
+        } catch (IllegalArgumentException e) {}
 
         particleRenderer.preRender(particleContainer.getParticleList(), interpolationFactor);
         particleRenderer.render(particleContainer.getParticleList(), interpolationFactor);
