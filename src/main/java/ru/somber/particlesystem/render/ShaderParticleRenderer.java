@@ -175,7 +175,7 @@ public class ShaderParticleRenderer extends AbstractShaderRenderer {
 
         for (IParticle particle : particleList) {
             particle.computeInterpolatedPosition(particleCenterPosition, interpolationFactor);
-            particle.computeNormalVector(particleNormalVector, xCamera, yCamera, zCamera, interpolationFactor);
+            particle.computeNormalVector(particleNormalVector, xCameraOffset, yCameraOffset, zCameraOffset, interpolationFactor);
             particle.computeInterpolatedHalfSizes(particleHalfSizes, interpolationFactor);
             particle.computeInterpolatedRotateAngles(particleRotationAngles, interpolationFactor);
             AtlasIcon icon = particle.getParticleIcon();

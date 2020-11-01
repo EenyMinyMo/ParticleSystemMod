@@ -10,12 +10,12 @@ import org.lwjgl.util.glu.GLU;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
+import ru.somber.clientutil.PlayerPositionUtil;
 import ru.somber.clientutil.opengl.ShaderProgram;
 import ru.somber.clientutil.opengl.VAO;
 import ru.somber.clientutil.opengl.vbo.VBODataManagerMap;
 import ru.somber.clientutil.opengl.vbo.VertexAttribVBO;
 import ru.somber.clientutil.textureatlas.AtlasTexture;
-import ru.somber.commonutil.SomberCommonUtil;
 import ru.somber.particlesystem.particle.IParticle;
 
 import java.nio.FloatBuffer;
@@ -53,6 +53,7 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
 
     /** Позиция камеры. */
     protected float xCamera, yCamera, zCamera;
+    protected float xCameraOffset, yCameraOffset, zCameraOffset;
 
     /** Вынесено в переменные объекта, чтобы постоянное не выделять объекты в методе. */
     protected Vector3f particleCenterPosition, particleNormalVector, particleRotationAngles;
@@ -94,10 +95,12 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
             initShaderAndBuffers();
         }
 
-        EntityLivingBase renderViewEntity = Minecraft.getMinecraft().renderViewEntity;
-        xCamera = SomberCommonUtil.interpolateBetween((float) renderViewEntity.lastTickPosX, (float) renderViewEntity.posX, interpolationFactor);
-        yCamera = SomberCommonUtil.interpolateBetween((float) renderViewEntity.lastTickPosY, (float) renderViewEntity.posY, interpolationFactor);
-        zCamera = SomberCommonUtil.interpolateBetween((float) renderViewEntity.lastTickPosZ, (float) renderViewEntity.posZ, interpolationFactor);
+        xCamera = PlayerPositionUtil.getInstance().getXPlayer();
+        yCamera = PlayerPositionUtil.getInstance().getYPlayer();
+        zCamera = PlayerPositionUtil.getInstance().getZPlayer();
+        xCameraOffset = PlayerPositionUtil.getInstance().getXCamera();
+        yCameraOffset = PlayerPositionUtil.getInstance().getYCamera();
+        zCameraOffset = PlayerPositionUtil.getInstance().getZCamera();
 
 
         GL11.glDepthMask(false);
