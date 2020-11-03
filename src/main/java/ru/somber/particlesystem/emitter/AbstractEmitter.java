@@ -82,6 +82,8 @@ public abstract class AbstractEmitter implements IParticleEmitter {
             throw new RuntimeException("Emitter cannot be used!");
         }
 
+        emitterParticleList.removeIf(IParticle::isDie);
+
         tick++;
     }
 
