@@ -1,11 +1,17 @@
 package ru.somber.particlesystem.emitter;
 
 import org.lwjgl.util.vector.Vector3f;
+import ru.somber.particlesystem.particle.IParticle;
 
-public class AbstractEmitter implements IParticleEmitter {
+import java.util.ArrayList;
+import java.util.List;
+
+public abstract class AbstractListContainerEmitter implements IParticleEmitter {
 
     /** Позиция эмиттера. */
     private float x, y, z;
+    /** Список частиц, за которые отвечает данный эмитер. */
+    private List<IParticle> emitterParticleList;
     /** true - эмиттер был создан через метод create и готов к работе, иначе false. */
     private boolean isCreated;
     /** true - эмиттер помечен мертвым и не может быть более использован. */
@@ -14,7 +20,7 @@ public class AbstractEmitter implements IParticleEmitter {
     private int tick;
 
 
-    public AbstractEmitter(float x, float y, float z) {
+    public AbstractListContainerEmitter(float x, float y, float z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -63,10 +69,11 @@ public class AbstractEmitter implements IParticleEmitter {
             throw new RuntimeException("Emitter cannot be created!");
         }
 
+        this.emitterParticleList = new ArrayList<>(50);
         this.tick = 0;
 
-        this.isCreated = true;
-        this.isDie = false;
+        isCreated = true;
+        isDie = false;
     }
 
     @Override
@@ -75,7 +82,9 @@ public class AbstractEmitter implements IParticleEmitter {
             throw new RuntimeException("Emitter cannot be used!");
         }
 
-        this.tick++;
+        emitterParticleList.removeIf(IParticle::isDie);
+
+        tick++;
     }
 
     @Override
@@ -84,8 +93,11 @@ public class AbstractEmitter implements IParticleEmitter {
             throw new RuntimeException("Emitter cannot be deleted!");
         }
 
-        this.tick = -1;
-        this.isDie = true;
+        emitterParticleList.forEach((particle) -> { particle.setDie(true); });
+
+        emitterParticleList = null;
+        tick = -1;
+        isDie = true;
     }
 
 
@@ -107,15 +119,24 @@ public class AbstractEmitter implements IParticleEmitter {
 
     @Override
     public String toString() {
-        return "AbstractEmitter{" +
+        return "AbstractListContainerEmitter{" +
                 "isCreated=" + isCreated +
                 ", isDie=" + isDie +
                 ", x=" + x +
                 ", y=" + y +
                 ", z=" + z +
+                ", countParticles=" + getEmitterParticleList().size() +
                 '}';
     }
 
+
+    protected List<IParticle> getEmitterParticleList() {
+        return emitterParticleList;
+    }
+
+    protected void addParticleInEmitter(IParticle particle) {
+        getEmitterParticleList().add(particle);
+    }
 
     protected int getTick() {
         return tick;
