@@ -2,7 +2,7 @@ package ru.somber.particlesystem.container.comparator;
 
 import net.minecraft.entity.Entity;
 import org.lwjgl.util.vector.Vector3f;
-import ru.somber.commonutil.SomberCommonUtil;
+import ru.somber.util.commonutil.SomberCommonUtil;
 import ru.somber.particlesystem.particle.IParticle;
 
 import java.util.Comparator;

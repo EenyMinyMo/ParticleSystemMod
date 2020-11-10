@@ -2,7 +2,7 @@ package ru.somber.particlesystem.render;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import ru.somber.clientutil.textureatlas.AtlasTexture;
+import ru.somber.util.clientutil.textureatlas.AtlasTexture;
 import ru.somber.particlesystem.particle.IParticle;
 
 import java.util.List;

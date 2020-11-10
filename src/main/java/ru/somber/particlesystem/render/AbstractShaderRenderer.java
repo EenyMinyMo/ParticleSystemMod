@@ -1,7 +1,5 @@
 package ru.somber.particlesystem.render;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.EntityLivingBase;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
@@ -10,12 +8,12 @@ import org.lwjgl.util.glu.GLU;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
-import ru.somber.clientutil.PlayerPositionUtil;
-import ru.somber.clientutil.opengl.ShaderProgram;
-import ru.somber.clientutil.opengl.VAO;
-import ru.somber.clientutil.opengl.vbo.VBODataManagerMap;
-import ru.somber.clientutil.opengl.vbo.VertexAttribVBO;
-import ru.somber.clientutil.textureatlas.AtlasTexture;
+import ru.somber.util.clientutil.PlayerPositionUtil;
+import ru.somber.util.clientutil.opengl.ShaderProgram;
+import ru.somber.util.clientutil.opengl.VAO;
+import ru.somber.util.clientutil.opengl.vbo.VBODataManagerMap;
+import ru.somber.util.clientutil.opengl.vbo.VertexAttribVBO;
+import ru.somber.util.clientutil.textureatlas.AtlasTexture;
 import ru.somber.particlesystem.particle.IParticle;
 
 import java.nio.FloatBuffer;

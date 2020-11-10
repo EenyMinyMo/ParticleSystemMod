@@ -1,8 +1,8 @@
 package ru.somber.particlesystem.particle;
 
 import org.lwjgl.util.vector.Vector3f;
-import ru.somber.clientutil.textureatlas.icon.AtlasIcon;
-import ru.somber.commonutil.SomberCommonUtil;
+import ru.somber.util.clientutil.textureatlas.icon.AtlasIcon;
+import ru.somber.util.commonutil.SomberCommonUtil;
 
 /**
  * Абстрактный класс частицы, реализцющий наиболее общий функционал частиц.
