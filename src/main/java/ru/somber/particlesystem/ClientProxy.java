@@ -7,6 +7,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraftforge.common.MinecraftForge;
+import ru.somber.particlesystem.event.RestartPlayerEvent;
 import ru.somber.particlesystem.event.RenderEvent;
 import ru.somber.particlesystem.event.UpdateEvent;
 
@@ -15,12 +16,15 @@ public class ClientProxy extends CommonProxy {
 
     private UpdateEvent updateEvent;
     private RenderEvent renderEvent;
+    private RestartPlayerEvent restartPlayerEvent;
+
 
     public ClientProxy() {
         super();
 
         updateEvent = new UpdateEvent();
         renderEvent = new RenderEvent();
+        restartPlayerEvent = new RestartPlayerEvent();
     }
 
     @Override
@@ -35,6 +39,9 @@ public class ClientProxy extends CommonProxy {
 
         FMLCommonHandler.instance().bus().register(updateEvent);
         MinecraftForge.EVENT_BUS.register(renderEvent);
+
+        FMLCommonHandler.instance().bus().register(restartPlayerEvent);
+        MinecraftForge.EVENT_BUS.register(restartPlayerEvent);
     }
 
     @Override
