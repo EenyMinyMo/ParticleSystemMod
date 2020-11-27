@@ -52,7 +52,6 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
 
     /** Позиция камеры. */
     protected float xCamera, yCamera, zCamera;
-    protected float xCameraOffset, yCameraOffset, zCameraOffset;
 
     /** Вынесено в переменные объекта, чтобы постоянное не выделять объекты в методе. */
     protected Vector3f particleCenterPosition, particleNormalVector, particleRotationAngles;
@@ -97,9 +96,6 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
         xCamera = PlayerPositionUtil.getInstance().xPlayer();
         yCamera = PlayerPositionUtil.getInstance().yPlayer();
         zCamera = PlayerPositionUtil.getInstance().zPlayer();
-        xCameraOffset = PlayerPositionUtil.getInstance().xCamera();
-        yCameraOffset = PlayerPositionUtil.getInstance().yCamera();
-        zCameraOffset = PlayerPositionUtil.getInstance().zCamera();
 
 
         GL11.glDepthMask(false);

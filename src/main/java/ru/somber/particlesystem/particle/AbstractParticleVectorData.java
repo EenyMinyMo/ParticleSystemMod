@@ -409,6 +409,7 @@ public abstract class AbstractParticleVectorData extends AbstractParticle {
 
 
 
-    public abstract void computeNormalVector(Vector3f destination, float lookAtX, float lookAtY, float lookAtZ, float interpolateFactor);
+    @Override
+    public abstract void computeNormalVector(Vector3f destination, float interpolateFactor);
 
 }
