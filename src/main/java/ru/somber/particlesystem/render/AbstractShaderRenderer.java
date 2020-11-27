@@ -11,6 +11,7 @@ import org.lwjgl.util.vector.Vector3f;
 import ru.somber.util.clientutil.PlayerPositionUtil;
 import ru.somber.util.clientutil.opengl.ShaderProgram;
 import ru.somber.util.clientutil.opengl.VAO;
+import ru.somber.util.clientutil.opengl.vbo.VBODataManager;
 import ru.somber.util.clientutil.opengl.vbo.VBODataManagerMap;
 import ru.somber.util.clientutil.opengl.vbo.VertexAttribVBO;
 import ru.somber.util.clientutil.textureatlas.AtlasTexture;
@@ -93,12 +94,12 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
             initShaderAndBuffers();
         }
 
-        xCamera = PlayerPositionUtil.getInstance().getXPlayer();
-        yCamera = PlayerPositionUtil.getInstance().getYPlayer();
-        zCamera = PlayerPositionUtil.getInstance().getZPlayer();
-        xCameraOffset = PlayerPositionUtil.getInstance().getXCamera();
-        yCameraOffset = PlayerPositionUtil.getInstance().getYCamera();
-        zCameraOffset = PlayerPositionUtil.getInstance().getZCamera();
+        xCamera = PlayerPositionUtil.getInstance().xPlayer();
+        yCamera = PlayerPositionUtil.getInstance().yPlayer();
+        zCamera = PlayerPositionUtil.getInstance().zPlayer();
+        xCameraOffset = PlayerPositionUtil.getInstance().xCamera();
+        yCameraOffset = PlayerPositionUtil.getInstance().yCamera();
+        zCameraOffset = PlayerPositionUtil.getInstance().zCamera();
 
 
         GL11.glDepthMask(false);
@@ -116,6 +117,12 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
 
 
         prepareUniforms();
+
+        VBODataManager dataManagerVertex = vertexAttributes[0].getVboDataManager();
+        if (dataManagerVertex.getLastUpdateVBOSize() <= particleList.size() * 4) {
+            allocateVBOs(particleList);
+        }
+
         prepareDataVBOs(particleList, interpolationFactor);
 
 
