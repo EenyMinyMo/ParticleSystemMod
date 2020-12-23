@@ -9,6 +9,7 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL31;
 import org.lwjgl.util.vector.Matrix4f;
+import ru.somber.util.clientutil.PlayerPositionUtil;
 import ru.somber.util.clientutil.opengl.Shader;
 import ru.somber.util.clientutil.opengl.ShaderProgram;
 import ru.somber.util.clientutil.opengl.vbo.VBO;
@@ -64,6 +65,10 @@ public class InstanceShaderParticleRenderer extends AbstractShaderRenderer {
 
     @Override
     protected void prepareUniforms() {
+        float xCamera = PlayerPositionUtil.getInstance().xPlayer();
+        float yCamera = PlayerPositionUtil.getInstance().yPlayer();
+        float zCamera = PlayerPositionUtil.getInstance().zPlayer();
+
         int uniformLocation;
 
         GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, buffer16);
@@ -93,8 +98,8 @@ public class InstanceShaderParticleRenderer extends AbstractShaderRenderer {
     protected void createVBOsAndVertAttribVBOs() {
         vertexAttributes = new VertexAttribVBO[7];
 
-        int intervalTimeUpdate = SomberCommonUtil.timeToTick(0, 1, 0);
-        float expansionFactor = 1.5F;
+        int intervalTimeUpdate = SomberCommonUtil.timeToTick(0, 5, 0);
+        float expansionFactor = 2F;
 
         VBO positionVBO = VBO.createVBO(GL15.GL_STREAM_DRAW);
         VBODataManager positionVBOManager = new VBODataManager(positionVBO, BufferUtils.createFloatBuffer(0), intervalTimeUpdate, expansionFactor);

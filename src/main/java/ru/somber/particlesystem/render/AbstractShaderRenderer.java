@@ -50,9 +50,6 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
     /** Служебный буфер на 16 float элементов. */
     protected FloatBuffer buffer16;
 
-    /** Позиция камеры. */
-    protected float xCamera, yCamera, zCamera;
-
     /** Вынесено в переменные объекта, чтобы постоянное не выделять объекты в методе. */
     protected Vector3f particleCenterPosition, particleNormalVector, particleRotationAngles;
     /** Вынесено в переменные объекта, чтобы постоянное не выделять объекты в методе. */
@@ -93,11 +90,6 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
             initShaderAndBuffers();
         }
 
-        xCamera = PlayerPositionUtil.getInstance().xPlayer();
-        yCamera = PlayerPositionUtil.getInstance().yPlayer();
-        zCamera = PlayerPositionUtil.getInstance().zPlayer();
-
-
         GL11.glDepthMask(false);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -108,24 +100,19 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
         GL14.glBlendEquation(GL14.GL_FUNC_ADD);
         GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-
         GL20.glUseProgram(shaderProgram.getShaderProgramID());
-
 
         prepareUniforms();
 
         VBODataManager dataManagerVertex = vertexAttributes[0].getVboDataManager();
-        if (dataManagerVertex.getLastUpdateVBOSize() <= particleList.size() * 4) {
+        if (dataManagerVertex.getLastUpdateVBOSize() <= particleList.size() * 4L) {
             allocateVBOs(particleList);
         }
 
         prepareDataVBOs(particleList, interpolationFactor);
 
-
         VAO.bindVAO(vao);
-
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, atlasTexture.getGlTextureId());
@@ -138,12 +125,10 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
     public void postRender(List<IParticle> particleList, float interpolationFactor) {
         VAO.bindNone();
 
-
         for (VertexAttribVBO attrib : vertexAttributes) {
             attrib.disableVertexAttribArray();
             attrib.disableVertexAttribDivisor();
         }
-
 
         GL20.glUseProgram(0);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
@@ -153,8 +138,7 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glDepthMask(true);
 
-
-        checkError(false);
+        checkError("Post check error", false);
     }
 
     @Override
@@ -192,8 +176,6 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
         }
 
         VAO.bindNone();
-
-
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 
         for (VertexAttribVBO attrib : vertexAttributes) {
@@ -208,7 +190,7 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
     protected void allocateVBOs(List<IParticle> particleList) {
         //Резервиуется место под 1000 частиц,
         //чтобы на малых количествах частиц не нужно было постояноо изменять размеры памяти.
-        int countParticles = Math.max(particleList.size(), 1000);
+        int countParticles = Math.max(particleList.size(), 5000);
 
         for (VertexAttribVBO attrib : vertexAttributes) {
             attrib.allocateVBO(countParticles);
@@ -219,21 +201,25 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
      * Проверяет наличие OpenGL ошибок и логирует их, если они найдены.
      * Если throwException = true, то выбрасывается исключение времени выполнения.
      */
-    protected void checkError(boolean throwException) {
-        int i = GL11.glGetError();
+    protected void checkError(String postMessage, boolean throwException) {
+        int errorCode = GL11.glGetError();
 
-        Logger logger = LogManager.getLogger();
-        String str = "shader program error";
+        while (errorCode != 0){
+            String errorString = GLU.gluErrorString(errorCode);
+            String resultErrorMessage = "";
+            resultErrorMessage += "########## GL ERROR ##########\n";
+            resultErrorMessage += "@ particle renderer error\n";
+            resultErrorMessage += errorCode + ": " + errorString + "\n";
+            resultErrorMessage += "Message: " + postMessage + "\n";
 
-        if (i != 0) {
-            String s1 = GLU.gluErrorString(i);
-            logger.error("########## GL ERROR ##########");
-            logger.error("@ " + str);
-            logger.error(i + ": " + s1);
+            Logger logger = LogManager.getLogger();
+            logger.error(resultErrorMessage);
 
             if (throwException) {
-                throw new RuntimeException("########## GL ERROR ##########");
+                throw new RuntimeException(resultErrorMessage);
             }
+
+            errorCode = GL11.glGetError();
         }
     }
 
