@@ -1,15 +1,25 @@
 #version 330
 
-layout (location = 0) in vec2 particleVertPosition;
-layout (location = 1) in vec4 particleColorFactor;
-layout (location = 2) in vec4 particleSideScalesLightBlend;
-layout (location = 3) in vec3 particleCenterPosition;
-layout (location = 4) in vec3 particleNormalVector;
-layout (location = 5) in vec3 particleRotateAngles;
-layout (location = 6) in vec2 particleTexCoord;
+layout (location = 0) in vec2 vertPosition;
+layout (location = 1) in vec4 colorFactors;
+
+layout (location = 2) in vec4 sideScalesLightBlend;
+layout (location = 3) in vec4 oldSideScalesLightBlend;
+
+layout (location = 4) in vec3 centerPosition;
+layout (location = 5) in vec3 oldCenterPosition;
+
+layout (location = 6) in vec3 normalVector;
+layout (location = 7) in vec3 oldNormalVector;
+
+layout (location = 8) in vec3 rotateAngles;
+layout (location = 9) in vec3 oldRotateAngles;
+
+layout (location = 10) in vec2 texCoord;
 
 uniform vec3 cameraPosition;
 uniform mat4 projectionCameraMatrix;
+uniform float interpolationFactor;
 
 out vec4 colorFactor;
 out vec2 textureCoord;
@@ -39,13 +49,6 @@ mat4 computeModelTranformMat(vec3 particleCenterPos, vec3 particleNormalVec) {
         translatePosition.x,    translatePosition.y,    translatePosition.z,    1
     );
 
-//    mat4 modelTransformMat = mat4(
-//        1,                      0,                      0,                      0,
-//        0,                      1,                      0,                      0,
-//        0,                      0,                      1,                      0,
-//        translatePosition.x,    translatePosition.y,    translatePosition.z,    1
-//    );
-
     return modelTransformMat;
 }
 
@@ -68,13 +71,18 @@ mat4 computeRotateMat(vec3 rotateAngles) {
 }
 
 void main() {
-    mat4 modelTransformMat = computeModelTranformMat(particleCenterPosition, particleNormalVector);
-    mat4 rotateMat = computeRotateMat(particleRotateAngles);
+    vec4 interpolationSideScalesLightBlend = sideScalesLightBlend + (sideScalesLightBlend - oldSideScalesLightBlend) * interpolationFactor;
+    vec3 interpolateCenterPosition = centerPosition + (centerPosition - oldCenterPosition) * interpolationFactor;
+    vec3 interpolateNormalVector = normalVector + (normalVector - oldNormalVector) * interpolationFactor;
+    vec3 interpolateRotateAngles = rotateAngles + (rotateAngles - oldRotateAngles) * interpolationFactor;
 
-    textureCoord = particleTexCoord;
-    colorFactor = particleColorFactor;
-    light = particleSideScalesLightBlend.z;
-    blend = particleSideScalesLightBlend.w;
+    mat4 modelTransformMat = computeModelTranformMat(interpolateCenterPosition, interpolateNormalVector);
+    mat4 rotateMat = computeRotateMat(interpolateRotateAngles);
 
-    gl_Position = projectionCameraMatrix * modelTransformMat * rotateMat * vec4(particleVertPosition * particleSideScalesLightBlend.xy, 0, 1);
+    textureCoord = texCoord;
+    colorFactor = colorFactors;
+    light = interpolationSideScalesLightBlend.z;
+    blend = interpolationSideScalesLightBlend.w;
+
+    gl_Position = projectionCameraMatrix * modelTransformMat * rotateMat * vec4(vertPosition * interpolationSideScalesLightBlend.xy, 0, 1);
 }

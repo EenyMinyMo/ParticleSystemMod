@@ -31,7 +31,7 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
     protected ShaderProgram shaderProgram;
 
     /** Менеджер VBO и буферов данных, связанный с VBO. */
-    protected VBODataManagerMap vboDataManagerMap;
+//    protected VBODataManagerMap vboDataManagerMap;
     /** VAO для хранения точек привязки вершинных атрибутов с VBO, а также других модификаторов атрибутов вершин. */
     protected VAO vao;
     /** Массив объектов, связывающих VBO и вертексные атрибуты. */
@@ -70,7 +70,7 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
         particleRotationAngles = new Vector3f();
         particleHalfSizes = new Vector2f();
 
-        vboDataManagerMap = new VBODataManagerMap();
+//        vboDataManagerMap = new VBODataManagerMap();
         tickUpdate = 0;
     }
 
@@ -102,9 +102,9 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
 
         GL20.glUseProgram(shaderProgram.getShaderProgramID());
 
-        prepareUniforms();
+        prepareUniforms(interpolationFactor);
 
-        VBODataManager dataManagerVertex = vertexAttributes[0].getVboDataManager();
+        VBODataManager dataManagerVertex = vertexAttributes[1].getVboDataManager();
         if (dataManagerVertex.getLastUpdateVBOSize() <= particleList.size() * 4L) {
             allocateVBOs(particleList);
         }
@@ -188,9 +188,9 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
      * Производит выделение памяти VBO в зависимости от размеров переданного листа.
      */
     protected void allocateVBOs(List<IParticle> particleList) {
-        //Резервиуется место под 1000 частиц,
+        //Резервиуется место под 2500 частиц,
         //чтобы на малых количествах частиц не нужно было постояноо изменять размеры памяти.
-        int countParticles = Math.max(particleList.size(), 5000);
+        int countParticles = Math.max(particleList.size(), 2500);
 
         for (VertexAttribVBO attrib : vertexAttributes) {
             attrib.allocateVBO(countParticles);
@@ -227,7 +227,7 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
     /**
      * Подготавливает юниформы шейдерной программы для отрисовки.
      */
-    protected abstract void prepareUniforms();
+    protected abstract void prepareUniforms(float interpolationFactor);
 
     /**
      * Создает шейдерную программу для отрисовки частиц.
