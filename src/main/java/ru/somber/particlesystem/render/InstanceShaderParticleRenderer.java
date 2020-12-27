@@ -9,6 +9,8 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL31;
 import org.lwjgl.util.vector.Matrix4f;
+import ru.somber.particlesystem.ParticleSystemMod;
+import ru.somber.particlesystem.particle.IParticle;
 import ru.somber.util.clientutil.PlayerPositionUtil;
 import ru.somber.util.clientutil.opengl.Shader;
 import ru.somber.util.clientutil.opengl.ShaderProgram;
@@ -17,8 +19,6 @@ import ru.somber.util.clientutil.opengl.vbo.VBODataManager;
 import ru.somber.util.clientutil.opengl.vbo.VertexAttribVBO;
 import ru.somber.util.clientutil.textureatlas.icon.AtlasIcon;
 import ru.somber.util.commonutil.SomberCommonUtil;
-import ru.somber.particlesystem.ParticleSystemMod;
-import ru.somber.particlesystem.particle.IParticle;
 
 import java.nio.FloatBuffer;
 import java.util.List;
@@ -80,15 +80,14 @@ public class InstanceShaderParticleRenderer extends AbstractShaderRenderer {
         positionBuffer.put(+0.5F).put(+0.5F);
 
         for (IParticle particle : particleList) {
-            particle.computeNormalVector(particleNormalVector,  0);
             AtlasIcon icon = particle.getParticleIcon();
 
             centerPositionBuffer.put(particle.getPositionX()).put(particle.getPositionY()).put(particle.getPositionZ());
             oldCenterPositionBuffer.put(particle.getOldPositionX()).put(particle.getOldPositionY()).put(particle.getOldPositionZ());
             sideScaleBuffer.put(particle.getHalfWidth()).put(particle.getHalfHeight()).put(particle.getLightFactor()).put(particle.getBlendFactor());
             oldSideScaleBuffer.put(particle.getOldHalfWidth()).put(particle.getOldHalfHeight()).put(particle.getLightFactor()).put(particle.getBlendFactor());
-            normalVectorBuffer.put(particleNormalVector.getX()).put(particleNormalVector.getY()).put(particleNormalVector.getZ());
-            oldNormalVectorBuffer.put(particleNormalVector.getX()).put(particleNormalVector.getY()).put(particleNormalVector.getZ());
+            normalVectorBuffer.put(particle.getNormalVectorX()).put(particle.getNormalVectorY()).put(particle.getNormalVectorZ());
+            oldNormalVectorBuffer.put(particle.getOldNormalVectorX()).put(particle.getOldNormalVectorY()).put(particle.getOldNormalVectorZ());
             anglesBuffer.put(particle.getAngleX()).put(particle.getAngleY()).put(particle.getAngleZ());
             oldAnglesBuffer.put(particle.getOldAngleX()).put(particle.getOldAngleY()).put(particle.getOldAngleZ());
             colorFactorBuffer.put(particle.getRedFactor()).put(particle.getGreenFactor()).put(particle.getBlueFactor()).put(particle.getAlphaFactor());

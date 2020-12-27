@@ -1,19 +1,18 @@
 package ru.somber.particlesystem.manager;
 
-import net.minecraft.client.Minecraft;
 import ru.somber.particlesystem.container.IParticleContainer;
-import ru.somber.particlesystem.container.comparator.ParticleComparatorLowAccuracy;
+import ru.somber.particlesystem.container.comparator.ParticleComparator;
 import ru.somber.particlesystem.render.IParticleRenderer;
 
 public class SimpleParticleManager implements IParticleManager {
 
-    private ParticleComparatorLowAccuracy particleComparatorLowAccuracy;
+    private ParticleComparator particleComparator;
 
     private IParticleContainer particleContainer;
     private IParticleRenderer particleRenderer;
 
     public SimpleParticleManager() {
-        particleComparatorLowAccuracy = new ParticleComparatorLowAccuracy();
+        particleComparator = new ParticleComparator();
     }
 
     @Override
@@ -46,8 +45,8 @@ public class SimpleParticleManager implements IParticleManager {
         particleRenderer.update(particleContainer.getParticleList());
 
         try {
-            particleComparatorLowAccuracy.setEntityPos(Minecraft.getMinecraft().renderViewEntity, 0);
-            particleContainer.sort(particleComparatorLowAccuracy);
+            particleComparator.updateCameraPosition();
+            particleContainer.sort(particleComparator);
         } catch (Exception e) {
             //обработка исключений при сортировке массива частиц.
             //вообще обрабатывать исключение мне кажется бесполезно, т.к. некоторые исключения просто сложно исправить (городить проверки и т.д.)

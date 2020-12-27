@@ -1,52 +1,35 @@
 package ru.somber.particlesystem.container.comparator;
 
-import net.minecraft.entity.Entity;
-import org.lwjgl.util.vector.Vector3f;
-import ru.somber.util.commonutil.SomberCommonUtil;
 import ru.somber.particlesystem.particle.IParticle;
+import ru.somber.util.clientutil.PlayerPositionUtil;
+import ru.somber.util.commonutil.SomberCommonUtil;
 
 import java.util.Comparator;
 
 public class ParticleComparator implements Comparator<IParticle> {
-    private float interpolationFactor;
-    /**
-     * Векторы вынесены в переменные объекта, чтобы постоянное не создавать их в методе compare.
-     * Крч так лучше для скорости выполнения.
-     */
-    private Vector3f entityPos, pos1, pos2;
+    private float xCamera, yCamera, zCamera;
 
+    public ParticleComparator() {}
 
-    public ParticleComparator() {
-        this.interpolationFactor = 0;
-
-        entityPos = new Vector3f();
-        pos1 = new Vector3f();
-        pos2 = new Vector3f();
-    }
-
-
-    public float getInterpolationFactor() {
-        return interpolationFactor;
-    }
-
-    public void setEntityPos(Entity entity, float interpolationFactor) {
-        SomberCommonUtil.interpolateMove(entityPos, entity, interpolationFactor);
-    }
-
-    public void setInterpolationFactor(float interpolationFactor) {
-        this.interpolationFactor = interpolationFactor;
+    public void updateCameraPosition() {
+        PlayerPositionUtil positionUtil = PlayerPositionUtil.getInstance();
+        xCamera = positionUtil.xCamera();
+        yCamera = positionUtil.yCamera();
+        zCamera = positionUtil.zCamera();
     }
 
     @Override
-    public int compare(IParticle p1, IParticle p2) {
-        p1.computeInterpolatedPosition(pos1, interpolationFactor);
-        p2.computeInterpolatedPosition(pos2, interpolationFactor);
+    public int compare(IParticle o1, IParticle o2) {
+        double posX1 = xCamera - o1.getPositionX();
+        double posY1 = yCamera - o1.getPositionY();
+        double posZ1 = zCamera - o1.getPositionZ();
 
-        Vector3f.sub(entityPos, pos1, pos1);
-        Vector3f.sub(entityPos, pos2, pos2);
+        double posX2 = xCamera - o2.getPositionX();
+        double posY2 = yCamera - o2.getPositionY();
+        double posZ2 = zCamera - o2.getPositionZ();
 
-        float len1 = pos1.lengthSquared();
-        float len2 = pos2.lengthSquared();
+        double len1 = posX1 * posX1 + posY1 * posY1 + posZ1 * posZ1;
+        double len2 = posX2 * posX2 + posY2 * posY2 + posZ2 * posZ2;
 
         if (Math.abs(len1 - len2) < SomberCommonUtil.NUMBER_ERROR_8) {
             return 0;

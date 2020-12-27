@@ -7,8 +7,8 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraftforge.common.MinecraftForge;
-import ru.somber.particlesystem.event.RestartPlayerEvent;
 import ru.somber.particlesystem.event.RenderEvent;
+import ru.somber.particlesystem.event.RestartPlayerEvent;
 import ru.somber.particlesystem.event.UpdateEvent;
 
 @SideOnly(Side.CLIENT)

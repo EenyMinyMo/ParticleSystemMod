@@ -1,8 +1,5 @@
 package ru.somber.particlesystem.particle;
 
-import org.lwjgl.util.vector.Vector2f;
-import org.lwjgl.util.vector.Vector3f;
-import org.lwjgl.util.vector.Vector4f;
 import ru.somber.util.clientutil.textureatlas.icon.AtlasIcon;
 
 /**
@@ -11,20 +8,24 @@ import ru.somber.util.clientutil.textureatlas.icon.AtlasIcon;
  */
 public abstract class AbstractParticleSimpleData extends AbstractParticle {
 
-    /** Новая позиция частицы. */
+    /** Позиция частицы. */
     private float x, y, z;
     private float xOld, yOld, zOld;
 
     /** Половина размера частицы (halfWidth = width/2, halfHeight = height/2). */
     private float halfWidth, halfHeight;
-    private float halfWidthOld, halfHeightOld;
+    private float oldHalfWidth, oldHalfHeight;
 
     /**
      * Вектор, содержащий локальные углы поворота частицы
-     * (эти углы должны применятся после мировых преобразований частицы).
+     * (эти углы должны применяться после мировых преобразований частицы).
      */
     private float xAngle, yAngle, zAngle;
-    private float xAngleOld, yAngleOld, zAngleOld;
+    private float xOldAngle, yOldAngle, zOldAngle;
+
+    /** Координаты вектора нормали частицы. */
+    private float xNormalVector, yNormalVector, zNormalVector;
+    private float xOldNormalVector, yOldNormalVector, zOldNormalVector;
 
     /** Коэффициенты цветов. */
     private float r, g, b, a;
@@ -36,38 +37,33 @@ public abstract class AbstractParticleSimpleData extends AbstractParticle {
         this.x = x;
         this.y = y;
         this.z = z;
-
         this.xOld = this.x;
         this.yOld = this.y;
         this.zOld = this.z;
 
         this.halfWidth = 0.5F;
         this.halfHeight = 0.5F;
-        this.halfWidthOld = this.halfWidth;
-        this.halfHeightOld = this.halfHeight;
+        this.oldHalfWidth = this.halfWidth;
+        this.oldHalfHeight = this.halfHeight;
 
         this.xAngle = 0;
         this.yAngle = 0;
         this.zAngle = 0;
-        this.xAngleOld = this.xAngle;
-        this.yAngleOld = this.yAngle;
-        this.zAngleOld = this.zAngle;
+        this.xOldAngle = this.xAngle;
+        this.yOldAngle = this.yAngle;
+        this.zOldAngle = this.zAngle;
+
+        this.xNormalVector = 0;
+        this.yNormalVector = 0;
+        this.zNormalVector = 0;
+        this.xOldNormalVector = this.xNormalVector;
+        this.yOldNormalVector = this.yNormalVector;
+        this.zOldNormalVector = this.zNormalVector;
 
         this.r = 1;
         this.g = 1;
         this.b = 1;
         this.a = 1;
-    }
-
-
-    @Override
-    public void getPosition(Vector3f dest) {
-        dest.set(x, y, z);
-    }
-
-    @Override
-    public void getOldPosition(Vector3f dest) {
-        dest.set(xOld, yOld, zOld);
     }
 
 
@@ -103,17 +99,6 @@ public abstract class AbstractParticleSimpleData extends AbstractParticle {
 
 
     @Override
-    public void getHalfSizes(Vector2f dest) {
-        dest.set(halfWidth, halfHeight);
-    }
-
-    @Override
-    public void getOldHalfSizes(Vector2f dest) {
-        dest.set(halfWidthOld, halfHeightOld);
-    }
-
-
-    @Override
     public float getHalfWidth() {
         return halfWidth;
     }
@@ -125,23 +110,12 @@ public abstract class AbstractParticleSimpleData extends AbstractParticle {
 
     @Override
     public float getOldHalfWidth() {
-        return halfWidthOld;
+        return oldHalfWidth;
     }
 
     @Override
     public float getOldHalfHeight() {
-        return halfHeightOld;
-    }
-
-
-    @Override
-    public void getRotateAngles(Vector3f dest) {
-        dest.set(xAngle, yAngle, zAngle);
-    }
-
-    @Override
-    public void getOldRotateAngles(Vector3f dest) {
-        dest.set(xAngleOld, yAngleOld, zAngleOld);
+        return oldHalfHeight;
     }
 
 
@@ -162,24 +136,50 @@ public abstract class AbstractParticleSimpleData extends AbstractParticle {
 
     @Override
     public float getOldAngleX() {
-        return xAngleOld;
+        return xOldAngle;
     }
 
     @Override
     public float getOldAngleY() {
-        return yAngleOld;
+        return yOldAngle;
     }
 
     @Override
     public float getOldAngleZ() {
-        return zAngleOld;
+        return zOldAngle;
     }
 
 
     @Override
-    public void getColorFactor(Vector4f dest) {
-        dest.set(r, g, b, a);
+    public float getNormalVectorX() {
+        return xNormalVector;
     }
+
+    @Override
+    public float getNormalVectorY() {
+        return yNormalVector;
+    }
+
+    @Override
+    public float getNormalVectorZ() {
+        return zNormalVector;
+    }
+
+    @Override
+    public float getOldNormalVectorX() {
+        return xOldNormalVector;
+    }
+
+    @Override
+    public float getOldNormalVectorY() {
+        return yOldNormalVector;
+    }
+
+    @Override
+    public float getOldNormalVectorZ() {
+        return zOldNormalVector;
+    }
+
 
     @Override
     public float getRedFactor() {
@@ -210,24 +210,10 @@ public abstract class AbstractParticleSimpleData extends AbstractParticle {
     }
 
     @Override
-    public void setPosition(Vector3f position) {
-        this.x = position.getX();
-        this.y = position.getY();
-        this.z = position.getZ();
-    }
-
-    @Override
     public void setOldPosition(float x, float y, float z) {
         this.xOld = x;
         this.yOld = y;
         this.zOld = z;
-    }
-
-    @Override
-    public void setOldPosition(Vector3f oldPosition) {
-        this.xOld = oldPosition.getX();
-        this.yOld = oldPosition.getY();
-        this.zOld = oldPosition.getZ();
     }
 
     @Override
@@ -282,21 +268,9 @@ public abstract class AbstractParticleSimpleData extends AbstractParticle {
     }
 
     @Override
-    public void setHalfSizes(Vector2f halfSizes) {
-        this.halfWidth = halfSizes.getX();
-        this.halfHeight = halfSizes.getY();
-    }
-
-    @Override
     public void setOldHalfSizes(float halfWidth, float halfHeight) {
-        this.halfWidthOld = halfWidth;
-        this.halfHeightOld = halfHeight;
-    }
-
-    @Override
-    public void setOldHalfSizes(Vector2f oldHalfSizes) {
-        this.halfWidthOld = oldHalfSizes.getX();
-        this.halfHeightOld = oldHalfSizes.getY();
+        this.oldHalfWidth = halfWidth;
+        this.oldHalfHeight = halfHeight;
     }
 
     @Override
@@ -311,12 +285,12 @@ public abstract class AbstractParticleSimpleData extends AbstractParticle {
 
     @Override
     public void setOldHalfWidth(float halfWidth) {
-        this.halfWidthOld = halfWidth;
+        this.oldHalfWidth = halfWidth;
     }
 
     @Override
     public void setOldHalfHeight(float halfHeight) {
-        this.halfHeightOld = halfHeight;
+        this.oldHalfHeight = halfHeight;
     }
 
     @Override
@@ -327,8 +301,8 @@ public abstract class AbstractParticleSimpleData extends AbstractParticle {
 
     @Override
     public void addToOldHalfSizes(float halfWidth, float halfHeight) {
-        this.halfWidthOld += halfWidth;
-        this.halfHeightOld += halfHeight;
+        this.oldHalfWidth += halfWidth;
+        this.oldHalfHeight += halfHeight;
     }
 
 
@@ -340,24 +314,10 @@ public abstract class AbstractParticleSimpleData extends AbstractParticle {
     }
 
     @Override
-    public void setRotateAngles(Vector3f rotateAngles) {
-        this.xAngle = rotateAngles.getX();
-        this.yAngle = rotateAngles.getY();
-        this.zAngle = rotateAngles.getZ();
-    }
-
-    @Override
     public void setOldRotateAngles(float x, float y, float z) {
-        this.xAngleOld = x;
-        this.yAngleOld = y;
-        this.zAngleOld = z;
-    }
-
-    @Override
-    public void setOldRotateAngles(Vector3f oldRotateAngles) {
-        this.xAngle = oldRotateAngles.getX();
-        this.yAngle = oldRotateAngles.getY();
-        this.zAngle = oldRotateAngles.getZ();
+        this.xOldAngle = x;
+        this.yOldAngle = y;
+        this.zOldAngle = z;
     }
 
     @Override
@@ -377,17 +337,17 @@ public abstract class AbstractParticleSimpleData extends AbstractParticle {
 
     @Override
     public void setOldRotateAnglesX(float x) {
-        this.xAngleOld = x;
+        this.xOldAngle = x;
     }
 
     @Override
     public void setOldRotateAnglesY(float y) {
-        this.yAngleOld = y;
+        this.yOldAngle = y;
     }
 
     @Override
     public void setOldRotateAnglesZ(float z) {
-        this.zAngleOld = z;
+        this.zOldAngle = z;
     }
 
     @Override
@@ -399,10 +359,56 @@ public abstract class AbstractParticleSimpleData extends AbstractParticle {
 
     @Override
     public void addToOldRotateAngles(float x, float y, float z) {
-        this.xAngleOld += x;
-        this.yAngleOld += y;
-        this.zAngleOld += z;
+        this.xOldAngle += x;
+        this.yOldAngle += y;
+        this.zOldAngle += z;
     }
+
+
+    @Override
+    public void setNormalVector(float x, float y, float z) {
+        this.xNormalVector = x;
+        this.yNormalVector = y;
+        this.zNormalVector = z;
+    }
+
+    @Override
+    public void setOldNormalVector(float x, float y, float z) {
+        this.xOldNormalVector = x;
+        this.yOldNormalVector = y;
+        this.zOldNormalVector = z;
+    }
+
+    @Override
+    public void setNormalVectorX(float x) {
+        this.xNormalVector = x;
+    }
+
+    @Override
+    public void setNormalVectorY(float y) {
+        this.yNormalVector = y;
+    }
+
+    @Override
+    public void setNormalVectorZ(float z) {
+        this.zNormalVector = z;
+    }
+
+    @Override
+    public void setOldNormalVectorX(float x) {
+        this.xOldNormalVector = x;
+    }
+
+    @Override
+    public void setOldNormalVectorY(float y) {
+        this.yOldNormalVector = y;
+    }
+
+    @Override
+    public void setOldNormalVectorZ(float z) {
+        this.zOldNormalVector = z;
+    }
+
 
     @Override
     public void setColorFactor(float r, float g, float b, float a) {
@@ -410,14 +416,6 @@ public abstract class AbstractParticleSimpleData extends AbstractParticle {
         this.g = g;
         this.b = b;
         this.a = a;
-    }
-
-    @Override
-    public void setColorFactor(Vector4f colorFactor) {
-        this.r = colorFactor.getX();
-        this.g = colorFactor.getY();
-        this.b = colorFactor.getZ();
-        this.a = colorFactor.getW();
     }
 
     @Override
@@ -445,10 +443,5 @@ public abstract class AbstractParticleSimpleData extends AbstractParticle {
     public void update() {
         super.update();
     }
-
-
-
-    @Override
-    public abstract void computeNormalVector(Vector3f destination, float interpolateFactor);
 
 }

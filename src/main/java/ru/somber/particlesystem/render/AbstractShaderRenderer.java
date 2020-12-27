@@ -6,16 +6,12 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.*;
 import org.lwjgl.util.glu.GLU;
 import org.lwjgl.util.vector.Matrix4f;
-import org.lwjgl.util.vector.Vector2f;
-import org.lwjgl.util.vector.Vector3f;
-import ru.somber.util.clientutil.PlayerPositionUtil;
+import ru.somber.particlesystem.particle.IParticle;
 import ru.somber.util.clientutil.opengl.ShaderProgram;
 import ru.somber.util.clientutil.opengl.VAO;
 import ru.somber.util.clientutil.opengl.vbo.VBODataManager;
-import ru.somber.util.clientutil.opengl.vbo.VBODataManagerMap;
 import ru.somber.util.clientutil.opengl.vbo.VertexAttribVBO;
 import ru.somber.util.clientutil.textureatlas.AtlasTexture;
-import ru.somber.particlesystem.particle.IParticle;
 
 import java.nio.FloatBuffer;
 import java.util.List;
@@ -30,8 +26,7 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
     /** Объект шейдерной программы, через которую рисуются частицы. */
     protected ShaderProgram shaderProgram;
 
-    /** Менеджер VBO и буферов данных, связанный с VBO. */
-//    protected VBODataManagerMap vboDataManagerMap;
+
     /** VAO для хранения точек привязки вершинных атрибутов с VBO, а также других модификаторов атрибутов вершин. */
     protected VAO vao;
     /** Массив объектов, связывающих VBO и вертексные атрибуты. */
@@ -50,11 +45,6 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
     /** Служебный буфер на 16 float элементов. */
     protected FloatBuffer buffer16;
 
-    /** Вынесено в переменные объекта, чтобы постоянное не выделять объекты в методе. */
-    protected Vector3f particleCenterPosition, particleNormalVector, particleRotationAngles;
-    /** Вынесено в переменные объекта, чтобы постоянное не выделять объекты в методе. */
-    protected Vector2f particleHalfSizes;
-
 
     public AbstractShaderRenderer() {
         isShaderInit = false;
@@ -65,12 +55,6 @@ public abstract class AbstractShaderRenderer implements IParticleRenderer {
         cameraMatrix = new Matrix4f();
         projectionAndCameraMatrix = new Matrix4f();
 
-        particleCenterPosition = new Vector3f();
-        particleNormalVector = new Vector3f();
-        particleRotationAngles = new Vector3f();
-        particleHalfSizes = new Vector2f();
-
-//        vboDataManagerMap = new VBODataManagerMap();
         tickUpdate = 0;
     }
 

@@ -1,9 +1,7 @@
 package ru.somber.particlesystem.particle;
 
-import org.lwjgl.util.vector.Vector3f;
 import ru.somber.util.clientutil.PlayerPositionUtil;
 import ru.somber.util.clientutil.textureatlas.icon.AtlasIcon;
-import ru.somber.util.commonutil.SomberCommonUtil;
 
 /**
  * Абстрактный класс частицы, реализцющий наиболее общий функционал частиц.
@@ -25,6 +23,7 @@ public abstract class AbstractParticle implements IModifiableParticle {
 
     /** Флаг для определени жива ли частица. */
     private boolean isDie;
+
 
     public AbstractParticle(int maxLifeTime, AtlasIcon particleIcon) {
         this.maxLifeTime = maxLifeTime;
@@ -103,6 +102,7 @@ public abstract class AbstractParticle implements IModifiableParticle {
         setOldPosition(getPositionX(), getPositionY(), getPositionZ());
         setOldHalfSizes(getHalfWidth(), getHalfHeight());
         setOldRotateAngles(getAngleX(), getAngleY(), getAngleZ());
+        setOldNormalVector(getNormalVectorX(), getNormalVectorY(), getNormalVectorZ());
 
         lifeTime++;
         if (getLifeTime() >= getMaxLifeTime()) {
@@ -113,61 +113,31 @@ public abstract class AbstractParticle implements IModifiableParticle {
 
     /**
      * Вычисляет вектор нормали для частицы сферического типа (нормаль вращается по всем осям).
-     *
-     * @param destination вектор, куда запишутся данные нормали.
-     * @param interpolatePosition вектор с интерполированной позицией частицы.
      */
-    protected final void computeNormalVectorSphericalParticle(Vector3f destination, Vector3f interpolatePosition) {
-        destination.x = PlayerPositionUtil.getInstance().xCameraLookAt();
-        destination.y = PlayerPositionUtil.getInstance().yCameraLookAt();
-        destination.z = PlayerPositionUtil.getInstance().zCameraLookAt();
-    }
-
-    /**
-     * Вычисляет вектор нормали для частицы сферического типа (нормаль вращается по всем осям).
-     *
-     * @param destination вектор, куда запишутся данные нормали.
-     * @param interpolationFactor коэффициент интерполяции между старой и новой позициями частицы.
-     */
-    protected final void computeNormalVectorSphericalParticle(Vector3f destination, float interpolationFactor) {
-        destination.x = PlayerPositionUtil.getInstance().xCameraLookAt();
-        destination.y = PlayerPositionUtil.getInstance().yCameraLookAt();
-        destination.z = PlayerPositionUtil.getInstance().zCameraLookAt();
+    protected final void computeNormalVectorSphericalParticle() {
+        PlayerPositionUtil positionUtil = PlayerPositionUtil.getInstance();
+        setNormalVectorX(positionUtil.xCameraLookAt());
+        setNormalVectorY(positionUtil.yCameraLookAt());
+        setNormalVectorZ(positionUtil.zCameraLookAt());
     }
 
     /**
      * Вычисляет вектор нормали для частицы цилиндрического типа (нормаль вращается по оси Y).
-     *
-     * @param destination вектор, куда запишутся данные нормали.
-     * @param interpolatePosition вектор с интерполированной позицией частицы.
      */
-    protected final void computeNormalVectorCylindricalParticle(Vector3f destination, Vector3f interpolatePosition) {
-        destination.x = PlayerPositionUtil.getInstance().xCameraLookAt();
-        destination.y = 0;
-        destination.z = PlayerPositionUtil.getInstance().zCameraLookAt();
-    }
-
-    /**
-     * Вычисляет вектор нормали для частицы цилиндрического типа (нормаль вращается по оси Y).
-     *
-     * @param destination вектор, куда запишутся данные нормали.
-     * @param interpolationFactor коэффициент интерполяции между старой и новой позициями частицы.
-     */
-    protected final void computeNormalVectorCylindricalParticle(Vector3f destination, float interpolationFactor) {
-        destination.x = PlayerPositionUtil.getInstance().xCameraLookAt();
-        destination.y = 0;
-        destination.z = PlayerPositionUtil.getInstance().zCameraLookAt();
+    protected final void computeNormalVectorCylindricalParticle() {
+        PlayerPositionUtil positionUtil = PlayerPositionUtil.getInstance();
+        setNormalVectorX(positionUtil.xCameraLookAt());
+        setNormalVectorY(0);
+        setNormalVectorZ(positionUtil.zCameraLookAt());
     }
 
     /**
      * Вычисляет вектор нормали для частицы статического типа (нормаль не вращается по осям).
-     *
-     * @param destination вектор, куда запишутся данные нормали.
      */
-    protected final void computeNormalVectorStaticParticle(Vector3f destination) {
-        destination.x = 0;
-        destination.y = 0;
-        destination.z = 1;
+    protected final void computeNormalVectorStaticParticle() {
+        setNormalVectorX(0);
+        setNormalVectorY(0);
+        setNormalVectorZ(1);
     }
 
 }

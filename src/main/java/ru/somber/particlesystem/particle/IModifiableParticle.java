@@ -1,8 +1,5 @@
 package ru.somber.particlesystem.particle;
 
-import org.lwjgl.util.vector.Vector2f;
-import org.lwjgl.util.vector.Vector3f;
-import org.lwjgl.util.vector.Vector4f;
 import ru.somber.util.clientutil.textureatlas.icon.AtlasIcon;
 
 /**
@@ -11,15 +8,9 @@ import ru.somber.util.clientutil.textureatlas.icon.AtlasIcon;
  */
 public interface IModifiableParticle extends IParticle {
 
-    void setLifeTime(int lifeTime);
-
     void setPosition(float x, float y, float z);
 
-    void setPosition(Vector3f position);
-
     void setOldPosition(float x, float y, float z);
-
-    void setOldPosition(Vector3f oldPosition);
 
     void setPositionX(float x);
 
@@ -40,11 +31,7 @@ public interface IModifiableParticle extends IParticle {
 
     void setHalfSizes(float halfWidth, float halfHeight);
 
-    void setHalfSizes(Vector2f halfSizes);
-
     void setOldHalfSizes(float halfWidth, float halfHeight);
-
-    void setOldHalfSizes(Vector2f oldHalfSizes);
 
     void setHalfWidth(float halfWidth);
 
@@ -61,11 +48,7 @@ public interface IModifiableParticle extends IParticle {
 
     void setRotateAngles(float x, float y, float z);
 
-    void setRotateAngles(Vector3f rotateAngles);
-
     void setOldRotateAngles(float x, float y, float z);
-
-    void setOldRotateAngles(Vector3f oldRotateAngles);
 
     void setRotateAnglesX(float x);
 
@@ -84,9 +67,24 @@ public interface IModifiableParticle extends IParticle {
     void addToOldRotateAngles(float x, float y, float z);
 
 
-    void setColorFactor(float r, float g, float b, float a);
+    void setNormalVector(float x, float y, float z);
 
-    void setColorFactor(Vector4f colorFactor);
+    void setOldNormalVector(float x, float y, float z);
+
+    void setNormalVectorX(float x);
+
+    void setNormalVectorY(float y);
+
+    void setNormalVectorZ(float z);
+
+    void setOldNormalVectorX(float x);
+
+    void setOldNormalVectorY(float y);
+
+    void setOldNormalVectorZ(float z);
+
+
+    void setColorFactor(float r, float g, float b, float a);
 
     void setRedFactor(float r);
 
@@ -102,5 +100,8 @@ public interface IModifiableParticle extends IParticle {
 
 
     void setParticleIcon(AtlasIcon particleIcon);
+
+
+    void setLifeTime(int lifeTime);
 
 }

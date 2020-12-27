@@ -8,6 +8,8 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Matrix4f;
+import ru.somber.particlesystem.ParticleSystemMod;
+import ru.somber.particlesystem.particle.IParticle;
 import ru.somber.util.clientutil.PlayerPositionUtil;
 import ru.somber.util.clientutil.opengl.Shader;
 import ru.somber.util.clientutil.opengl.ShaderProgram;
@@ -16,8 +18,6 @@ import ru.somber.util.clientutil.opengl.vbo.VBODataManager;
 import ru.somber.util.clientutil.opengl.vbo.VertexAttribVBO;
 import ru.somber.util.clientutil.textureatlas.icon.AtlasIcon;
 import ru.somber.util.commonutil.SomberCommonUtil;
-import ru.somber.particlesystem.ParticleSystemMod;
-import ru.somber.particlesystem.particle.IParticle;
 
 import java.nio.FloatBuffer;
 import java.util.List;
@@ -81,11 +81,7 @@ public class ShaderParticleRenderer extends AbstractShaderRenderer {
 
 
         for (IParticle particle : particleList) {
-            particle.computeNormalVector(particleNormalVector,  0);
             AtlasIcon icon = particle.getParticleIcon();
-            float light = particle.getLightFactor();
-            float blend = particle.getBlendFactor();
-
 
             positionBuffer.put(-0.5F).put(-0.5F);
             positionBuffer.put(+0.5F).put(-0.5F);
@@ -97,15 +93,15 @@ public class ShaderParticleRenderer extends AbstractShaderRenderer {
             colorFactorBuffer.put(particle.getRedFactor()).put(particle.getGreenFactor()).put(particle.getBlueFactor()).put(particle.getAlphaFactor());
             colorFactorBuffer.put(particle.getRedFactor()).put(particle.getGreenFactor()).put(particle.getBlueFactor()).put(particle.getAlphaFactor());
 
-            sideScalesAndLightBlendBuffer.put(particle.getHalfWidth()).put(particle.getHalfHeight()).put(light).put(blend);
-            sideScalesAndLightBlendBuffer.put(particle.getHalfWidth()).put(particle.getHalfHeight()).put(light).put(blend);
-            sideScalesAndLightBlendBuffer.put(particle.getHalfWidth()).put(particle.getHalfHeight()).put(light).put(blend);
-            sideScalesAndLightBlendBuffer.put(particle.getHalfWidth()).put(particle.getHalfHeight()).put(light).put(blend);
+            sideScalesAndLightBlendBuffer.put(particle.getHalfWidth()).put(particle.getHalfHeight()).put(particle.getLightFactor()).put(particle.getBlendFactor());
+            sideScalesAndLightBlendBuffer.put(particle.getHalfWidth()).put(particle.getHalfHeight()).put(particle.getLightFactor()).put(particle.getBlendFactor());
+            sideScalesAndLightBlendBuffer.put(particle.getHalfWidth()).put(particle.getHalfHeight()).put(particle.getLightFactor()).put(particle.getBlendFactor());
+            sideScalesAndLightBlendBuffer.put(particle.getHalfWidth()).put(particle.getHalfHeight()).put(particle.getLightFactor()).put(particle.getBlendFactor());
 
-            oldSideScalesAndLightBlendBuffer.put(particle.getOldHalfWidth()).put(particle.getOldHalfHeight()).put(light).put(blend);
-            oldSideScalesAndLightBlendBuffer.put(particle.getOldHalfWidth()).put(particle.getOldHalfHeight()).put(light).put(blend);
-            oldSideScalesAndLightBlendBuffer.put(particle.getOldHalfWidth()).put(particle.getOldHalfHeight()).put(light).put(blend);
-            oldSideScalesAndLightBlendBuffer.put(particle.getOldHalfWidth()).put(particle.getOldHalfHeight()).put(light).put(blend);
+            oldSideScalesAndLightBlendBuffer.put(particle.getOldHalfWidth()).put(particle.getOldHalfHeight()).put(particle.getLightFactor()).put(particle.getBlendFactor());
+            oldSideScalesAndLightBlendBuffer.put(particle.getOldHalfWidth()).put(particle.getOldHalfHeight()).put(particle.getLightFactor()).put(particle.getBlendFactor());
+            oldSideScalesAndLightBlendBuffer.put(particle.getOldHalfWidth()).put(particle.getOldHalfHeight()).put(particle.getLightFactor()).put(particle.getBlendFactor());
+            oldSideScalesAndLightBlendBuffer.put(particle.getOldHalfWidth()).put(particle.getOldHalfHeight()).put(particle.getLightFactor()).put(particle.getBlendFactor());
 
             centerPositionBuffer.put(particle.getPositionX()).put(particle.getPositionY()).put(particle.getPositionZ());
             centerPositionBuffer.put(particle.getPositionX()).put(particle.getPositionY()).put(particle.getPositionZ());
@@ -117,15 +113,15 @@ public class ShaderParticleRenderer extends AbstractShaderRenderer {
             oldCenterPositionBuffer.put(particle.getOldPositionX()).put(particle.getOldPositionY()).put(particle.getOldPositionZ());
             oldCenterPositionBuffer.put(particle.getOldPositionX()).put(particle.getOldPositionY()).put(particle.getOldPositionZ());
 
-            normalVectorBuffer.put(particleNormalVector.getX()).put(particleNormalVector.getY()).put(particleNormalVector.getZ());
-            normalVectorBuffer.put(particleNormalVector.getX()).put(particleNormalVector.getY()).put(particleNormalVector.getZ());
-            normalVectorBuffer.put(particleNormalVector.getX()).put(particleNormalVector.getY()).put(particleNormalVector.getZ());
-            normalVectorBuffer.put(particleNormalVector.getX()).put(particleNormalVector.getY()).put(particleNormalVector.getZ());
+            normalVectorBuffer.put(particle.getNormalVectorX()).put(particle.getNormalVectorY()).put(particle.getNormalVectorZ());
+            normalVectorBuffer.put(particle.getNormalVectorX()).put(particle.getNormalVectorY()).put(particle.getNormalVectorZ());
+            normalVectorBuffer.put(particle.getNormalVectorX()).put(particle.getNormalVectorY()).put(particle.getNormalVectorZ());
+            normalVectorBuffer.put(particle.getNormalVectorX()).put(particle.getNormalVectorY()).put(particle.getNormalVectorZ());
 
-            oldNormalVectorBuffer.put(particleNormalVector.getX()).put(particleNormalVector.getY()).put(particleNormalVector.getZ());
-            oldNormalVectorBuffer.put(particleNormalVector.getX()).put(particleNormalVector.getY()).put(particleNormalVector.getZ());
-            oldNormalVectorBuffer.put(particleNormalVector.getX()).put(particleNormalVector.getY()).put(particleNormalVector.getZ());
-            oldNormalVectorBuffer.put(particleNormalVector.getX()).put(particleNormalVector.getY()).put(particleNormalVector.getZ());
+            oldNormalVectorBuffer.put(particle.getOldNormalVectorX()).put(particle.getOldNormalVectorY()).put(particle.getOldNormalVectorZ());
+            oldNormalVectorBuffer.put(particle.getOldNormalVectorX()).put(particle.getOldNormalVectorY()).put(particle.getOldNormalVectorZ());
+            oldNormalVectorBuffer.put(particle.getOldNormalVectorX()).put(particle.getOldNormalVectorY()).put(particle.getOldNormalVectorZ());
+            oldNormalVectorBuffer.put(particle.getOldNormalVectorX()).put(particle.getOldNormalVectorY()).put(particle.getOldNormalVectorZ());
 
             localAnglesBuffer.put(particle.getAngleX()).put(particle.getAngleY()).put(particle.getAngleZ());
             localAnglesBuffer.put(particle.getAngleX()).put(particle.getAngleY()).put(particle.getAngleZ());
