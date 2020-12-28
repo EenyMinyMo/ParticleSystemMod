@@ -42,7 +42,6 @@ public class SimpleParticleManager implements IParticleManager {
         }
 
         particleContainer.update();
-        particleRenderer.update(particleContainer.getParticleList());
 
         try {
             particleComparator.updateCameraPosition();
@@ -52,6 +51,8 @@ public class SimpleParticleManager implements IParticleManager {
             //вообще обрабатывать исключение мне кажется бесполезно, т.к. некоторые исключения просто сложно исправить (городить проверки и т.д.)
             //если исключени выпало, просто оставим список частиц без сортировки.
         }
+
+        particleRenderer.update(particleContainer.getParticleList());
     }
 
     @Override
