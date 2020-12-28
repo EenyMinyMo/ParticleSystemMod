@@ -6,10 +6,11 @@ layout (triangle_strip, max_vertices = 4) out;
 uniform vec3 cameraPosition;
 uniform mat4 projectionCameraMatrix;
 
-in vec4 particleColorFact[];
-in vec4 particleSScalesLightBlend[];
-in vec3 particleNormalVec[];
-in vec3 particleRotateAng[];
+in vec2 particleSideScales[];
+in vec3 particleNormalVector[];
+in vec3 particleRotateAngels[];
+in vec4 particleColorFactors[];
+in vec2 particleLightBlendFactors[];
 in vec4 texCoordAABB[];
 
 out vec4 colorFactor;
@@ -40,13 +41,6 @@ mat4 computeModelTranformMat(vec3 particleCenterPos, vec3 particleNormalVec, vec
         translatePosition.x,    translatePosition.y,    translatePosition.z,    1
     );
 
-//    mat4 modelTransformMat = mat4(
-//        1,                      0,                      0,                      0,
-//        0,                      1,                      0,                      0,
-//        0,                      0,                      1,                      0,
-//        translatePosition.x,    translatePosition.y,    translatePosition.z,    1
-//    );
-
     return modelTransformMat;
 }
 
@@ -70,15 +64,15 @@ mat4 computeRotateMat(vec3 rotateAngles) {
 
 void main() {
     vec3 pos = gl_in[0].gl_Position.xyz;
-    vec2 halfSideScales = vec2(particleSScalesLightBlend[0].xy) * 0.5;
+    vec2 halfSideScales = particleSideScales[0] * 0.5;
 
-    mat4 modelTransformMat = computeModelTranformMat(pos, particleNormalVec[0], cameraPosition);
-    mat4 rotateMat = computeRotateMat(particleRotateAng[0]);
+    mat4 modelTransformMat = computeModelTranformMat(pos, particleNormalVector[0], cameraPosition);
+    mat4 rotateMat = computeRotateMat(particleRotateAngels[0]);
     mat4 commonTransformMat = projectionCameraMatrix * modelTransformMat * rotateMat;
 
-    colorFactor = vec4(particleColorFact[0]);
-    light = particleSScalesLightBlend[0].z;
-    blend = particleSScalesLightBlend[0].w;
+    colorFactor = vec4(particleColorFactors[0]);
+    light = particleLightBlendFactors[0].x;
+    blend = particleLightBlendFactors[0].y;
 
     textureCoord = vec2(texCoordAABB[0].x, texCoordAABB[0].y);
     gl_Position = commonTransformMat * vec4(-halfSideScales.x, -halfSideScales.y, 0, 1);

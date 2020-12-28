@@ -3,14 +3,15 @@
 layout (location = 0) in vec2 position;                         //per vertex
 layout (location = 1) in vec3 centerPosition;                   //per primitive
 layout (location = 2) in vec3 oldCenterPosition;                //per primitive
-layout (location = 3) in vec4 sideScalesLightBlend;             //per primitive
-layout (location = 4) in vec4 oldSideScalesLightBlend;          //per primitive
+layout (location = 3) in vec2 sideScales;                       //per primitive
+layout (location = 4) in vec2 oldSideScales;                    //per primitive
 layout (location = 5) in vec3 normalVector;                     //per primitive
 layout (location = 6) in vec3 oldNormalVector;                  //per primitive
 layout (location = 7) in vec3 rotateAngles;                     //per primitive
 layout (location = 8) in vec3 oldRotateAngles;                  //per primitive
 layout (location = 9) in vec4 colorFactors;                     //per primitive
-layout (location = 10) in vec4 textureCoordAABB;                //per primitive
+layout (location = 10) in vec2 lightAndBlendFactors;            //per primitive
+layout (location = 11) in vec4 textureCoordAABB;                //per primitive
 
 
 uniform vec3 cameraPosition;
@@ -68,7 +69,7 @@ mat4 computeRotateMat(vec3 rotateAngles) {
 
 void main() {
     vec3 interpolatedCenterPosition = centerPosition + (centerPosition - oldCenterPosition) * interpolationFactor;
-    vec4 interpolatedSideScalesLightBlend = sideScalesLightBlend + (sideScalesLightBlend - oldSideScalesLightBlend) * interpolationFactor;
+    vec2 interpolatedSideScales = sideScales + (sideScales - oldSideScales) * interpolationFactor;
     vec3 interpolatedNormalVector = normalVector + (normalVector - oldNormalVector) * interpolationFactor;
     vec3 interpolatedRotateAngles = rotateAngles + (rotateAngles - oldRotateAngles) * interpolationFactor;
 
@@ -96,8 +97,8 @@ void main() {
     vec2 texCoordSideSizes = vec2(textureCoordAABB.zw - textureCoordAABB.xy);
     textureCoord = vec2(texCoordCenter.xy) + vec2(position.xy * texCoordSideSizes.xy);
     colorFactor = colorFactors;
-    light = interpolatedSideScalesLightBlend.z;
-    blend = interpolatedSideScalesLightBlend.w;
+    light = lightAndBlendFactors.x;
+    blend = lightAndBlendFactors.y;
 
-    gl_Position = commonTransformMat * vec4(position * interpolatedSideScalesLightBlend.xy, 0, 1);
+    gl_Position = commonTransformMat * vec4(position * interpolatedSideScales, 0, 1);
 }

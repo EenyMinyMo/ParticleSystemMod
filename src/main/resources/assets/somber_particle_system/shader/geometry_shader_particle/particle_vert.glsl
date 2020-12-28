@@ -2,31 +2,31 @@
 
 layout (location = 0) in vec3 centerPosition;
 layout (location = 1) in vec3 oldCenterPosition;
-layout (location = 2) in vec4 sideScalesLightBlend;
-layout (location = 3) in vec4 oldSideScalesLightBlend;
+layout (location = 2) in vec2 sideScales;
+layout (location = 3) in vec2 oldSideScales;
 layout (location = 4) in vec3 normalVector;
 layout (location = 5) in vec3 oldNormalVector;
 layout (location = 6) in vec3 rotateAngles;
 layout (location = 7) in vec3 oldRotateAngles;
-layout (location = 8) in vec4 colorFactor;
-layout (location = 9) in vec4 textureCoordAABB;
+layout (location = 8) in vec4 colorFactors;
+layout (location = 9) in vec2 lightAndBlendFactors;
+layout (location = 10) in vec4 textureCoordAABB;
 
-//uniform vec3 cameraPosition;
-//uniform mat4 cameraMatrix;
-//uniform mat4 projectionMatrix;
 uniform float interpolationFactor;
 
-out vec4 particleColorFact;
-out vec4 particleSScalesLightBlend;
-out vec3 particleNormalVec;
-out vec3 particleRotateAng;
+out vec2 particleSideScales;
+out vec3 particleNormalVector;
+out vec3 particleRotateAngels;
+out vec4 particleColorFactors;
+out vec2 particleLightBlendFactors;
 out vec4 texCoordAABB;
 
 void main() {
-    particleColorFact = colorFactor;
-    particleSScalesLightBlend = sideScalesLightBlend + (sideScalesLightBlend - oldSideScalesLightBlend) * interpolationFactor;
-    particleNormalVec = normalVector + (normalVector - oldNormalVector) * interpolationFactor;
-    particleRotateAng = rotateAngles + (rotateAngles - oldRotateAngles) * interpolationFactor;
+    particleSideScales = sideScales + (sideScales - oldSideScales) * interpolationFactor;
+    particleNormalVector = normalVector + (normalVector - oldNormalVector) * interpolationFactor;
+    particleRotateAngels = rotateAngles + (rotateAngles - oldRotateAngles) * interpolationFactor;
+    particleColorFactors = colorFactors;
+    particleLightBlendFactors = lightAndBlendFactors;
     /*
     texCoordAABB - текстурные координаты представлены в виде AABB:
     x - minU
