@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 public final class ParticleAPI {
-    private static ParticleAPI instance;
+    private static final  ParticleAPI instance = new ParticleAPI();
 
     private TreeMap<Integer, IParticleManager> particleManagerMap;
     private Set<IEmitterContainer> emitterContainerSet;
@@ -61,10 +61,6 @@ public final class ParticleAPI {
 
 
     public static ParticleAPI getInstance() {
-        if (instance == null) {
-            instance = new ParticleAPI();
-        }
-
         return instance;
     }
 
